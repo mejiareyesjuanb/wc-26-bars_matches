@@ -1,0 +1,28 @@
+import { useMemo } from 'react'
+import { BARS } from '../data/bars.js'
+import { rankBars } from '../lib/scoring.js'
+import { getTeam } from '../data/teams.js'
+import { formatKickoff } from '../lib/time.js'
+import BarCard from '../components/BarCard.jsx'
+
+export default function MatchDetail({ match, prefs, onBack }) {
+  const ranked = useMemo(() => rankBars(BARS, match, prefs), [match, prefs])
+  const home = getTeam(match.homeTeam)
+  const away = getTeam(match.awayTeam)
+
+  return (
+    <div className="max-w-3xl mx-auto p-6">
+      <button onClick={onBack} className="text-sm text-accent underline mb-4">← All matches</button>
+      <div className="bg-white rounded-xl border border-neutral-200 p-5 mb-6">
+        <div className="text-xs font-medium text-accent">{match.stage}{match.group ? ` · Group ${match.group}` : ''}</div>
+        <div className="text-xl font-bold mt-1">{home.flag} {home.name} vs {away.flag} {away.name}</div>
+        <div className="text-sm text-neutral-500 mt-1">{formatKickoff(match.datetime)} · {match.venueCity}</div>
+      </div>
+
+      <h2 className="font-semibold mb-3">Best Seattle venues for this match</h2>
+      <div className="grid gap-3">
+        {ranked.map((bar) => <BarCard key={bar.id} bar={bar} />)}
+      </div>
+    </div>
+  )
+}
