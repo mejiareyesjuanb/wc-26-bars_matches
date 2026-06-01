@@ -57,6 +57,39 @@ describe('scoreBar', () => {
   })
 })
 
+describe('stadium-proximity ambiance bonus', () => {
+  const emptyPrefs = { neighborhoods: [], venueTypes: [], wantsReservations: false, wantsBigScreen: false, atmosphere: null }
+  const seattleMatch = { id: 'S', stage: 'Group', homeTeam: 'USA', awayTeam: 'AUS', venueCity: 'Seattle' }
+  const awayMatch = { ...seattleMatch, venueCity: 'Los Angeles' }
+
+  it('boosts a near-stadium bar only when the match is played in Seattle', () => {
+    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
+    const inSeattle = scoreBar(pioneer, seattleMatch, emptyPrefs).score
+    const elsewhere = scoreBar(pioneer, awayMatch, emptyPrefs).score
+    expect(inSeattle).toBeGreaterThan(elsewhere)
+  })
+
+  it('caps the bonus at 10 points', () => {
+    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
+    const inSeattle = scoreBar(pioneer, seattleMatch, emptyPrefs).score
+    const elsewhere = scoreBar(pioneer, awayMatch, emptyPrefs).score
+    expect(inSeattle - elsewhere).toBeLessThanOrEqual(10)
+  })
+
+  it('gives no bonus to bars far from the stadium', () => {
+    const ballard = { ...baseBar, neighborhood: 'Ballard' }
+    const inSeattle = scoreBar(ballard, seattleMatch, emptyPrefs).score
+    const elsewhere = scoreBar(ballard, awayMatch, emptyPrefs).score
+    expect(inSeattle).toBe(elsewhere)
+  })
+
+  it('adds a "Near the stadium" reason chip for Seattle matches', () => {
+    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
+    const { reasons } = scoreBar(pioneer, seattleMatch, emptyPrefs)
+    expect(reasons).toContain('Near the stadium')
+  })
+})
+
 describe('rankBars', () => {
   it('sorts best-first and assigns rank starting at 1', () => {
     const bars = [

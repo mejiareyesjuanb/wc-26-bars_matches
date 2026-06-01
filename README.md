@@ -22,6 +22,21 @@ npm test         # run the unit tests
 3. **Match detail** — pick a match to get Seattle venues ranked #1 best-first,
    each with a score and "why ranked here" reason chips.
 
+This is the go-to app for a fan who wants to watch **any** World Cup match in
+Seattle (whether or not the game is played here) and doesn't know which bar to
+pick. All kickoff times are shown in **Pacific time** — what's on your clock in
+Seattle.
+
+## Data
+
+The full 104-match schedule is **real**: the actual 2026 group draw (Dec 5
+2025), dates, venues, and kickoff times, converted from the published UK times to
+Pacific (PT = UK − 8h). Group-stage matches show real teams; knockout matches
+show the real bracket slots (e.g. "Group G winner", "Winner M82") since those
+teams depend on results. Seattle hosts six matches at Lumen Field (four group,
+one Round of 32, one Round of 16). The Seattle venue list and fan-affinity tags
+are curated demo data.
+
 ## Ranking model
 
 Each venue is scored 0–100 per match as a weighted sum (`src/lib/scoring.js`):
@@ -36,6 +51,11 @@ Each venue is scored 0–100 per match as a weighted sum (`src/lib/scoring.js`):
 | Size fit (marquee stages favor larger venues) | 7 |
 | Reservations (if you want them) | 4 |
 | Atmosphere / amenities | 4 |
+
+Plus a complementary **stadium-proximity ambiance bonus** (up to +10, capped):
+only when the match is actually played in Seattle, bars near Lumen Field
+(Pioneer Square, Downtown, Georgetown…) earn a small boost for the matchday
+buzz. It nudges the ranking rather than driving it.
 
 ## Structure
 

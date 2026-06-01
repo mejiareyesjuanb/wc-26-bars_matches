@@ -50,12 +50,35 @@ function venueTypeScore(bar, prefs) {
 }
 
 const SIZE_RANK = { small: 0.34, medium: 0.67, large: 1 }
-const MARQUEE = new Set(['R16', 'QF', 'SF', 'Third Place', 'Final'])
+const MARQUEE = new Set(['Round of 16', 'Quarter-final', 'Semi-final', 'Third place', 'Final'])
 
 function sizeScore(bar, match) {
   const size = SIZE_RANK[bar.capacity] ?? 0.5
   // Marquee matches favor bigger venues; group matches are size-neutral-ish.
   return MARQUEE.has(match.stage) ? size : 0.4 + 0.6 * size
+}
+
+// Complementary ambiance bonus (max +10), applied ONLY when the match is
+// actually played in Seattle: bars near Lumen Field ride the matchday buzz.
+// This is intentionally NOT a primary factor — it sits on top of the 100-point
+// base and is capped low so it nudges rather than dominates the ranking.
+export const STADIUM_BONUS_MAX = 10
+const STADIUM_PROXIMITY = {
+  'Pioneer Square': 1.0, // adjacent to the stadium
+  Downtown: 0.7,
+  Georgetown: 0.5,
+  Belltown: 0.45,
+  'South Lake Union': 0.3,
+  'Capitol Hill': 0.25,
+}
+
+function isSeattleMatch(match) {
+  return match.venueCity === 'Seattle'
+}
+
+function stadiumBonus(bar, match) {
+  if (!isSeattleMatch(match)) return 0
+  return (STADIUM_PROXIMITY[bar.neighborhood] ?? 0) * STADIUM_BONUS_MAX
 }
 
 function reservationsScore(bar, prefs) {
@@ -82,15 +105,18 @@ export function scoreBar(bar, match, prefs) {
   }
   let total = 0
   for (const k of Object.keys(WEIGHTS)) total += parts[k] * WEIGHTS[k]
-  const score = Math.round(total)
 
-  const reasons = buildReasons(bar, match, prefs, parts)
+  const bonus = stadiumBonus(bar, match)
+  const score = Math.round(Math.min(100, total + bonus))
+
+  const reasons = buildReasons(bar, match, prefs, parts, bonus)
   return { score, reasons }
 }
 
-function buildReasons(bar, match, prefs, parts) {
+function buildReasons(bar, match, prefs, parts, bonus = 0) {
   const r = []
   if (parts.neighborhood > 0) r.push(`In ${bar.neighborhood}`)
+  if (bonus > 0) r.push('Near the stadium')
   const aff = bar.fanAffinity || []
   if (aff.includes(match.homeTeam) || aff.includes(match.awayTeam)) {
     const team = aff.includes(match.homeTeam) ? match.homeTeam : match.awayTeam

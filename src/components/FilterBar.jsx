@@ -5,7 +5,9 @@ const TIMES = ['morning', 'afternoon', 'evening']
 
 export default function FilterBar({ filters, setFilters, dates }) {
   const update = (patch) => setFilters({ ...filters, ...patch })
-  const teamCodes = Object.keys(TEAMS)
+  const teamCodes = Object.keys(TEAMS).sort((a, b) =>
+    TEAMS[a].name.localeCompare(TEAMS[b].name),
+  )
   const hasFilters = Object.values(filters).some(Boolean)
   return (
     <div className="mb-6">

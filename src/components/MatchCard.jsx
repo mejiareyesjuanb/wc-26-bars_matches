@@ -15,10 +15,10 @@ export default function MatchCard({ match, onClick }) {
         </span>
         <span className="text-xs text-neutral-500">{match.venueCity}</span>
       </div>
-      <div className="flex items-center gap-2 text-lg font-semibold">
-        <span>{home.flag} {home.name}</span>
+      <div className="flex items-center gap-2 text-base sm:text-lg font-semibold">
+        <span>{home.flag ? `${home.flag} ` : ''}{home.name}</span>
         <span className="text-neutral-400 text-sm">vs</span>
-        <span>{away.flag} {away.name}</span>
+        <span>{away.flag ? `${away.flag} ` : ''}{away.name}</span>
       </div>
       <div className="mt-2 text-sm text-neutral-500">{formatKickoff(match.datetime)}</div>
     </button>
