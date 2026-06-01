@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { loadPrefs, savePrefs } from './lib/storage.js'
+import { loadVenues } from './lib/venues.js'
 import Onboarding from './views/Onboarding.jsx'
 import Matches from './views/Matches.jsx'
 import MatchDetail from './views/MatchDetail.jsx'
@@ -8,6 +9,11 @@ export default function App() {
   const [prefs, setPrefs] = useState(loadPrefs)
   const [view, setView] = useState(prefs.onboarded ? 'matches' : 'onboarding')
   const [selected, setSelected] = useState(null)
+  const [venueData, setVenueData] = useState(null)
+
+  useEffect(() => {
+    loadVenues().then(setVenueData)
+  }, [])
 
   const handleSave = (p) => {
     setPrefs(p)
@@ -29,7 +35,13 @@ export default function App() {
         />
       )}
       {view === 'detail' && selected && (
-        <MatchDetail match={selected} prefs={prefs} onBack={() => setView('matches')} />
+        <MatchDetail
+          match={selected}
+          prefs={prefs}
+          venues={venueData?.venues}
+          source={venueData?.source}
+          onBack={() => setView('matches')}
+        />
       )}
     </div>
   )

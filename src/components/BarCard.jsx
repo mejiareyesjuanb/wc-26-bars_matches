@@ -18,6 +18,9 @@ export default function BarCard({ bar }) {
           {bar.reasons.map((r, i) => (
             <span key={i} className="text-xs bg-neutral-100 text-neutral-700 rounded-full px-2 py-0.5">{r}</span>
           ))}
+          {bar.unconfirmedSignals && (
+            <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">Screens unconfirmed</span>
+          )}
         </div>
       </div>
     </div>

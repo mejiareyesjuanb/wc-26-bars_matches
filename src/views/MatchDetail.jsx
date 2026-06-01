@@ -1,12 +1,14 @@
 import { useMemo } from 'react'
-import { BARS } from '../data/bars.js'
 import { rankBars } from '../lib/scoring.js'
 import { getTeam } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
 import BarCard from '../components/BarCard.jsx'
 
-export default function MatchDetail({ match, prefs, onBack }) {
-  const ranked = useMemo(() => rankBars(BARS, match, prefs), [match, prefs])
+export default function MatchDetail({ match, prefs, venues, source, onBack }) {
+  const ranked = useMemo(
+    () => (venues ? rankBars(venues, match, prefs) : []),
+    [venues, match, prefs],
+  )
   const home = getTeam(match.homeTeam)
   const away = getTeam(match.awayTeam)
 
@@ -24,10 +26,22 @@ export default function MatchDetail({ match, prefs, onBack }) {
         )}
       </div>
 
-      <h2 className="font-semibold mb-3">Best Seattle venues for this match</h2>
-      <div className="grid gap-3">
-        {ranked.map((bar) => <BarCard key={bar.id} bar={bar} />)}
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="font-semibold">Best Seattle venues for this match</h2>
+        {venues && (
+          <span className="text-xs text-neutral-400">
+            {source === 'google' ? 'Live · Google' : 'Curated list'}
+          </span>
+        )}
       </div>
+
+      {!venues ? (
+        <p className="text-center text-neutral-400 py-12">Finding venues…</p>
+      ) : (
+        <div className="grid gap-3">
+          {ranked.map((bar) => <BarCard key={bar.id} bar={bar} />)}
+        </div>
+      )}
     </div>
   )
 }
