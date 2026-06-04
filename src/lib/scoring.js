@@ -15,11 +15,12 @@ export function reviewsScore(bar) {
   return quality * (0.6 + 0.4 * confidence)
 }
 
-// `bar.type` is the category from the Places primaryType (source of truth).
-// Fallback: "sports bar" in the NAME makes it very likely a sports bar even when
-// Google's primaryType says otherwise (e.g. "Slim Goody Sports Bar").
+// A venue counts as a sports bar if Google returns it for a "sports bars in
+// {neighborhood}" search (googleSportsBar), if its primaryType is sports_bar
+// (bar.type), or if its name says so — covering sports bars that Google types
+// as a generic bar/pub/grill (Old County Bar, Bad Albert's, 4Bs Tavern, …).
 export function isSportsBar(bar) {
-  return bar.type === 'sports bar' || /sports\s*bar/i.test(bar.name || '')
+  return bar.googleSportsBar === true || bar.type === 'sports bar' || /sports\s*bar/i.test(bar.name || '')
 }
 
 export function isConfirmedWorldCup(bar, check) {

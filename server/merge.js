@@ -59,6 +59,7 @@ export function mergeVenue(place, neighborhood, signals = {}) {
     neighborhood,
     type,
     primaryType: place.primaryType || null,
+    googleSportsBar: !!place.sportsBarMatch, // appeared in a "sports bars in …" query
     lat: place.lat,
     lng: place.lng,
     website: place.website,

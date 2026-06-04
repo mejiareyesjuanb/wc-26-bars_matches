@@ -16,6 +16,11 @@ describe('isSportsBar (category is source of truth, name is a fallback)', () => 
   it('"sports bar" in the name is, even when miscategorized', () => {
     expect(isSportsBar(venue({ type: 'restaurant', name: 'Slim Goody Sports Bar' }))).toBe(true)
   })
+  it('a generic bar Google lists under "sports bars in …" counts (googleSportsBar)', () => {
+    // e.g. Bad Albert's Tap & Grill — primaryType "bar", but in the sports-bar query
+    expect(isSportsBar(venue({ type: 'bar', name: "Bad Albert's Tap & Grill", googleSportsBar: true }))).toBe(true)
+    expect(isSportsBar(venue({ type: 'bar', name: 'Some Cocktail Lounge' }))).toBe(false)
+  })
 })
 
 describe('isConfirmedWorldCup', () => {

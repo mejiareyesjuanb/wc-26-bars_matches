@@ -19,11 +19,12 @@ const SEATTLE = { latitude: 47.6062, longitude: -122.3321 }
 // sports_bar.
 const BAR_TYPES = ['sports_bar', 'pub', 'bar', 'brewery', 'bar_and_grill']
 
+const NEIGHBORHOODS = Object.keys(NEIGHBORHOOD_CENTROIDS)
+
 // Supplemental text queries for prominence + explicit viewing-experience spots.
 const TEXT_QUERIES = [
   'World Cup viewing party bars Seattle',
   'restaurants showing soccer matches Seattle',
-  'sports bars in Seattle',
 ]
 
 const FIELD_MASK = [
@@ -68,12 +69,15 @@ async function googlePlaces(endpoint, body, apiKey) {
   return (data.places || []).map(normalizePlace)
 }
 
-function searchText(query, apiKey) {
-  return googlePlaces('searchText', {
+async function searchText(query, apiKey, { sportsBar = false } = {}) {
+  const places = await googlePlaces('searchText', {
     textQuery: query,
     locationBias: { circle: { center: SEATTLE, radius: 14000 } },
     maxResultCount: 20,
   }, apiKey)
+  // Tag venues that Google itself returns for a "sports bars in …" query, even
+  // when their primaryType is a generic bar/pub/grill.
+  return sportsBar ? places.map((p) => ({ ...p, sportsBarMatch: true })) : places
 }
 
 function searchNearby(center, radius, apiKey) {
@@ -87,11 +91,18 @@ function searchNearby(center, radius, apiKey) {
   }, apiKey)
 }
 
-// Dedupe a list of normalized places by id (pure — unit tested).
+// Dedupe a list of normalized places by id (pure — unit tested). Merges the
+// sportsBarMatch flag so a venue keeps it if ANY source query flagged it.
 export function dedupeById(places) {
   const byId = new Map()
   for (const p of places) {
-    if (p.id && !byId.has(p.id)) byId.set(p.id, p)
+    if (!p.id) continue
+    const existing = byId.get(p.id)
+    if (existing) {
+      if (p.sportsBarMatch) existing.sportsBarMatch = true
+    } else {
+      byId.set(p.id, { ...p })
+    }
   }
   return [...byId.values()]
 }
@@ -102,6 +113,14 @@ export async function fetchSeattleVenues(apiKey) {
     ...Object.values(NEIGHBORHOOD_CENTROIDS).map((c) =>
       searchNearby(c, 2000, apiKey).catch((e) => {
         console.error('[places] nearby failed:', e.message)
+        return []
+      }),
+    ),
+    // Google's own "sports bars in {neighborhood}" answer — catches sports bars
+    // typed as generic bar/pub/grill, and improves per-neighborhood coverage.
+    ...NEIGHBORHOODS.map((n) =>
+      searchText(`sports bars in ${n} Seattle`, apiKey, { sportsBar: true }).catch((e) => {
+        console.error('[places] sports-bar query failed:', n, '-', e.message)
         return []
       }),
     ),
