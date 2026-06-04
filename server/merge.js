@@ -51,9 +51,14 @@ export function mergeVenue(place, neighborhood, signals = {}) {
   const s = sig || defaultSignals(type)
   return {
     id: place.id,
+    placeId: place.id,
     name: place.name,
     neighborhood,
     type,
+    lat: place.lat,
+    lng: place.lng,
+    website: place.website,
+    googleMapsUri: place.googleMapsUri,
     rating: typeof place.rating === 'number' ? place.rating : 0,
     reviewCount: place.userRatingCount || 0,
     priceLevel: normalizePrice(place.priceLevel),

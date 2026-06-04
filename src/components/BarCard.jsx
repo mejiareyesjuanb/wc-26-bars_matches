@@ -1,7 +1,12 @@
-export default function BarCard({ bar }) {
+import { mapsUrl } from '../lib/venues.js'
+
+export default function BarCard({ bar, check, onClick }) {
   const top3 = bar.rank <= 3
   return (
-    <div className={`bg-white rounded-xl border p-4 flex gap-4 ${top3 ? 'border-accent shadow-sm' : 'border-neutral-200'}`}>
+    <div
+      onClick={onClick}
+      className={`bg-white rounded-xl border p-4 flex gap-4 cursor-pointer hover:shadow-md transition ${top3 ? 'border-accent shadow-sm' : 'border-neutral-200'}`}
+    >
       <div className={`shrink-0 w-10 h-10 rounded-full grid place-items-center font-bold ${top3 ? 'bg-accent text-white' : 'bg-neutral-100 text-neutral-600'}`}>
         {bar.rank}
       </div>
@@ -18,9 +23,26 @@ export default function BarCard({ bar }) {
           {bar.reasons.map((r, i) => (
             <span key={i} className="text-xs bg-neutral-100 text-neutral-700 rounded-full px-2 py-0.5">{r}</span>
           ))}
-          {bar.unconfirmedSignals && (
+          {check?.worldCup && (
+            <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">📺 Showing the World Cup</span>
+          )}
+          {check && !check.worldCup && check.screens && (
+            <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">✓ Screens confirmed</span>
+          )}
+          {bar.unconfirmedSignals && !check?.screens && !check?.worldCup && (
             <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">Screens unconfirmed</span>
           )}
+        </div>
+        <div className="mt-2">
+          <a
+            href={mapsUrl(bar)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-xs text-accent hover:underline"
+          >
+            Open in Google Maps ↗
+          </a>
         </div>
       </div>
     </div>

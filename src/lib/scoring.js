@@ -110,7 +110,40 @@ export function scoreBar(bar, match, prefs) {
   const score = Math.round(Math.min(100, total + bonus))
 
   const reasons = buildReasons(bar, match, prefs, parts, bonus)
-  return { score, reasons }
+  const breakdown = buildBreakdown(parts, bonus)
+  return { score, reasons, breakdown }
+}
+
+export const FACTOR_LABELS = {
+  neighborhood: 'Your neighborhoods',
+  viewing: 'Match viewing setup',
+  reviews: 'Ratings & reviews',
+  fanAffinity: 'Fan affinity (this match)',
+  venueType: 'Venue-type match',
+  size: 'Right size for the stage',
+  reservations: 'Reservations',
+  atmosphere: 'Atmosphere',
+}
+
+// Per-dimension contribution, for the "how it ranks" modal.
+function buildBreakdown(parts, bonus) {
+  const rows = Object.keys(WEIGHTS).map((k) => ({
+    key: k,
+    label: FACTOR_LABELS[k],
+    weight: WEIGHTS[k],
+    sub: parts[k],
+    points: Math.round(parts[k] * WEIGHTS[k]),
+  }))
+  if (bonus > 0) {
+    rows.push({
+      key: 'stadium',
+      label: 'Near Lumen Field (played in Seattle)',
+      weight: STADIUM_BONUS_MAX,
+      sub: bonus / STADIUM_BONUS_MAX,
+      points: Math.round(bonus),
+    })
+  }
+  return rows
 }
 
 function buildReasons(bar, match, prefs, parts, bonus = 0) {
@@ -134,8 +167,8 @@ function buildReasons(bar, match, prefs, parts, bonus = 0) {
 export function rankBars(bars, match, prefs) {
   return bars
     .map((bar) => {
-      const { score, reasons } = scoreBar(bar, match, prefs)
-      return { ...bar, score, reasons }
+      const { score, reasons, breakdown } = scoreBar(bar, match, prefs)
+      return { ...bar, score, reasons, breakdown }
     })
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score

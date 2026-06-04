@@ -40,6 +40,7 @@ export default function App() {
           prefs={prefs}
           venues={venueData?.venues}
           source={venueData?.source}
+          reason={venueData?.reason}
           onBack={() => setView('matches')}
         />
       )}

@@ -57,6 +57,29 @@ describe('scoreBar', () => {
   })
 })
 
+describe('scoreBar breakdown', () => {
+  it('returns a per-dimension breakdown that roughly sums to the score', () => {
+    const { score, breakdown } = scoreBar(baseBar, match, prefs)
+    expect(breakdown.length).toBeGreaterThanOrEqual(8)
+    for (const row of breakdown) {
+      expect(row).toHaveProperty('label')
+      expect(row).toHaveProperty('weight')
+      expect(row).toHaveProperty('points')
+      expect(row.sub).toBeGreaterThanOrEqual(0)
+      expect(row.sub).toBeLessThanOrEqual(1)
+    }
+    const sum = breakdown.reduce((a, r) => a + r.points, 0)
+    expect(Math.abs(sum - score)).toBeLessThanOrEqual(8) // rounding slack
+  })
+
+  it('adds a stadium row for Seattle matches', () => {
+    const seattle = { ...match, venueCity: 'Seattle' }
+    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
+    const { breakdown } = scoreBar(pioneer, seattle, prefs)
+    expect(breakdown.some((r) => r.key === 'stadium')).toBe(true)
+  })
+})
+
 describe('stadium-proximity ambiance bonus', () => {
   const emptyPrefs = { neighborhoods: [], venueTypes: [], wantsReservations: false, wantsBigScreen: false, atmosphere: null }
   const seattleMatch = { id: 'S', stage: 'Group', homeTeam: 'USA', awayTeam: 'AUS', venueCity: 'Seattle' }
@@ -100,6 +123,12 @@ describe('rankBars', () => {
     expect(ranked[0].id).toBe('high')
     expect(ranked[0].rank).toBe(1)
     expect(ranked[1].rank).toBe(2)
+  })
+
+  it('carries the per-dimension breakdown through to ranked results', () => {
+    const ranked = rankBars([baseBar], match, prefs)
+    expect(Array.isArray(ranked[0].breakdown)).toBe(true)
+    expect(ranked[0].breakdown.length).toBeGreaterThanOrEqual(8)
   })
 
   it('breaks ties by rating then reviewCount', () => {

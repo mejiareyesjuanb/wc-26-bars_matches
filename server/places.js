@@ -16,7 +16,7 @@ const FIELD_MASK = [
   'places.id', 'places.displayName', 'places.formattedAddress', 'places.location',
   'places.rating', 'places.userRatingCount', 'places.priceLevel', 'places.types',
   'places.primaryType', 'places.reservable', 'places.editorialSummary',
-  'places.businessStatus',
+  'places.businessStatus', 'places.websiteUri', 'places.googleMapsUri',
 ].join(',')
 
 function normalizePlace(p) {
@@ -34,6 +34,8 @@ function normalizePlace(p) {
     reservable: p.reservable,
     blurb: p.editorialSummary?.text,
     businessStatus: p.businessStatus,
+    website: p.websiteUri,
+    googleMapsUri: p.googleMapsUri,
   }
 }
 
