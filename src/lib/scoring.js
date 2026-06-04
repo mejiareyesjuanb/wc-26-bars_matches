@@ -1,12 +1,17 @@
+// Simplified ranking model. Four factors only — World Cup viewing is the
+// dominant signal, especially when a venue's own website confirms it.
 export const WEIGHTS = {
-  neighborhood: 25,
-  viewing: 20,
-  reviews: 15,
-  fanAffinity: 15,
-  venueType: 10,
-  size: 7,
-  reservations: 4,
-  atmosphere: 4,
+  worldCup: 40, // showing the World Cup (website-confirmed counts most)
+  screens: 25, // has screens / projector
+  neighborhood: 20, // in one of the user's preferred neighborhoods
+  reviews: 15, // good ratings
+}
+
+export const FACTOR_LABELS = {
+  worldCup: 'Showing the World Cup',
+  screens: 'Screens / projector',
+  neighborhood: 'Your neighborhoods',
+  reviews: 'Ratings & reviews',
 }
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x))
@@ -19,13 +24,21 @@ function neighborhoodScore(bar, prefs) {
   return 1 - idx * 0.12 // #1 -> 1.0, #5 -> 0.52
 }
 
-function viewingScore(bar) {
+// `check` is the optional website confirmation { screens, worldCup } for a venue.
+function screensScore(bar, check) {
   let s = 0
-  if (bar.confirmedViewing) s += 0.45
-  if (bar.bigScreenOrProjector) s += 0.2
-  if (bar.soundOnForMatches) s += 0.15
-  s += clamp01(bar.screens / 12) * 0.2 // screens contribution, saturating at 12
+  if (bar.confirmedViewing || check?.screens === true) s += 0.4
+  if (bar.bigScreenOrProjector) s += 0.3
+  s += clamp01((bar.screens || 0) / 10) * 0.3 // saturates at 10 screens
   return clamp01(s)
+}
+
+// World Cup viewing — website confirmation is the strongest evidence.
+function worldCupScore(bar, check) {
+  if (check?.worldCup === true) return 1 // confirmed on their website
+  if (bar.confirmedViewing) return 0.6 // known to show matches (curated)
+  if (check?.screens === true) return 0.35 // has sports screens (likely)
+  return 0.1 // unknown
 }
 
 function reviewsScore(bar) {
@@ -34,37 +47,11 @@ function reviewsScore(bar) {
   return quality * (0.6 + 0.4 * confidence)
 }
 
-function fanAffinityScore(bar, match) {
-  const aff = bar.fanAffinity || []
-  const hitHome = aff.includes(match.homeTeam)
-  const hitAway = aff.includes(match.awayTeam)
-  if (hitHome && hitAway) return 1
-  if (hitHome || hitAway) return 0.75
-  return 0
-}
-
-function venueTypeScore(bar, prefs) {
-  const types = prefs.venueTypes || []
-  if (types.length === 0) return 0.5 // neutral when user has no preference
-  return types.includes(bar.type) ? 1 : 0
-}
-
-const SIZE_RANK = { small: 0.34, medium: 0.67, large: 1 }
-const MARQUEE = new Set(['Round of 16', 'Quarter-final', 'Semi-final', 'Third place', 'Final'])
-
-function sizeScore(bar, match) {
-  const size = SIZE_RANK[bar.capacity] ?? 0.5
-  // Marquee matches favor bigger venues; group matches are size-neutral-ish.
-  return MARQUEE.has(match.stage) ? size : 0.4 + 0.6 * size
-}
-
-// Complementary ambiance bonus (max +10), applied ONLY when the match is
-// actually played in Seattle: bars near Lumen Field ride the matchday buzz.
-// This is intentionally NOT a primary factor — it sits on top of the 100-point
-// base and is capped low so it nudges rather than dominates the ranking.
+// Complementary ambiance bonus (max +10), only when the match is actually played
+// in Seattle: bars near Lumen Field ride the matchday buzz. Not a primary factor.
 export const STADIUM_BONUS_MAX = 10
 const STADIUM_PROXIMITY = {
-  'Pioneer Square': 1.0, // adjacent to the stadium
+  'Pioneer Square': 1.0,
   Downtown: 0.7,
   Georgetown: 0.5,
   Belltown: 0.45,
@@ -72,36 +59,17 @@ const STADIUM_PROXIMITY = {
   'Capitol Hill': 0.25,
 }
 
-function isSeattleMatch(match) {
-  return match.venueCity === 'Seattle'
-}
-
 function stadiumBonus(bar, match) {
-  if (!isSeattleMatch(match)) return 0
+  if (match.venueCity !== 'Seattle') return 0
   return (STADIUM_PROXIMITY[bar.neighborhood] ?? 0) * STADIUM_BONUS_MAX
 }
 
-function reservationsScore(bar, prefs) {
-  if (!prefs.wantsReservations) return 0.5 // neutral when not requested
-  return bar.takesReservations ? 1 : 0
-}
-
-function atmosphereScore(bar, prefs) {
-  if (!prefs.atmosphere) return 0.5
-  const tags = bar.atmosphereTags || []
-  return tags.includes(prefs.atmosphere) ? 1 : 0.2
-}
-
-export function scoreBar(bar, match, prefs) {
+export function scoreBar(bar, match, prefs, check) {
   const parts = {
+    worldCup: worldCupScore(bar, check),
+    screens: screensScore(bar, check),
     neighborhood: neighborhoodScore(bar, prefs),
-    viewing: viewingScore(bar),
     reviews: reviewsScore(bar),
-    fanAffinity: fanAffinityScore(bar, match),
-    venueType: venueTypeScore(bar, prefs),
-    size: sizeScore(bar, match),
-    reservations: reservationsScore(bar, prefs),
-    atmosphere: atmosphereScore(bar, prefs),
   }
   let total = 0
   for (const k of Object.keys(WEIGHTS)) total += parts[k] * WEIGHTS[k]
@@ -109,20 +77,23 @@ export function scoreBar(bar, match, prefs) {
   const bonus = stadiumBonus(bar, match)
   const score = Math.round(Math.min(100, total + bonus))
 
-  const reasons = buildReasons(bar, match, prefs, parts, bonus)
-  const breakdown = buildBreakdown(parts, bonus)
-  return { score, reasons, breakdown }
+  return {
+    score,
+    reasons: buildReasons(bar, match, prefs, parts, bonus, check),
+    breakdown: buildBreakdown(parts, bonus),
+  }
 }
 
-export const FACTOR_LABELS = {
-  neighborhood: 'Your neighborhoods',
-  viewing: 'Match viewing setup',
-  reviews: 'Ratings & reviews',
-  fanAffinity: 'Fan affinity (this match)',
-  venueType: 'Venue-type match',
-  size: 'Right size for the stage',
-  reservations: 'Reservations',
-  atmosphere: 'Atmosphere',
+function buildReasons(bar, match, prefs, parts, bonus, check) {
+  const r = []
+  if (check?.worldCup === true) r.push('Confirmed: showing the World Cup')
+  else if (bar.confirmedViewing) r.push('Shows matches')
+  if (parts.neighborhood > 0) r.push(`In ${bar.neighborhood}`)
+  if (bonus > 0) r.push('Near the stadium')
+  if (bar.screens >= 6) r.push(`${bar.screens} screens`)
+  else if (bar.bigScreenOrProjector || check?.screens === true) r.push('Big screen/projector')
+  if (bar.rating >= 4.5) r.push(`${bar.rating.toFixed(1)}★`)
+  return r
 }
 
 // Per-dimension contribution, for the "how it ranks" modal.
@@ -146,28 +117,10 @@ function buildBreakdown(parts, bonus) {
   return rows
 }
 
-function buildReasons(bar, match, prefs, parts, bonus = 0) {
-  const r = []
-  if (parts.neighborhood > 0) r.push(`In ${bar.neighborhood}`)
-  if (bonus > 0) r.push('Near the stadium')
-  const aff = bar.fanAffinity || []
-  if (aff.includes(match.homeTeam) || aff.includes(match.awayTeam)) {
-    const team = aff.includes(match.homeTeam) ? match.homeTeam : match.awayTeam
-    r.push(`Draws ${team} fans`)
-  }
-  if (bar.confirmedViewing) r.push('Confirmed viewing')
-  if (bar.screens >= 6) r.push(`${bar.screens} screens`)
-  else if (bar.bigScreenOrProjector) r.push('Big screen/projector')
-  if (bar.rating >= 4.5) r.push(`${bar.rating.toFixed(1)}★`)
-  if (prefs.wantsReservations && bar.takesReservations) r.push('Takes reservations')
-  if (prefs.venueTypes?.includes(bar.type)) r.push(bar.type)
-  return r
-}
-
-export function rankBars(bars, match, prefs) {
+export function rankBars(bars, match, prefs, checks = {}) {
   return bars
     .map((bar) => {
-      const { score, reasons, breakdown } = scoreBar(bar, match, prefs)
+      const { score, reasons, breakdown } = scoreBar(bar, match, prefs, checks[bar.id])
       return { ...bar, score, reasons, breakdown }
     })
     .sort((a, b) => {

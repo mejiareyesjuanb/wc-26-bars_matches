@@ -8,6 +8,7 @@ import VenueMap from '../components/VenueMap.jsx'
 import VenueModal from '../components/VenueModal.jsx'
 
 const PAGE = 10
+const ENRICH = 30 // confirm websites for this many top candidates (feeds ranking)
 
 export default function MatchDetail({ match, prefs, venues, source, reason, onBack }) {
   const [visible, setVisible] = useState(PAGE)
@@ -15,9 +16,16 @@ export default function MatchDetail({ match, prefs, venues, source, reason, onBa
   const [selected, setSelected] = useState(null)
   const [checks, setChecks] = useState({})
 
-  const ranked = useMemo(
+  // Base ranking (no website checks) decides which venues are worth checking.
+  const baseRanked = useMemo(
     () => (venues ? rankBars(venues, match, prefs) : []),
     [venues, match, prefs],
+  )
+  // Final ranking folds in website confirmations (World Cup viewing / screens),
+  // so a confirmed venue can climb above unconfirmed peers.
+  const ranked = useMemo(
+    () => (venues ? rankBars(venues, match, prefs, checks) : []),
+    [venues, match, prefs, checks],
   )
 
   // Reset paging when the match changes.
@@ -25,9 +33,16 @@ export default function MatchDetail({ match, prefs, venues, source, reason, onBa
 
   const shown = ranked.slice(0, visible)
 
-  // Confirm screens / World Cup viewing for the venues currently shown.
+  // Confirm websites for the top candidates (to inform ranking) plus anything
+  // currently shown (for badges) — whichever we haven't checked yet.
   useEffect(() => {
-    const need = shown.filter((v) => v.website && checks[v.id] === undefined)
+    const pool = [...baseRanked.slice(0, ENRICH), ...shown]
+    const seen = new Set()
+    const need = pool.filter((v) => {
+      if (!v.website || checks[v.id] !== undefined || seen.has(v.id)) return false
+      seen.add(v.id)
+      return true
+    })
     if (!need.length) return
     let cancelled = false
     confirmScreens(need).then((res) => {
@@ -35,7 +50,7 @@ export default function MatchDetail({ match, prefs, venues, source, reason, onBa
     })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shown.map((v) => v.id).join(',')])
+  }, [baseRanked.slice(0, ENRICH).map((v) => v.id).join(','), shown.map((v) => v.id).join(',')])
 
   const home = getTeam(match.homeTeam)
   const away = getTeam(match.awayTeam)

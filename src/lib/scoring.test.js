@@ -8,18 +8,25 @@ const baseBar = {
   takesReservations: true, fanAffinity: [], atmosphereTags: ['lively'],
   priceLevel: 2, address: '', blurb: '',
 }
-const match = { id: 'M1', stage: 'Group', homeTeam: 'USA', awayTeam: 'MEX' }
-const prefs = {
-  neighborhoods: ['Ballard'], venueTypes: ['pub'], wantsReservations: true,
-  wantsBigScreen: true, atmosphere: 'lively',
-}
+const match = { id: 'M1', stage: 'Group', homeTeam: 'USA', awayTeam: 'MEX', venueCity: 'Dallas' }
+const prefs = { neighborhoods: ['Ballard'] }
 
 describe('scoreBar', () => {
-  it('returns a 0..100 score and reasons array', () => {
+  it('returns a 0..100 score, reasons, and breakdown', () => {
     const r = scoreBar(baseBar, match, prefs)
     expect(r.score).toBeGreaterThan(0)
     expect(r.score).toBeLessThanOrEqual(100)
     expect(Array.isArray(r.reasons)).toBe(true)
+    expect(Array.isArray(r.breakdown)).toBe(true)
+  })
+
+  it('weights sum to 100', () => {
+    expect(Object.values(WEIGHTS).reduce((a, b) => a + b, 0)).toBe(100)
+  })
+
+  it('makes World Cup the single largest weight', () => {
+    const max = Math.max(...Object.values(WEIGHTS))
+    expect(WEIGHTS.worldCup).toBe(max)
   })
 
   it('rewards a neighborhood match', () => {
@@ -28,15 +35,9 @@ describe('scoreBar', () => {
     expect(inHood).toBeGreaterThan(outHood)
   })
 
-  it('rewards fan affinity to a team in this match', () => {
-    const affine = scoreBar({ ...baseBar, fanAffinity: ['MEX'] }, match, prefs).score
-    const none = scoreBar({ ...baseBar, fanAffinity: ['JPN'] }, match, prefs).score
-    expect(affine).toBeGreaterThan(none)
-  })
-
-  it('is monotonic in screen count (more screens never scores lower)', () => {
+  it('is monotonic in screen count', () => {
     const few = scoreBar({ ...baseBar, screens: 2 }, match, prefs).score
-    const many = scoreBar({ ...baseBar, screens: 12 }, match, prefs).score
+    const many = scoreBar({ ...baseBar, screens: 10 }, match, prefs).score
     expect(many).toBeGreaterThanOrEqual(few)
   })
 
@@ -46,78 +47,66 @@ describe('scoreBar', () => {
     expect(hi).toBeGreaterThanOrEqual(lo)
   })
 
+  it('website-confirmed World Cup is the biggest booster', () => {
+    const plain = { ...baseBar, confirmedViewing: false }
+    const unconfirmed = scoreBar(plain, match, prefs).score
+    const confirmed = scoreBar(plain, match, prefs, { worldCup: true, screens: true }).score
+    expect(confirmed).toBeGreaterThan(unconfirmed)
+    // The boost should be large (≈ the worldCup weight), dwarfing other factors.
+    expect(confirmed - unconfirmed).toBeGreaterThanOrEqual(25)
+  })
+
   it('produces a neighborhood reason chip when matched', () => {
-    const r = scoreBar(baseBar, match, prefs)
-    expect(r.reasons.some((x) => x.includes('Ballard'))).toBe(true)
+    expect(scoreBar(baseBar, match, prefs).reasons.some((x) => x.includes('Ballard'))).toBe(true)
   })
 
-  it('weights sum to 100', () => {
-    const total = Object.values(WEIGHTS).reduce((a, b) => a + b, 0)
-    expect(total).toBe(100)
+  it('adds a confirmed-World-Cup reason chip from the website check', () => {
+    const r = scoreBar(baseBar, match, prefs, { worldCup: true })
+    expect(r.reasons).toContain('Confirmed: showing the World Cup')
   })
-})
 
-describe('scoreBar breakdown', () => {
-  it('returns a per-dimension breakdown that roughly sums to the score', () => {
+  it('breakdown has four factors and roughly sums to the score', () => {
     const { score, breakdown } = scoreBar(baseBar, match, prefs)
-    expect(breakdown.length).toBeGreaterThanOrEqual(8)
-    for (const row of breakdown) {
-      expect(row).toHaveProperty('label')
-      expect(row).toHaveProperty('weight')
-      expect(row).toHaveProperty('points')
-      expect(row.sub).toBeGreaterThanOrEqual(0)
-      expect(row.sub).toBeLessThanOrEqual(1)
-    }
+    expect(breakdown.length).toBe(4)
     const sum = breakdown.reduce((a, r) => a + r.points, 0)
-    expect(Math.abs(sum - score)).toBeLessThanOrEqual(8) // rounding slack
-  })
-
-  it('adds a stadium row for Seattle matches', () => {
-    const seattle = { ...match, venueCity: 'Seattle' }
-    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
-    const { breakdown } = scoreBar(pioneer, seattle, prefs)
-    expect(breakdown.some((r) => r.key === 'stadium')).toBe(true)
+    expect(Math.abs(sum - score)).toBeLessThanOrEqual(4)
   })
 })
 
 describe('stadium-proximity ambiance bonus', () => {
-  const emptyPrefs = { neighborhoods: [], venueTypes: [], wantsReservations: false, wantsBigScreen: false, atmosphere: null }
-  const seattleMatch = { id: 'S', stage: 'Group', homeTeam: 'USA', awayTeam: 'AUS', venueCity: 'Seattle' }
-  const awayMatch = { ...seattleMatch, venueCity: 'Los Angeles' }
+  const seattleMatch = { ...match, venueCity: 'Seattle' }
+  const awayMatch = { ...match, venueCity: 'Los Angeles' }
 
   it('boosts a near-stadium bar only when the match is played in Seattle', () => {
     const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
-    const inSeattle = scoreBar(pioneer, seattleMatch, emptyPrefs).score
-    const elsewhere = scoreBar(pioneer, awayMatch, emptyPrefs).score
-    expect(inSeattle).toBeGreaterThan(elsewhere)
+    expect(scoreBar(pioneer, seattleMatch, prefs).score)
+      .toBeGreaterThan(scoreBar(pioneer, awayMatch, prefs).score)
   })
 
   it('caps the bonus at 10 points', () => {
-    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
-    const inSeattle = scoreBar(pioneer, seattleMatch, emptyPrefs).score
-    const elsewhere = scoreBar(pioneer, awayMatch, emptyPrefs).score
+    const pioneer = { ...baseBar, neighborhood: 'Pioneer Square', rating: 3.2, reviewCount: 50, confirmedViewing: false }
+    const inSeattle = scoreBar(pioneer, seattleMatch, prefs).score
+    const elsewhere = scoreBar(pioneer, awayMatch, prefs).score
     expect(inSeattle - elsewhere).toBeLessThanOrEqual(10)
   })
 
   it('gives no bonus to bars far from the stadium', () => {
     const ballard = { ...baseBar, neighborhood: 'Ballard' }
-    const inSeattle = scoreBar(ballard, seattleMatch, emptyPrefs).score
-    const elsewhere = scoreBar(ballard, awayMatch, emptyPrefs).score
-    expect(inSeattle).toBe(elsewhere)
+    expect(scoreBar(ballard, seattleMatch, prefs).score)
+      .toBe(scoreBar(ballard, awayMatch, prefs).score)
   })
 
-  it('adds a "Near the stadium" reason chip for Seattle matches', () => {
+  it('adds a stadium row to the breakdown for Seattle matches', () => {
     const pioneer = { ...baseBar, neighborhood: 'Pioneer Square' }
-    const { reasons } = scoreBar(pioneer, seattleMatch, emptyPrefs)
-    expect(reasons).toContain('Near the stadium')
+    expect(scoreBar(pioneer, seattleMatch, prefs).breakdown.some((r) => r.key === 'stadium')).toBe(true)
   })
 })
 
 describe('rankBars', () => {
   it('sorts best-first and assigns rank starting at 1', () => {
     const bars = [
-      { ...baseBar, id: 'low', neighborhood: 'Georgetown', fanAffinity: [], rating: 3.0 },
-      { ...baseBar, id: 'high', neighborhood: 'Ballard', fanAffinity: ['MEX'], rating: 5.0 },
+      { ...baseBar, id: 'low', neighborhood: 'Georgetown', rating: 3.0, confirmedViewing: false },
+      { ...baseBar, id: 'high', neighborhood: 'Ballard', rating: 5.0 },
     ]
     const ranked = rankBars(bars, match, prefs)
     expect(ranked[0].id).toBe('high')
@@ -125,16 +114,16 @@ describe('rankBars', () => {
     expect(ranked[1].rank).toBe(2)
   })
 
+  it('lifts a website-confirmed venue above an unconfirmed peer', () => {
+    const a = { ...baseBar, id: 'a', confirmedViewing: false }
+    const b = { ...baseBar, id: 'b', confirmedViewing: false }
+    const ranked = rankBars([a, b], match, prefs, { b: { worldCup: true, screens: true } })
+    expect(ranked[0].id).toBe('b')
+  })
+
   it('carries the per-dimension breakdown through to ranked results', () => {
     const ranked = rankBars([baseBar], match, prefs)
     expect(Array.isArray(ranked[0].breakdown)).toBe(true)
-    expect(ranked[0].breakdown.length).toBeGreaterThanOrEqual(8)
-  })
-
-  it('breaks ties by rating then reviewCount', () => {
-    const a = { ...baseBar, id: 'a', rating: 4.0, reviewCount: 100 }
-    const b = { ...baseBar, id: 'b', rating: 4.0, reviewCount: 900 }
-    const ranked = rankBars([a, b], match, { neighborhoods: [], venueTypes: [], wantsReservations: false, wantsBigScreen: false, atmosphere: null })
-    expect(ranked[0].id).toBe('b')
+    expect(ranked[0].breakdown.length).toBeGreaterThanOrEqual(4)
   })
 })

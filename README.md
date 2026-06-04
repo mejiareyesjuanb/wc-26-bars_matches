@@ -43,14 +43,15 @@ Each venue is scored 0–100 per match as a weighted sum (`src/lib/scoring.js`):
 
 | Factor | Weight |
 |---|---|
-| Neighborhood match (by your priority order) | 25 |
-| Viewing setup (confirmed viewing, screens, projector, sound) | 20 |
-| Reviews (rating × review-count confidence) | 15 |
-| Fan affinity to either team playing | 15 |
-| Venue-type preference | 10 |
-| Size fit (marquee stages favor larger venues) | 7 |
-| Reservations (if you want them) | 4 |
-| Atmosphere / amenities | 4 |
+| Showing the World Cup (website-confirmed counts most) | 40 |
+| Screens / projector | 25 |
+| In one of your preferred neighborhoods | 20 |
+| Ratings & reviews | 15 |
+
+The dominant signal is whether the venue is actually showing the World Cup. The
+server checks the top candidates' own websites; a confirmed match-viewing venue
+gets the full World Cup weight and rises to the top (this is how, e.g., the
+Kangaroo & Kiwi Pub in Ballard surfaces as #1).
 
 Plus a complementary **stadium-proximity ambiance bonus** (up to +10, capped):
 only when the match is actually played in Seattle, bars near Lumen Field

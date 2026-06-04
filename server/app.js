@@ -48,7 +48,7 @@ export function createApiApp() {
   })
 
   app.post('/api/venue-screens', async (req, res) => {
-    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 12) : []
+    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 40) : []
     const checks = {}
     await Promise.all(
       venues.map(async (v) => {
