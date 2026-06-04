@@ -1,84 +1,67 @@
 import { describe, it, expect } from 'vitest'
-import { scoreBar, rankBars, tierOf, isSportsBar } from './scoring.js'
+import { scoreBar, rankBars, isSportsBar, isConfirmedWorldCup } from './scoring.js'
 
 const venue = (over) => ({
   id: 'x', name: 'X', neighborhood: 'Ballard', type: 'restaurant',
   rating: 4.2, reviewCount: 500, confirmedViewing: false, ...over,
 })
 
-describe('tierOf', () => {
-  it('A = confirmed World Cup (website or curated)', () => {
-    expect(tierOf(venue(), { worldCup: true })).toBe('A')
-    expect(tierOf(venue({ confirmedViewing: true }), undefined)).toBe('A')
+describe('isSportsBar (category is source of truth, name is a fallback)', () => {
+  it('a mexican restaurant is not a sports bar', () => {
+    expect(isSportsBar(venue({ type: 'mexican restaurant', name: 'Matador Ballard' }))).toBe(false)
   })
-  it('B = sports bar or screens confirmed', () => {
-    expect(tierOf(venue({ type: 'sports bar' }), undefined)).toBe('B')
-    expect(tierOf(venue(), { screens: true })).toBe('B')
-  })
-  it('C = plain venue with no confirmation', () => {
-    expect(tierOf(venue({ type: 'mexican restaurant' }), undefined)).toBe('C')
-    expect(tierOf(venue({ type: 'mexican restaurant' }), { worldCup: false, screens: false })).toBe('C')
-  })
-})
-
-describe('isSportsBar uses the category (primaryType) as source of truth', () => {
-  it('a mexican restaurant is NOT a sports bar', () => {
-    expect(isSportsBar(venue({ type: 'mexican restaurant' }))).toBe(false)
-  })
-  it('a sports bar is', () => {
+  it('a sports_bar category is', () => {
     expect(isSportsBar(venue({ type: 'sports bar' }))).toBe(true)
   })
-  it('falls back to the name when Google miscategorizes it', () => {
-    // Slim Goody Sports Bar — Google primaryType says "restaurant"
+  it('"sports bar" in the name is, even when miscategorized', () => {
     expect(isSportsBar(venue({ type: 'restaurant', name: 'Slim Goody Sports Bar' }))).toBe(true)
-    expect(isSportsBar(venue({ type: 'restaurant', name: 'Matador Ballard' }))).toBe(false)
-  })
-  it('a name-matched sports bar reaches at least tier B', () => {
-    expect(tierOf(venue({ type: 'restaurant', name: 'Foo Sports Bar' }), undefined)).toBe('B')
   })
 })
 
-describe('scoreBar tier bands never overlap', () => {
-  const a = scoreBar(venue(), { worldCup: true }).score
-  const b = scoreBar(venue({ type: 'sports bar' }), undefined).score
-  const c = scoreBar(venue({ type: 'mexican restaurant' }), undefined).score
-
-  it('A (75-100) > B (45-70) > C (0-40)', () => {
-    expect(a).toBeGreaterThanOrEqual(75)
-    expect(b).toBeGreaterThanOrEqual(45)
-    expect(b).toBeLessThanOrEqual(70)
-    expect(c).toBeLessThanOrEqual(40)
-    expect(a).toBeGreaterThan(b)
-    expect(b).toBeGreaterThan(c)
+describe('isConfirmedWorldCup', () => {
+  it('true when the website check confirms it', () => {
+    expect(isConfirmedWorldCup(venue(), { worldCup: true })).toBe(true)
+  })
+  it('true when curated data confirms it', () => {
+    expect(isConfirmedWorldCup(venue({ confirmedViewing: true }), undefined)).toBe(true)
+  })
+  it('false otherwise', () => {
+    expect(isConfirmedWorldCup(venue(), { worldCup: false })).toBe(false)
   })
 })
 
-describe('reviews only tune within a tier', () => {
-  it('higher reviews rank higher among confirmed venues', () => {
-    const hi = scoreBar(venue({ rating: 4.8, reviewCount: 2000 }), { worldCup: true }).score
-    const lo = scoreBar(venue({ rating: 3.6, reviewCount: 30 }), { worldCup: true }).score
-    expect(hi).toBeGreaterThan(lo)
-    expect(lo).toBeGreaterThanOrEqual(75) // still tier A despite weak reviews
+describe('scoreBar inclusion', () => {
+  it('excludes a plain restaurant entirely (Matador)', () => {
+    const r = scoreBar(venue({ type: 'mexican restaurant', name: 'Matador Ballard', rating: 4.4, reviewCount: 2572 }), undefined)
+    expect(r.included).toBe(false)
+    expect(r.score).toBe(0)
   })
-
-  it('a great-reviewed plain restaurant never beats a confirmed venue', () => {
-    const greatRestaurant = scoreBar(venue({ type: 'italian restaurant', rating: 4.9, reviewCount: 5000 }), undefined).score
-    const weakConfirmed = scoreBar(venue({ rating: 3.4, reviewCount: 10 }), { worldCup: true }).score
-    expect(weakConfirmed).toBeGreaterThan(greatRestaurant)
+  it('includes a sports bar (not confirmed) in the 0–55 band', () => {
+    const r = scoreBar(venue({ type: 'sports bar' }), undefined)
+    expect(r.included).toBe(true)
+    expect(r.confirmed).toBe(false)
+    expect(r.score).toBeLessThanOrEqual(55)
+  })
+  it('includes a confirmed venue in the 60–100 band, even a restaurant by category (KK)', () => {
+    const r = scoreBar(venue({ type: 'australian restaurant', name: 'Kangaroo & Kiwi' }), { worldCup: true })
+    expect(r.included).toBe(true)
+    expect(r.confirmed).toBe(true)
+    expect(r.score).toBeGreaterThanOrEqual(60)
   })
 })
 
-describe('rankBars', () => {
-  it('orders confirmed > sports bar > plain restaurant, with breakdown + rank', () => {
+describe('ranking order', () => {
+  it('confirmed > unconfirmed sports bar > excluded; reviews tune within confirmed', () => {
     const bars = [
-      venue({ id: 'matador', type: 'mexican restaurant', rating: 4.4, reviewCount: 2572 }),
-      venue({ id: 'kk', type: 'australian restaurant', rating: 4.2, reviewCount: 1223 }),
-      venue({ id: 'sportsbar', type: 'sports bar', rating: 4.0, reviewCount: 100 }),
+      venue({ id: 'matador', type: 'mexican restaurant', name: 'Matador', rating: 4.4, reviewCount: 2572 }),
+      venue({ id: 'plainSB', type: 'sports bar', name: 'Plain SB', rating: 4.0, reviewCount: 100 }),
+      venue({ id: 'kk', type: 'australian restaurant', name: 'Kangaroo & Kiwi', rating: 4.2, reviewCount: 1223 }),
+      venue({ id: 'sg', type: 'restaurant', name: 'Slim Goody Sports Bar', rating: 4.5, reviewCount: 169 }),
     ]
-    const ranked = rankBars(bars, { kk: { worldCup: true } })
-    expect(ranked.map((b) => b.id)).toEqual(['kk', 'sportsbar', 'matador'])
-    expect(ranked[0].rank).toBe(1)
-    expect(ranked[0].tier).toBe('A')
-    expect(ranked[0].breakdown.tier).toBe('A')
+    const ranked = rankBars(bars, { kk: { worldCup: true }, sg: { worldCup: true } })
+    const included = ranked.filter((b) => b.included).map((b) => b.id)
+    // both confirmed (kk, sg) first — kk edges sg on review confidence — then the plain sports bar
+    expect(included).toEqual(['kk', 'sg', 'plainSB'])
+    expect(ranked.find((b) => b.id === 'matador').included).toBe(false)
   })
 })

@@ -1,12 +1,10 @@
-// Tiered ranking. The question we answer, in order of importance:
-//   1. Which venues in your neighborhoods CONFIRM they're showing the World Cup?
-//   2. Then: sports bars, and venues with screens confirmed on their website.
-//   3. Reviews only fine-tune the order within a tier.
+// Ranking model (strict): only show sports bars and venues that CONFIRM they're
+// showing the World Cup. Everything else is excluded from the ranking entirely.
 //
-//   Tier A (confirmed World Cup):            score 75–100
-//   Tier B (sports bar OR screens confirmed): score 45–70
-//   Tier C (everything else):                 score  0–40
-// The bands don't overlap, so tier always dominates; reviews tune within.
+//   Confirmed World Cup:        score 60–100  (top group)
+//   Sports bar, not confirmed:  score  0–55
+//   Anything else:              excluded (included = false)
+// Reviews only break ties within a group.
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x))
 
@@ -17,70 +15,74 @@ export function reviewsScore(bar) {
   return quality * (0.6 + 0.4 * confidence)
 }
 
-// `bar.type` is the venue's category derived from the Places primaryType
-// (source of truth) — so a Mexican restaurant is never treated as a sports bar.
+// `bar.type` is the category from the Places primaryType (source of truth).
 // Fallback: "sports bar" in the NAME makes it very likely a sports bar even when
 // Google's primaryType says otherwise (e.g. "Slim Goody Sports Bar").
 export function isSportsBar(bar) {
   return bar.type === 'sports bar' || /sports\s*bar/i.test(bar.name || '')
 }
 
-export function tierOf(bar, check) {
-  if (check?.worldCup === true || bar.confirmedViewing === true) return 'A'
-  if (isSportsBar(bar) || check?.screens === true) return 'B'
-  return 'C'
+export function isConfirmedWorldCup(bar, check) {
+  return check?.worldCup === true || bar.confirmedViewing === true
+}
+
+// A venue is shown only if it's a sports bar OR confirms World Cup viewing.
+export function isRanked(bar, check) {
+  return isSportsBar(bar) || isConfirmedWorldCup(bar, check)
 }
 
 export function scoreBar(bar, check) {
-  const tier = tierOf(bar, check)
+  const confirmed = isConfirmedWorldCup(bar, check)
+  const sports = isSportsBar(bar)
+  const included = confirmed || sports
   const r = reviewsScore(bar)
   let score
-  if (tier === 'A') score = 75 + r * 25
-  else if (tier === 'B') score = 45 + r * 25
-  else score = r * 40
+  if (confirmed) score = 60 + r * 40 // 60–100
+  else if (sports) score = r * 55 // 0–55
+  else score = 0 // excluded
   return {
     score: Math.round(score),
-    tier,
-    reasons: buildReasons(bar, check),
-    breakdown: buildBreakdown(bar, check, tier),
+    included,
+    confirmed,
+    sports,
+    reasons: buildReasons(bar, check, confirmed, sports),
+    breakdown: buildBreakdown(bar, check, confirmed, sports, included),
   }
 }
 
-function buildReasons(bar, check) {
+function buildReasons(bar, check, confirmed, sports) {
   const r = []
-  if (isSportsBar(bar)) r.push('Sports bar')
+  if (sports) r.push('Sports bar')
   if (bar.confirmedViewing && check?.worldCup !== true) r.push('Shows matches')
   if (bar.rating >= 4.5) r.push(`${bar.rating.toFixed(1)}★`)
   return r
 }
 
-function buildBreakdown(bar, check, tier) {
-  const confirmedWC = check?.worldCup === true || bar.confirmedViewing === true
-  const sports = isSportsBar(bar)
-  const screens = check?.screens === true
-  const tierLabel =
-    tier === 'A' ? 'Confirmed: showing the World Cup'
-      : tier === 'B' ? (sports ? 'Sports bar' : 'Screens confirmed on website')
-        : 'Not confirmed to show the World Cup'
+function buildBreakdown(bar, check, confirmed, sports, included) {
+  const tier = confirmed ? 'A' : sports ? 'B' : 'C'
+  const tierLabel = confirmed
+    ? 'Confirmed: showing the World Cup'
+    : sports
+      ? 'Sports bar'
+      : 'Not shown (not a sports bar, not confirmed)'
   return {
     tier,
     tierLabel,
+    included,
     criteria: [
-      { label: 'Confirms World Cup viewing (website)', met: confirmedWC },
+      { label: 'Confirms World Cup viewing (website)', met: confirmed },
       { label: `Sports bar (by name or Google category: ${bar.type || 'unknown'})`, met: sports },
-      { label: 'Screens confirmed on website', met: screens },
     ],
     rating: bar.rating,
     reviewCount: bar.reviewCount,
   }
 }
 
+// Scores and ranks every venue (tagging `included`); callers filter to included
+// for display. Excluded venues sink to the bottom (score 0).
 export function rankBars(bars, checks = {}) {
   return bars
-    .map((bar) => {
-      const { score, tier, reasons, breakdown } = scoreBar(bar, checks[bar.id])
-      return { ...bar, score, tier, reasons, breakdown }
-    })
+    .map((bar) => ({ ...bar, ...scoreBar(bar, checks[bar.id]) }))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score
       if (b.rating !== a.rating) return b.rating - a.rating

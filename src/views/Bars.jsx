@@ -6,7 +6,7 @@ import VenueMap from '../components/VenueMap.jsx'
 import VenueModal from '../components/VenueModal.jsx'
 import NeighborhoodPicker from './NeighborhoodPicker.jsx'
 
-const PER_HOOD = 5 // bars shown per neighborhood before "show all"
+const PER_HOOD = 10 // bars shown per neighborhood before "show all"
 
 // Bar-style Google categories (vs. restaurants/cafes) — prioritized for the
 // website check, but we still check everything with a website to find any venue
@@ -20,7 +20,6 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   const [selected, setSelected] = useState(null)
   const [checks, setChecks] = useState({})
   const [expanded, setExpanded] = useState({})
-  const [expandedOther, setExpandedOther] = useState({})
 
   const hoods = prefs.neighborhoods || []
 
@@ -71,10 +70,9 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
     )
   }
 
-  // Only tiers A/B (confirmed World Cup, sports bars, or screens confirmed) are
-  // real recommendations. Tier C (everything else) is kept out of the top list.
-  const isRelevant = (v) => v.tier === 'A' || v.tier === 'B'
-  const mapVenues = hoods.flatMap((h) => (byHood[h] || []).filter(isRelevant))
+  // Only sports bars and confirmed-World-Cup venues are shown; everything else
+  // is excluded entirely.
+  const mapVenues = hoods.flatMap((h) => (byHood[h] || []).filter((v) => v.included))
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -89,7 +87,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
         </div>
       </div>
       <p className="text-sm text-neutral-500 mb-4">
-        Ranked by World Cup viewing, screens, your neighborhoods, and reviews.
+        Sports bars and venues confirmed showing the World Cup — confirmed first, then by reviews.
         {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? 'Live · Google' : 'Curated'}</span>}
       </p>
 
@@ -106,17 +104,15 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
       ) : (
         <div className="space-y-8">
           {hoods.map((h) => {
-            const list = byHood[h] || []
-            const relevant = list.filter(isRelevant)
-            const other = list.filter((v) => !isRelevant(v))
-            const shown = relevant.slice(0, expanded[h] ? Infinity : PER_HOOD)
+            const list = (byHood[h] || []).filter((v) => v.included)
+            const shown = list.slice(0, expanded[h] ? Infinity : PER_HOOD)
             return (
               <section key={h}>
                 <h2 className="font-semibold mb-3">
-                  {h} <span className="text-neutral-400 font-normal">({relevant.length})</span>
+                  {h} <span className="text-neutral-400 font-normal">({list.length})</span>
                 </h2>
-                {relevant.length === 0 ? (
-                  <p className="text-neutral-400 text-sm">No venues here are confirmed to show the World Cup yet.</p>
+                {list.length === 0 ? (
+                  <p className="text-neutral-400 text-sm">No sports bars or confirmed World Cup venues found in {h}.</p>
                 ) : (
                   <div className="grid gap-3">
                     {shown.map((bar) => (
@@ -124,33 +120,13 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
                     ))}
                   </div>
                 )}
-                {relevant.length > PER_HOOD && !expanded[h] && (
+                {list.length > PER_HOOD && !expanded[h] && (
                   <button
                     onClick={() => setExpanded((e) => ({ ...e, [h]: true }))}
                     className="mt-3 text-sm text-accent hover:underline"
                   >
-                    Show all {relevant.length} in {h}
+                    Show all {list.length} in {h}
                   </button>
-                )}
-
-                {other.length > 0 && (
-                  <div className="mt-3">
-                    <button
-                      onClick={() => setExpandedOther((e) => ({ ...e, [h]: !e[h] }))}
-                      className="text-sm text-neutral-400 hover:text-accent"
-                    >
-                      {expandedOther[h]
-                        ? 'Hide other venues'
-                        : `Show ${other.length} other ${h} venue${other.length > 1 ? 's' : ''} (not confirmed to show the World Cup)`}
-                    </button>
-                    {expandedOther[h] && (
-                      <div className="grid gap-3 mt-3 opacity-70">
-                        {other.map((bar) => (
-                          <BarCard key={bar.id} bar={bar} check={checks[bar.id]} onClick={() => setSelected(bar)} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 )}
               </section>
             )
