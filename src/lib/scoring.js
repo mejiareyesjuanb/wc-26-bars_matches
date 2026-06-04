@@ -19,8 +19,10 @@ export function reviewsScore(bar) {
 
 // `bar.type` is the venue's category derived from the Places primaryType
 // (source of truth) — so a Mexican restaurant is never treated as a sports bar.
+// Fallback: "sports bar" in the NAME makes it very likely a sports bar even when
+// Google's primaryType says otherwise (e.g. "Slim Goody Sports Bar").
 export function isSportsBar(bar) {
-  return bar.type === 'sports bar'
+  return bar.type === 'sports bar' || /sports\s*bar/i.test(bar.name || '')
 }
 
 export function tierOf(bar, check) {
@@ -65,7 +67,7 @@ function buildBreakdown(bar, check, tier) {
     tierLabel,
     criteria: [
       { label: 'Confirms World Cup viewing (website)', met: confirmedWC },
-      { label: `Sports bar (Google category: ${bar.type || 'unknown'})`, met: sports },
+      { label: `Sports bar (by name or Google category: ${bar.type || 'unknown'})`, met: sports },
       { label: 'Screens confirmed on website', met: screens },
     ],
     rating: bar.rating,

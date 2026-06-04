@@ -28,6 +28,14 @@ describe('isSportsBar uses the category (primaryType) as source of truth', () =>
   it('a sports bar is', () => {
     expect(isSportsBar(venue({ type: 'sports bar' }))).toBe(true)
   })
+  it('falls back to the name when Google miscategorizes it', () => {
+    // Slim Goody Sports Bar — Google primaryType says "restaurant"
+    expect(isSportsBar(venue({ type: 'restaurant', name: 'Slim Goody Sports Bar' }))).toBe(true)
+    expect(isSportsBar(venue({ type: 'restaurant', name: 'Matador Ballard' }))).toBe(false)
+  })
+  it('a name-matched sports bar reaches at least tier B', () => {
+    expect(tierOf(venue({ type: 'restaurant', name: 'Foo Sports Bar' }), undefined)).toBe('B')
+  })
 })
 
 describe('scoreBar tier bands never overlap', () => {
