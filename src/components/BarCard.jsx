@@ -29,9 +29,6 @@ export default function BarCard({ bar, check, onClick }) {
           {check && !check.worldCup && check.screens && (
             <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">✓ Screens confirmed</span>
           )}
-          {bar.unconfirmedSignals && !check?.screens && !check?.worldCup && (
-            <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">Screens unconfirmed</span>
-          )}
         </div>
         <div className="mt-2">
           <a

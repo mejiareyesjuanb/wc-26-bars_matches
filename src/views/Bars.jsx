@@ -6,11 +6,13 @@ import VenueMap from '../components/VenueMap.jsx'
 import VenueModal from '../components/VenueModal.jsx'
 import NeighborhoodPicker from './NeighborhoodPicker.jsx'
 
-// Bars are ranked independently of any single match. Pass a match-less context
-// so the (match-only) stadium bonus doesn't apply here.
-const NO_MATCH = { venueCity: null, stage: null, homeTeam: null, awayTeam: null }
 const PER_HOOD = 5 // bars shown per neighborhood before "show all"
-const RESTAURANTS_PER_HOOD = 4 // also website-check this many top restaurants/neighborhood
+
+// Bar-style Google categories (vs. restaurants/cafes) — prioritized for the
+// website check, but we still check everything with a website to find any venue
+// that confirms World Cup viewing.
+const BAR_CATEGORIES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'wine bar', 'beer hall', 'night club'])
+const isBarish = (v) => BAR_CATEGORIES.has(v.type)
 
 export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   const [editing, setEditing] = useState(false)
@@ -23,35 +25,29 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
 
   // Rank venues within each chosen neighborhood (1..N per neighborhood).
   const rankHood = (h, withChecks) =>
-    venues ? rankBars(venues.filter((v) => v.neighborhood === h), NO_MATCH, prefs, withChecks ? checks : {}) : []
+    venues ? rankBars(venues.filter((v) => v.neighborhood === h), withChecks ? checks : {}) : []
 
   const baseByHood = useMemo(() => {
     const m = {}
     for (const h of hoods) m[h] = rankHood(h, false)
     return m
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [venues, prefs])
+  }, [venues, hoods.join(',')])
 
   const byHood = useMemo(() => {
     const m = {}
     for (const h of hoods) m[h] = rankHood(h, true)
     return m
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [venues, prefs, checks])
+  }, [venues, hoods.join(','), checks])
 
-  // Website-check candidates (feeds ranking). Check EVERY sports-type venue in
-  // the chosen neighborhoods regardless of review count — a sports bar is a
-  // prime World Cup spot even with few reviews — plus the top few restaurants.
-  // Sporty venues go first so they survive the server-side cap.
+  // Website-check every venue with a website in the chosen neighborhoods, so we
+  // can find which actually confirm World Cup viewing. Bars are checked first so
+  // they survive the server-side cap.
   const candidates = useMemo(() => {
-    const sporty = []
-    const restaurants = []
-    for (const h of hoods) {
-      const inHood = (baseByHood[h] || []).filter((v) => v.website)
-      sporty.push(...inHood.filter((v) => v.type !== 'restaurant'))
-      restaurants.push(...inHood.filter((v) => v.type === 'restaurant').slice(0, RESTAURANTS_PER_HOOD))
-    }
-    return [...sporty, ...restaurants]
+    const all = []
+    for (const h of hoods) all.push(...(baseByHood[h] || []).filter((v) => v.website))
+    return [...all.filter(isBarish), ...all.filter((v) => !isBarish(v))]
   }, [baseByHood, hoods])
 
   useEffect(() => {

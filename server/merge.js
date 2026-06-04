@@ -5,16 +5,19 @@ export function normalizeName(name) {
   return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 }
 
-// Map Google place types/name to our venue-type vocabulary.
-export function mapType(place) {
+// Venue category from Google's primaryType — the SOURCE OF TRUTH — so a
+// Mexican restaurant tagged with a secondary `sports_bar` type is still a
+// restaurant. Falls back to the types array only when primaryType is absent.
+export function categoryOf(place) {
+  const pt = (place.primaryType || '').toLowerCase()
+  if (pt) return pt.replace(/_/g, ' ') // e.g. mexican_restaurant -> "mexican restaurant"
   const t = (place.types || []).map((x) => String(x).toLowerCase())
-  const n = (place.name || '').toLowerCase()
-  if (n.includes('brew') || t.includes('brewery')) return 'brewery'
-  if (n.includes('beer hall') || n.includes('taproom') || n.includes('biergarten') || n.includes('bier')) return 'beer hall'
   if (t.includes('sports_bar')) return 'sports bar'
-  if (t.includes('pub') || n.includes('pub') || n.includes('tavern')) return 'pub'
-  if (t.includes('bar') || t.includes('night_club')) return 'sports bar'
-  return 'restaurant'
+  if (t.includes('pub')) return 'pub'
+  if (t.includes('brewery')) return 'brewery'
+  if (t.includes('bar')) return 'bar'
+  if (t.some((x) => x.includes('restaurant'))) return 'restaurant'
+  return 'venue'
 }
 
 const PRICE_ENUM = {
@@ -46,7 +49,7 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 // place: normalized Places object {id,name,address,lat,lng,rating,userRatingCount,priceLevel,types,reservable,blurb}
 // neighborhood: string. signals: map of normalizedName -> curated signals.
 export function mergeVenue(place, neighborhood, signals = {}) {
-  const type = mapType(place)
+  const type = categoryOf(place) // category from Places primaryType (source of truth)
   const sig = signals[normalizeName(place.name)] || null
   const s = sig || defaultSignals(type)
   return {
@@ -55,6 +58,7 @@ export function mergeVenue(place, neighborhood, signals = {}) {
     name: place.name,
     neighborhood,
     type,
+    primaryType: place.primaryType || null,
     lat: place.lat,
     lng: place.lng,
     website: place.website,

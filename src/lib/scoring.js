@@ -1,139 +1,88 @@
-// Simplified ranking model. Four factors only — World Cup viewing is the
-// dominant signal, especially when a venue's own website confirms it.
-export const WEIGHTS = {
-  worldCup: 40, // showing the World Cup (website-confirmed counts most)
-  screens: 25, // has screens / projector
-  neighborhood: 20, // in one of the user's preferred neighborhoods
-  reviews: 15, // good ratings
-}
-
-export const FACTOR_LABELS = {
-  worldCup: 'Showing the World Cup',
-  screens: 'Screens / projector',
-  neighborhood: 'Your neighborhoods',
-  reviews: 'Ratings & reviews',
-}
+// Tiered ranking. The question we answer, in order of importance:
+//   1. Which venues in your neighborhoods CONFIRM they're showing the World Cup?
+//   2. Then: sports bars, and venues with screens confirmed on their website.
+//   3. Reviews only fine-tune the order within a tier.
+//
+//   Tier A (confirmed World Cup):            score 75–100
+//   Tier B (sports bar OR screens confirmed): score 45–70
+//   Tier C (everything else):                 score  0–40
+// The bands don't overlap, so tier always dominates; reviews tune within.
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x))
 
-// 1.0 for top-priority neighborhood, decaying with selection order; 0 if none.
-function neighborhoodScore(bar, prefs) {
-  const list = prefs.neighborhoods || []
-  const idx = list.indexOf(bar.neighborhood)
-  if (idx === -1) return 0
-  return 1 - idx * 0.12 // #1 -> 1.0, #5 -> 0.52
-}
-
-// A sports bar inherently has screens and almost certainly shows the World Cup,
-// even if we couldn't scrape its website.
-function isSportsBar(bar) {
-  return bar.type === 'sports bar' || /sports bar/i.test(bar.name || '')
-}
-
-// `check` is the optional website confirmation { screens, worldCup } for a venue.
-function screensScore(bar, check) {
-  let s = 0
-  if (bar.confirmedViewing || check?.screens === true || isSportsBar(bar)) s += 0.4
-  if (bar.bigScreenOrProjector || isSportsBar(bar)) s += 0.3
-  s += clamp01((bar.screens || 0) / 10) * 0.3 // saturates at 10 screens
-  return clamp01(s)
-}
-
-// World Cup viewing — website confirmation is the strongest evidence.
-function worldCupScore(bar, check) {
-  if (check?.worldCup === true) return 1 // confirmed on their website
-  if (bar.confirmedViewing) return 0.6 // known to show matches (curated)
-  if (check?.screens === true) return 0.35 // has sports screens (likely)
-  if (isSportsBar(bar)) return 0.3 // a sports bar — very likely to show it
-  return 0.1 // unknown
-}
-
-function reviewsScore(bar) {
-  const quality = clamp01((bar.rating - 3) / 2) // 3.0 -> 0, 5.0 -> 1
-  const confidence = clamp01(bar.reviewCount / 1500) // saturates at 1500 reviews
+// 0..1 from rating (3.0→0, 5.0→1) scaled by review-count confidence.
+export function reviewsScore(bar) {
+  const quality = clamp01((bar.rating - 3) / 2)
+  const confidence = clamp01((bar.reviewCount || 0) / 1500)
   return quality * (0.6 + 0.4 * confidence)
 }
 
-// Complementary ambiance bonus (max +10), only when the match is actually played
-// in Seattle: bars near Lumen Field ride the matchday buzz. Not a primary factor.
-export const STADIUM_BONUS_MAX = 10
-const STADIUM_PROXIMITY = {
-  'Pioneer Square': 1.0,
-  Downtown: 0.7,
-  Georgetown: 0.5,
-  Belltown: 0.45,
-  'South Lake Union': 0.3,
-  'Capitol Hill': 0.25,
+// `bar.type` is the venue's category derived from the Places primaryType
+// (source of truth) — so a Mexican restaurant is never treated as a sports bar.
+export function isSportsBar(bar) {
+  return bar.type === 'sports bar'
 }
 
-function stadiumBonus(bar, match) {
-  if (match.venueCity !== 'Seattle') return 0
-  return (STADIUM_PROXIMITY[bar.neighborhood] ?? 0) * STADIUM_BONUS_MAX
+export function tierOf(bar, check) {
+  if (check?.worldCup === true || bar.confirmedViewing === true) return 'A'
+  if (isSportsBar(bar) || check?.screens === true) return 'B'
+  return 'C'
 }
 
-export function scoreBar(bar, match, prefs, check) {
-  const parts = {
-    worldCup: worldCupScore(bar, check),
-    screens: screensScore(bar, check),
-    neighborhood: neighborhoodScore(bar, prefs),
-    reviews: reviewsScore(bar),
-  }
-  let total = 0
-  for (const k of Object.keys(WEIGHTS)) total += parts[k] * WEIGHTS[k]
-
-  const bonus = stadiumBonus(bar, match)
-  const score = Math.round(Math.min(100, total + bonus))
-
+export function scoreBar(bar, check) {
+  const tier = tierOf(bar, check)
+  const r = reviewsScore(bar)
+  let score
+  if (tier === 'A') score = 75 + r * 25
+  else if (tier === 'B') score = 45 + r * 25
+  else score = r * 40
   return {
-    score,
-    reasons: buildReasons(bar, match, prefs, parts, bonus, check),
-    breakdown: buildBreakdown(parts, bonus),
+    score: Math.round(score),
+    tier,
+    reasons: buildReasons(bar, check),
+    breakdown: buildBreakdown(bar, check, tier),
   }
 }
 
-function buildReasons(bar, match, prefs, parts, bonus, check) {
+function buildReasons(bar, check) {
   const r = []
-  if (check?.worldCup === true) r.push('Confirmed: showing the World Cup')
-  else if (bar.confirmedViewing) r.push('Shows matches')
-  if (parts.neighborhood > 0) r.push(`In ${bar.neighborhood}`)
-  if (bonus > 0) r.push('Near the stadium')
-  if (bar.screens >= 6) r.push(`${bar.screens} screens`)
-  else if (bar.bigScreenOrProjector || check?.screens === true) r.push('Big screen/projector')
+  if (isSportsBar(bar)) r.push('Sports bar')
+  if (bar.confirmedViewing && check?.worldCup !== true) r.push('Shows matches')
   if (bar.rating >= 4.5) r.push(`${bar.rating.toFixed(1)}★`)
   return r
 }
 
-// Per-dimension contribution, for the "how it ranks" modal.
-function buildBreakdown(parts, bonus) {
-  const rows = Object.keys(WEIGHTS).map((k) => ({
-    key: k,
-    label: FACTOR_LABELS[k],
-    weight: WEIGHTS[k],
-    sub: parts[k],
-    points: Math.round(parts[k] * WEIGHTS[k]),
-  }))
-  if (bonus > 0) {
-    rows.push({
-      key: 'stadium',
-      label: 'Near Lumen Field (played in Seattle)',
-      weight: STADIUM_BONUS_MAX,
-      sub: bonus / STADIUM_BONUS_MAX,
-      points: Math.round(bonus),
-    })
+function buildBreakdown(bar, check, tier) {
+  const confirmedWC = check?.worldCup === true || bar.confirmedViewing === true
+  const sports = isSportsBar(bar)
+  const screens = check?.screens === true
+  const tierLabel =
+    tier === 'A' ? 'Confirmed: showing the World Cup'
+      : tier === 'B' ? (sports ? 'Sports bar' : 'Screens confirmed on website')
+        : 'Not confirmed to show the World Cup'
+  return {
+    tier,
+    tierLabel,
+    criteria: [
+      { label: 'Confirms World Cup viewing (website)', met: confirmedWC },
+      { label: `Sports bar (Google category: ${bar.type || 'unknown'})`, met: sports },
+      { label: 'Screens confirmed on website', met: screens },
+    ],
+    rating: bar.rating,
+    reviewCount: bar.reviewCount,
   }
-  return rows
 }
 
-export function rankBars(bars, match, prefs, checks = {}) {
+export function rankBars(bars, checks = {}) {
   return bars
     .map((bar) => {
-      const { score, reasons, breakdown } = scoreBar(bar, match, prefs, checks[bar.id])
-      return { ...bar, score, reasons, breakdown }
+      const { score, tier, reasons, breakdown } = scoreBar(bar, checks[bar.id])
+      return { ...bar, score, tier, reasons, breakdown }
     })
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score
       if (b.rating !== a.rating) return b.rating - a.rating
-      return b.reviewCount - a.reviewCount
+      return (b.reviewCount || 0) - (a.reviewCount || 0)
     })
     .map((bar, i) => ({ ...bar, rank: i + 1 }))
 }

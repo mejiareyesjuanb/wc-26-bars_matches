@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
 import { mapsUrl } from '../lib/venues.js'
 
-function Bar({ sub }) {
-  return (
-    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden w-full">
-      <div className="h-full bg-accent" style={{ width: `${Math.round((sub || 0) * 100)}%` }} />
-    </div>
-  )
+const TIER_STYLE = {
+  A: 'bg-green-100 text-green-700',
+  B: 'bg-sky-100 text-sky-700',
+  C: 'bg-neutral-100 text-neutral-500',
 }
 
 export default function VenueModal({ venue, check, onClose }) {
@@ -17,7 +15,7 @@ export default function VenueModal({ venue, check, onClose }) {
   }, [onClose])
 
   if (!venue) return null
-  const breakdown = venue.breakdown || []
+  const bd = venue.breakdown || {}
 
   return (
     <div
@@ -44,33 +42,35 @@ export default function VenueModal({ venue, check, onClose }) {
         </div>
 
         <div className="p-5">
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-2">
             <span className="font-semibold">Watch score</span>
             <span className="font-bold text-accent">{venue.score}/100</span>
           </div>
-          <p className="text-sm text-neutral-500 mb-4">How this venue scores on each ranking dimension:</p>
 
-          <div className="space-y-3">
-            {breakdown.map((row) => (
-              <div key={row.key}>
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-neutral-700">{row.label}</span>
-                  <span className="text-neutral-500 tabular-nums">{row.points}/{row.weight}</span>
-                </div>
-                <Bar sub={row.sub} />
-              </div>
+          {bd.tierLabel && (
+            <span className={`inline-block text-xs font-medium rounded-full px-2.5 py-1 mb-4 ${TIER_STYLE[bd.tier] || ''}`}>
+              {bd.tierLabel}
+            </span>
+          )}
+
+          <p className="text-sm text-neutral-500 mb-2">Why it ranks here:</p>
+          <ul className="space-y-1.5 text-sm">
+            {(bd.criteria || []).map((c, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className={c.met ? 'text-green-600' : 'text-neutral-300'}>{c.met ? '✓' : '○'}</span>
+                <span className={c.met ? 'text-neutral-700' : 'text-neutral-400'}>{c.label}</span>
+              </li>
             ))}
-          </div>
+            <li className="flex items-start gap-2">
+              <span className="text-neutral-400">★</span>
+              <span className="text-neutral-700">
+                Reviews (tie-breaker): {bd.rating?.toFixed?.(1)}★ ({bd.reviewCount})
+              </span>
+            </li>
+          </ul>
 
-          {check && (check.screens != null || check.worldCup != null) && (
-            <div className="mt-5 text-sm bg-neutral-50 border border-neutral-200 rounded-lg p-3">
-              <div className="font-medium mb-1">Website check</div>
-              <ul className="text-neutral-600 space-y-0.5">
-                <li>{check.worldCup ? '📺 Mentions World Cup / soccer viewing' : '— No World Cup mention found'}</li>
-                <li>{check.screens ? '✓ Mentions screens / TVs / sports' : '— No screen mention found'}</li>
-              </ul>
-              {check.evidence && <p className="mt-2 text-xs text-neutral-400 italic">“…{check.evidence}…”</p>}
-            </div>
+          {check?.evidence && (
+            <p className="mt-4 text-xs text-neutral-400 italic">Website: “…{check.evidence}…”</p>
           )}
 
           <div className="mt-5 flex flex-wrap gap-3">

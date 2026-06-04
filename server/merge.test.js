@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeName, mapType, normalizePrice, mergeVenue } from './merge.js'
+import { normalizeName, categoryOf, normalizePrice, mergeVenue } from './merge.js'
 
 describe('normalizeName', () => {
   it('lowercases and strips punctuation', () => {
@@ -8,18 +8,19 @@ describe('normalizeName', () => {
   })
 })
 
-describe('mapType', () => {
-  it('detects breweries by name', () => {
-    expect(mapType({ name: 'Stoup Brewing', types: ['bar'] })).toBe('brewery')
+describe('categoryOf (primaryType is source of truth)', () => {
+  it('uses primaryType, prettified', () => {
+    expect(categoryOf({ primaryType: 'sports_bar', types: ['bar'] })).toBe('sports bar')
+    expect(categoryOf({ primaryType: 'mexican_restaurant', types: ['sports_bar', 'bar'] })).toBe('mexican restaurant')
   })
-  it('detects sports bars by type', () => {
-    expect(mapType({ name: 'Somewhere', types: ['sports_bar'] })).toBe('sports bar')
+  it('does NOT call a restaurant a sports bar just because of a secondary type', () => {
+    // Matador: primaryType mexican_restaurant, but types includes sports_bar
+    expect(categoryOf({ primaryType: 'mexican_restaurant', types: ['sports_bar', 'bar', 'restaurant'] }))
+      .not.toBe('sports bar')
   })
-  it('detects pubs', () => {
-    expect(mapType({ name: 'Old Tavern', types: ['restaurant'] })).toBe('pub')
-  })
-  it('falls back to restaurant', () => {
-    expect(mapType({ name: 'Bistro X', types: ['restaurant'] })).toBe('restaurant')
+  it('falls back to the types array when primaryType is missing', () => {
+    expect(categoryOf({ types: ['sports_bar', 'bar'] })).toBe('sports bar')
+    expect(categoryOf({ types: ['restaurant'] })).toBe('restaurant')
   })
 })
 
