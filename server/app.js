@@ -36,6 +36,20 @@ async function getVenues() {
 const screenCache = new Map() // id -> { at, result }
 const SCREEN_TTL = 24 * 60 * 60 * 1000
 
+// Run async work with bounded concurrency (avoid opening many sockets at once).
+async function mapLimit(items, limit, fn) {
+  const results = []
+  let i = 0
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (i < items.length) {
+      const idx = i++
+      results[idx] = await fn(items[idx])
+    }
+  })
+  await Promise.all(workers)
+  return results
+}
+
 // Build the API as an Express app so it can run standalone (server/index.js)
 // or be mounted as Vite dev middleware (vite.config.js) — one source of truth.
 export function createApiApp() {
@@ -48,21 +62,19 @@ export function createApiApp() {
   })
 
   app.post('/api/venue-screens', async (req, res) => {
-    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 40) : []
+    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 80) : []
     const checks = {}
-    await Promise.all(
-      venues.map(async (v) => {
-        if (!v || !v.id) return
-        const cached = screenCache.get(v.id)
-        if (cached && Date.now() - cached.at < SCREEN_TTL) {
-          checks[v.id] = cached.result
-          return
-        }
-        const result = await checkVenue(v.website)
-        screenCache.set(v.id, { at: Date.now(), result })
-        checks[v.id] = result
-      }),
-    )
+    await mapLimit(venues, 10, async (v) => {
+      if (!v || !v.id) return
+      const cached = screenCache.get(v.id)
+      if (cached && Date.now() - cached.at < SCREEN_TTL) {
+        checks[v.id] = cached.result
+        return
+      }
+      const result = await checkVenue(v.website)
+      screenCache.set(v.id, { at: Date.now(), result })
+      checks[v.id] = result
+    })
     res.json({ checks })
   })
 

@@ -14,18 +14,19 @@ npm test         # run the unit tests
 
 ## How it works
 
-1. **Onboarding** — pick up to 5 Seattle neighborhoods (in priority order) and
-   your venue tastes (types, atmosphere, big-screen, reservations). Saved to
-   `localStorage`.
-2. **Matches** — browse all 104 matches; filter by team, date, stage, or
-   time of day (morning / afternoon / evening).
-3. **Match detail** — pick a match to get Seattle venues ranked #1 best-first,
-   each with a score and "why ranked here" reason chips.
+Two tabs:
 
-This is the go-to app for a fan who wants to watch **any** World Cup match in
-Seattle (whether or not the game is played here) and doesn't know which bar to
-pick. All kickoff times are shown in **Pacific time** — what's on your clock in
-Seattle.
+1. **Matches** — browse all 104 World Cup matches; filter by team, date, stage,
+   or time of day (morning / afternoon / evening). All kickoff times are in
+   **Pacific time** — what's on your clock in Seattle.
+2. **Bars** — first choose up to 5 preferred neighborhoods (required), then see
+   the best bars to watch the World Cup **grouped by neighborhood**, ranked
+   best-first, as a list or on a map. Tap a venue for its score breakdown and an
+   "Open in Google Maps" link.
+
+Bar recommendations are independent of any single match — this is the go-to app
+for a fan who wants to find where to watch in Seattle. Preferences (neighborhoods)
+are saved to `localStorage`.
 
 ## Data
 

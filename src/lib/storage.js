@@ -1,13 +1,9 @@
 const KEY = 'wc26_prefs'
 
+// Preferences are now just the user's preferred neighborhoods (in priority
+// order). Older fields (venue type, atmosphere, etc.) are no longer used.
 export const DEFAULT_PREFS = {
-  city: 'Seattle',
   neighborhoods: [],
-  venueTypes: [],
-  wantsReservations: false,
-  wantsBigScreen: false,
-  atmosphere: null,
-  onboarded: false,
 }
 
 export function loadPrefs() {

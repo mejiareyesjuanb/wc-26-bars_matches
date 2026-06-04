@@ -45,10 +45,10 @@ export default function VenueModal({ venue, check, onClose }) {
 
         <div className="p-5">
           <div className="flex items-center justify-between mb-1">
-            <span className="font-semibold">Match-fit score</span>
+            <span className="font-semibold">Watch score</span>
             <span className="font-bold text-accent">{venue.score}/100</span>
           </div>
-          <p className="text-sm text-neutral-500 mb-4">How this venue scores on each ranking dimension for this match:</p>
+          <p className="text-sm text-neutral-500 mb-4">How this venue scores on each ranking dimension:</p>
 
           <div className="space-y-3">
             {breakdown.map((row) => (
