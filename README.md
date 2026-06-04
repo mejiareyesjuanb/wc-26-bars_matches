@@ -3,6 +3,12 @@
 A minimalist, responsive web app that ranks the best Seattle venues to watch any
 FIFA World Cup 2026 match, based on your neighborhoods and venue preferences.
 
+**🔴 Live demo: https://wc-26-bars-matches.onrender.com**
+
+Browse all 104 World Cup 2026 matches (Pacific time), then pick your neighborhoods
+on the **Bars** tab to see the sports bars — and venues confirmed showing the
+World Cup — ranked across (or within) your neighborhoods.
+
 ## Run it
 
 ```bash
