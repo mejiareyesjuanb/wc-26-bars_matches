@@ -26,3 +26,22 @@ export function formatKickoff(iso) {
 export function dateKey(iso) {
   return iso.split('T')[0]
 }
+
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+// "Mon Jun 15" — short date for the spreadsheet-style list.
+export function formatDay(iso) {
+  const [y, mo, d] = iso.split('T')[0].split('-').map(Number)
+  const wd = new Date(Date.UTC(y, mo - 1, d)).getUTCDay()
+  return `${WEEKDAYS[wd]} ${MONTHS[mo - 1]} ${d}`
+}
+
+// "3:00 PM" — clock time only (Pacific).
+export function formatClock(iso) {
+  const t = iso.split('T')[1]
+  const hh = Number(t.slice(0, 2))
+  const mm = t.slice(3, 5)
+  const ampm = hh >= 12 ? 'PM' : 'AM'
+  const h12 = hh % 12 === 0 ? 12 : hh % 12
+  return `${h12}:${mm} ${ampm}`
+}
