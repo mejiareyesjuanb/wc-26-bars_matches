@@ -62,7 +62,7 @@ export function createApiApp() {
   })
 
   app.post('/api/venue-screens', async (req, res) => {
-    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 80) : []
+    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 100) : []
     const checks = {}
     await mapLimit(venues, 10, async (v) => {
       if (!v || !v.id) return

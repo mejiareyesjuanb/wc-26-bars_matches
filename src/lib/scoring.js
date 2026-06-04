@@ -24,11 +24,17 @@ function neighborhoodScore(bar, prefs) {
   return 1 - idx * 0.12 // #1 -> 1.0, #5 -> 0.52
 }
 
+// A sports bar inherently has screens and almost certainly shows the World Cup,
+// even if we couldn't scrape its website.
+function isSportsBar(bar) {
+  return bar.type === 'sports bar' || /sports bar/i.test(bar.name || '')
+}
+
 // `check` is the optional website confirmation { screens, worldCup } for a venue.
 function screensScore(bar, check) {
   let s = 0
-  if (bar.confirmedViewing || check?.screens === true) s += 0.4
-  if (bar.bigScreenOrProjector) s += 0.3
+  if (bar.confirmedViewing || check?.screens === true || isSportsBar(bar)) s += 0.4
+  if (bar.bigScreenOrProjector || isSportsBar(bar)) s += 0.3
   s += clamp01((bar.screens || 0) / 10) * 0.3 // saturates at 10 screens
   return clamp01(s)
 }
@@ -38,6 +44,7 @@ function worldCupScore(bar, check) {
   if (check?.worldCup === true) return 1 // confirmed on their website
   if (bar.confirmedViewing) return 0.6 // known to show matches (curated)
   if (check?.screens === true) return 0.35 // has sports screens (likely)
+  if (isSportsBar(bar)) return 0.3 // a sports bar — very likely to show it
   return 0.1 // unknown
 }
 

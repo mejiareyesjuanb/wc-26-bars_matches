@@ -56,6 +56,13 @@ describe('scoreBar', () => {
     expect(confirmed - unconfirmed).toBeGreaterThanOrEqual(25)
   })
 
+  it('treats a sports bar as having screens + likely World Cup, even unscraped', () => {
+    const generic = { ...baseBar, type: 'restaurant', name: 'Generic Eatery', confirmedViewing: false }
+    const sportsBar = { ...generic, type: 'sports bar', name: 'Slim Goody Sports Bar' }
+    expect(scoreBar(sportsBar, match, prefs).score)
+      .toBeGreaterThan(scoreBar(generic, match, prefs).score)
+  })
+
   it('produces a neighborhood reason chip when matched', () => {
     expect(scoreBar(baseBar, match, prefs).reasons.some((x) => x.includes('Ballard'))).toBe(true)
   })

@@ -10,7 +10,7 @@ import NeighborhoodPicker from './NeighborhoodPicker.jsx'
 // so the (match-only) stadium bonus doesn't apply here.
 const NO_MATCH = { venueCity: null, stage: null, homeTeam: null, awayTeam: null }
 const PER_HOOD = 5 // bars shown per neighborhood before "show all"
-const ENRICH_PER_HOOD = 12 // top candidates per neighborhood to website-check
+const RESTAURANTS_PER_HOOD = 4 // also website-check this many top restaurants/neighborhood
 
 export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   const [editing, setEditing] = useState(false)
@@ -39,18 +39,19 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [venues, prefs, checks])
 
-  // Website-check the top candidates in each neighborhood (feeds ranking).
-  // Prioritize likely-sports venues so a sports bar gets checked even when
-  // higher-rated non-sports venues sit above it in the (type-agnostic) ranking.
+  // Website-check candidates (feeds ranking). Check EVERY sports-type venue in
+  // the chosen neighborhoods regardless of review count — a sports bar is a
+  // prime World Cup spot even with few reviews — plus the top few restaurants.
+  // Sporty venues go first so they survive the server-side cap.
   const candidates = useMemo(() => {
-    const out = []
+    const sporty = []
+    const restaurants = []
     for (const h of hoods) {
       const inHood = (baseByHood[h] || []).filter((v) => v.website)
-      const sporty = inHood.filter((v) => v.type !== 'restaurant')
-      const rest = inHood.filter((v) => v.type === 'restaurant')
-      out.push(...[...sporty, ...rest].slice(0, ENRICH_PER_HOOD))
+      sporty.push(...inHood.filter((v) => v.type !== 'restaurant'))
+      restaurants.push(...inHood.filter((v) => v.type === 'restaurant').slice(0, RESTAURANTS_PER_HOOD))
     }
-    return out
+    return [...sporty, ...restaurants]
   }, [baseByHood, hoods])
 
   useEffect(() => {
