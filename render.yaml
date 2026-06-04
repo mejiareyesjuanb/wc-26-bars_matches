@@ -1,0 +1,15 @@
+# Render Blueprint — deploy as a single Node web service that serves both the
+# API and the built front-end. In the Render dashboard: New → Blueprint →
+# connect this repo → set GOOGLE_MAPS_API_KEY when prompted → Apply.
+services:
+  - type: web
+    name: wc26-bars-matches
+    runtime: node
+    plan: free
+    # --include=dev so Vite (a devDependency) is available for the build.
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false # entered in the Render dashboard, never committed
