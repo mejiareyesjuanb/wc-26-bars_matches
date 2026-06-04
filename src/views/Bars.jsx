@@ -7,6 +7,7 @@ import VenueModal from '../components/VenueModal.jsx'
 import NeighborhoodPicker from './NeighborhoodPicker.jsx'
 
 const PER_HOOD = 10 // bars shown per neighborhood before "show all"
+const PAGE = 10 // combined-view page size
 
 // Bar-style Google categories (vs. restaurants/cafes) — prioritized for the
 // website check, but we still check everything with a website to find any venue
@@ -17,29 +18,39 @@ const isBarish = (v) => BAR_CATEGORIES.has(v.type)
 export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   const [editing, setEditing] = useState(false)
   const [tab, setTab] = useState('list')
+  const [group, setGroup] = useState('combined') // 'combined' | 'byHood'
   const [selected, setSelected] = useState(null)
   const [checks, setChecks] = useState({})
   const [expanded, setExpanded] = useState({})
+  const [combinedShown, setCombinedShown] = useState(PAGE)
 
   const hoods = prefs.neighborhoods || []
+  const hoodKey = hoods.join(',')
 
-  // Rank venues within each chosen neighborhood (1..N per neighborhood).
-  const rankHood = (h, withChecks) =>
-    venues ? rankBars(venues.filter((v) => v.neighborhood === h), withChecks ? checks : {}) : []
+  const rankIn = (predicate, withChecks) =>
+    venues ? rankBars(venues.filter(predicate), withChecks ? checks : {}) : []
 
+  // Per-neighborhood rankings (for the grouped view).
   const baseByHood = useMemo(() => {
     const m = {}
-    for (const h of hoods) m[h] = rankHood(h, false)
+    for (const h of hoods) m[h] = rankIn((v) => v.neighborhood === h, false)
     return m
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [venues, hoods.join(',')])
+  }, [venues, hoodKey])
 
   const byHood = useMemo(() => {
     const m = {}
-    for (const h of hoods) m[h] = rankHood(h, true)
+    for (const h of hoods) m[h] = rankIn((v) => v.neighborhood === h, true)
     return m
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [venues, hoods.join(','), checks])
+  }, [venues, hoodKey, checks])
+
+  // One ranking across ALL selected neighborhoods (the default view).
+  const combined = useMemo(
+    () => rankIn((v) => hoods.includes(v.neighborhood), true).filter((v) => v.included),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [venues, hoodKey, checks],
+  )
 
   // Website-check every venue with a website in the chosen neighborhoods, so we
   // can find which actually confirm World Cup viewing. Bars are checked first so
@@ -61,6 +72,9 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candidates.map((v) => v.id).join(',')])
 
+  // Reset paging when the selection or grouping changes.
+  useEffect(() => setCombinedShown(PAGE), [hoodKey, group])
+
   if (hoods.length === 0 || editing) {
     return (
       <NeighborhoodPicker
@@ -70,14 +84,14 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
     )
   }
 
-  // Only sports bars and confirmed-World-Cup venues are shown; everything else
-  // is excluded entirely.
-  const mapVenues = hoods.flatMap((h) => (byHood[h] || []).filter((v) => v.included))
+  const multi = hoods.length > 1
+  const grouped = multi && group === 'byHood'
+  const mapVenues = combined // included venues across all selected neighborhoods
 
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold">Best bars by neighborhood</h1>
+        <h1 className="text-2xl font-bold">{grouped ? 'Best bars by neighborhood' : 'Best bars'}</h1>
         <div className="flex items-center gap-3">
           <button onClick={() => setEditing(true)} className="text-sm text-accent underline">Edit neighborhoods</button>
           <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm">
@@ -86,10 +100,18 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
           </div>
         </div>
       </div>
-      <p className="text-sm text-neutral-500 mb-4">
+
+      <p className="text-sm text-neutral-500 mb-3">
         Sports bars and venues confirmed showing the World Cup — confirmed first, then by reviews.
         {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? 'Live · Google' : 'Curated'}</span>}
       </p>
+
+      {multi && tab === 'list' && (
+        <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm w-max mb-5">
+          <button onClick={() => setGroup('combined')} className={`px-3 py-1 ${group === 'combined' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Combined</button>
+          <button onClick={() => setGroup('byHood')} className={`px-3 py-1 ${group === 'byHood' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>By neighborhood</button>
+        </div>
+      )}
 
       {source === 'curated' && (
         <div className="mb-4 text-sm bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-3 py-2">
@@ -101,7 +123,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
         <p className="text-center text-neutral-400 py-12">Finding bars…</p>
       ) : tab === 'map' ? (
         <VenueMap venues={mapVenues} onSelect={setSelected} />
-      ) : (
+      ) : grouped ? (
         <div className="space-y-8">
           {hoods.map((h) => {
             const list = (byHood[h] || []).filter((v) => v.included)
@@ -132,6 +154,26 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
             )
           })}
         </div>
+      ) : (
+        <>
+          {combined.length === 0 ? (
+            <p className="text-neutral-400 text-sm py-8 text-center">No sports bars or confirmed World Cup venues found in your neighborhoods.</p>
+          ) : (
+            <div className="grid gap-3">
+              {combined.slice(0, combinedShown).map((bar) => (
+                <BarCard key={bar.id} bar={bar} check={checks[bar.id]} onClick={() => setSelected(bar)} />
+              ))}
+            </div>
+          )}
+          {combinedShown < combined.length && (
+            <button
+              onClick={() => setCombinedShown((n) => n + PAGE)}
+              className="mt-4 w-full border border-neutral-300 rounded-lg py-2.5 text-sm font-medium hover:border-accent hover:text-accent"
+            >
+              Show more results ({combined.length - combinedShown} more)
+            </button>
+          )}
+        </>
       )}
 
       {selected && <VenueModal venue={selected} check={checks[selected.id]} onClose={() => setSelected(null)} />}
