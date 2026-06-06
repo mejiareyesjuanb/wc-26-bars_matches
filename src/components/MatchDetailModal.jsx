@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getTeam } from '../data/teams.js'
+import { getTeam, isPlaceholder } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
 import { googleCalendarUrl, icsForMatch, ICS_FILENAME } from '../lib/calendar.js'
 import { stakesFor } from '../lib/stakes.js'
@@ -7,6 +7,7 @@ import { rankBars } from '../lib/scoring.js'
 import { confirmScreens } from '../lib/venues.js'
 import { MATCHES } from '../data/matches.js'
 import BarCard from './BarCard.jsx'
+import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
 
 function downloadIcs(match) {
   const blob = new Blob([icsForMatch(match)], { type: 'text/calendar;charset=utf-8' })
@@ -22,6 +23,20 @@ function downloadIcs(match) {
 
 function TeamName({ team }) {
   return <span>{team.flag ? `${team.flag} ` : ''}{team.name}</span>
+}
+
+// Tappable when the team is known (group stage); plain text for knockout slots.
+function TeamLabel({ team, onPick }) {
+  if (isPlaceholder(team) || !onPick) return <TeamName team={team} />
+  return (
+    <button
+      onClick={() => onPick(team.code)}
+      aria-label={`See ${team.name}'s schedule`}
+      className="hover:text-accent underline-offset-2 hover:underline"
+    >
+      <TeamName team={team} />
+    </button>
+  )
 }
 
 export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, onClose, onSeeAllBars, onPickTeam }) {
@@ -86,7 +101,7 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
               {match.stage}{match.group ? ` · Group ${match.group}` : ''}
             </div>
             <h2 className="text-lg font-semibold mt-1">
-              <TeamName team={home} /> <span className="text-neutral-400 font-normal">vs</span> <TeamName team={away} />
+              <TeamLabel team={home} onPick={onPickTeam} /> <span className="text-neutral-400 font-normal">vs</span> <TeamLabel team={away} onPick={onPickTeam} />
             </h2>
             <p className="text-sm text-neutral-500 mt-1">{formatKickoff(match.datetime)} · {match.venueCity}</p>
           </div>
@@ -120,12 +135,11 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
           <section>
             <h3 className="text-sm font-semibold mb-2">Where to watch</h3>
             {hoods.length === 0 ? (
-              <div className="text-sm text-neutral-500">
-                <p className="mb-2">Choose your neighborhoods to see the best nearby bars showing the World Cup.</p>
-                <button onClick={onSeeAllBars} className="text-sm bg-accent text-white rounded-lg px-3 py-2 hover:opacity-90">
-                  Choose neighborhoods
-                </button>
-              </div>
+              <NeighborhoodPicker
+                initial={hoods}
+                compact
+                onSave={(h) => onSavePrefs?.({ ...prefs, neighborhoods: h })}
+              />
             ) : !venues || (top.length === 0 && enriching) ? (
               <div className="space-y-2">
                 <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
