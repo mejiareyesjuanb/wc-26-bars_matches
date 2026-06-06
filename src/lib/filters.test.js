@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { filterMatches } from './filters.js'
 
 const MATCHES = [
-  { id: 'M1', stage: 'Group', datetime: '2026-06-15T09:00:00-07:00', homeTeam: 'USA', awayTeam: 'MEX' },
-  { id: 'M2', stage: 'Group', datetime: '2026-06-15T18:00:00-07:00', homeTeam: 'ENG', awayTeam: 'BRA' },
-  { id: 'M3', stage: 'R16', datetime: '2026-07-06T14:00:00-07:00', homeTeam: 'USA', awayTeam: 'GER' },
+  { id: 'M1', stage: 'Group', venueCity: 'Seattle', datetime: '2026-06-15T09:00:00-07:00', homeTeam: 'USA', awayTeam: 'MEX' },
+  { id: 'M2', stage: 'Group', venueCity: 'Dallas', datetime: '2026-06-15T18:00:00-07:00', homeTeam: 'ENG', awayTeam: 'BRA' },
+  { id: 'M3', stage: 'R16', venueCity: 'Seattle', datetime: '2026-07-06T14:00:00-07:00', homeTeam: 'USA', awayTeam: 'GER' },
 ]
 
 describe('filterMatches', () => {
@@ -20,6 +20,10 @@ describe('filterMatches', () => {
   })
   it('filters by date', () => {
     expect(filterMatches(MATCHES, { date: '2026-06-15' }).length).toBe(2)
+  })
+  it('filters by city', () => {
+    expect(filterMatches(MATCHES, { city: 'Seattle' }).map((m) => m.id)).toEqual(['M1', 'M3'])
+    expect(filterMatches(MATCHES, { city: 'Dallas' }).map((m) => m.id)).toEqual(['M2'])
   })
   it('filters by time of day', () => {
     expect(filterMatches(MATCHES, { timeOfDay: 'morning' }).map((m) => m.id)).toEqual(['M1'])

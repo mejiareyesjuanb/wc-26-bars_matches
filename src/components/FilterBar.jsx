@@ -3,7 +3,7 @@ import { STAGE_ORDER } from '../data/matches.js'
 
 const TIMES = ['morning', 'afternoon', 'evening']
 
-export default function FilterBar({ filters, setFilters, dates }) {
+export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
   const update = (patch) => setFilters({ ...filters, ...patch })
   const teamCodes = Object.keys(TEAMS).sort((a, b) =>
     TEAMS[a].name.localeCompare(TEAMS[b].name),
@@ -11,7 +11,7 @@ export default function FilterBar({ filters, setFilters, dates }) {
   const hasFilters = Object.values(filters).some(Boolean)
   return (
     <div className="mb-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <select
           className="border border-neutral-300 rounded-lg px-3 py-2 bg-white"
           value={filters.team || ''}
@@ -21,6 +21,15 @@ export default function FilterBar({ filters, setFilters, dates }) {
           {teamCodes.map((c) => (
             <option key={c} value={c}>{TEAMS[c].name}</option>
           ))}
+        </select>
+
+        <select
+          className="border border-neutral-300 rounded-lg px-3 py-2 bg-white"
+          value={filters.city || ''}
+          onChange={(e) => update({ city: e.target.value || undefined })}
+        >
+          <option value="">All cities</option>
+          {cities.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
 
         <select
