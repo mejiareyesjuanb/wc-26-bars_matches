@@ -41,6 +41,7 @@ function TeamLabel({ team, onPick }) {
 
 export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, onClose, onSeeAllBars, onPickTeam }) {
   const [checks, setChecks] = useState({})
+  const [editingHoods, setEditingHoods] = useState(false)
   const contentRef = useRef(null)
 
   useEffect(() => {
@@ -147,38 +148,59 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
             <p className="mt-2 text-xs text-neutral-400">Includes a reminder 1 hour before kickoff.</p>
           </section>
 
-          {/* Where to watch — top bars in the user's neighborhoods */}
-          <section>
-            <h3 className="text-sm font-semibold mb-2">Where to watch</h3>
-            {hoods.length === 0 ? (
-              <NeighborhoodPicker
-                initial={hoods}
-                compact
-                onSave={(h) => onSavePrefs?.({ ...prefs, neighborhoods: h })}
-              />
-            ) : !venues || (top.length === 0 && enriching) ? (
-              <div className="space-y-2">
-                <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
-                <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
-              </div>
-            ) : top.length === 0 ? (
-              <p className="text-sm text-neutral-400">No sports bars or confirmed World Cup venues in your areas yet.</p>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-xs text-neutral-400">Bars that show the World Cup in your areas — not confirmation for this specific match.</p>
-                {top.map((bar) => (
-                  <BarCard key={bar.id} bar={bar} check={checks[bar.id]} />
-                ))}
-                <button onClick={onSeeAllBars} className="text-sm text-accent hover:underline">See all bars →</button>
-              </div>
-            )}
-          </section>
-
+          {/* Stage stakes — banner above where-to-watch */}
           {stakes && (
             <section className="text-sm bg-accent/10 text-accent rounded-lg px-3 py-2">
               ⚡ {stakes}
             </section>
           )}
+
+          {/* Where to watch — top bars in the user's neighborhoods */}
+          <section>
+            <h3 className="text-sm font-semibold mb-2">Where to watch</h3>
+            {hoods.length === 0 || editingHoods ? (
+              <NeighborhoodPicker
+                initial={hoods}
+                compact
+                onSave={(h) => { onSavePrefs?.({ ...prefs, neighborhoods: h }); setEditingHoods(false) }}
+              />
+            ) : (
+              <>
+                {/* Chosen neighborhoods — same pin + chip pattern as the Bars tab */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span aria-hidden="true" className="text-neutral-400">📍</span>
+                  {hoods.map((h) => (
+                    <button
+                      key={h}
+                      onClick={() => setEditingHoods(true)}
+                      title="Change areas"
+                      aria-label={`${h} — change areas`}
+                      className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
+                    >
+                      {h}
+                    </button>
+                  ))}
+                </div>
+
+                {!venues || (top.length === 0 && enriching) ? (
+                  <div className="space-y-2">
+                    <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
+                    <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
+                  </div>
+                ) : top.length === 0 ? (
+                  <p className="text-sm text-neutral-400">No sports bars or confirmed World Cup venues in your areas yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-xs text-neutral-400">Bars that show the World Cup in your areas — not confirmation for this specific match.</p>
+                    {top.map((bar) => (
+                      <BarCard key={bar.id} bar={bar} check={checks[bar.id]} />
+                    ))}
+                    <button onClick={onSeeAllBars} className="text-sm text-accent hover:underline">See all bars →</button>
+                  </div>
+                )}
+              </>
+            )}
+          </section>
         </div>
       </div>
     </div>
