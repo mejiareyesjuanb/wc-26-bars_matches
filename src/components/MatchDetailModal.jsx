@@ -1,6 +1,19 @@
 import { useEffect } from 'react'
 import { getTeam } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
+import { googleCalendarUrl, icsForMatch, ICS_FILENAME } from '../lib/calendar.js'
+
+function downloadIcs(match) {
+  const blob = new Blob([icsForMatch(match)], { type: 'text/calendar;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = ICS_FILENAME(match)
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
 
 function TeamName({ team }) {
   return (
@@ -44,6 +57,30 @@ export default function MatchDetailModal({ match, onClose }) {
             <p className="text-sm text-neutral-500 mt-1">{formatKickoff(match.datetime)} · {match.venueCity}</p>
           </div>
           <button onClick={onClose} aria-label="Close" className="text-neutral-400 hover:text-neutral-700 text-xl leading-none">×</button>
+        </div>
+
+        <div className="p-5 space-y-6">
+          {/* Add to calendar (the .ics includes a 1-hour reminder alarm) */}
+          <section>
+            <h3 className="text-sm font-semibold mb-2">Add to calendar</h3>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <a
+                href={googleCalendarUrl(match)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1 text-sm bg-accent text-white rounded-lg px-3 py-2 hover:opacity-90"
+              >
+                Add to Google Calendar ↗
+              </a>
+              <button
+                onClick={() => downloadIcs(match)}
+                className="inline-flex items-center justify-center gap-1 text-sm border border-neutral-300 rounded-lg px-3 py-2 hover:border-accent"
+              >
+                Download .ics (Apple/Outlook)
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-neutral-400">Includes a reminder 1 hour before kickoff.</p>
+          </section>
         </div>
       </div>
     </div>
