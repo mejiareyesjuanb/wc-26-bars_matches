@@ -93,7 +93,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold">{grouped ? 'Best bars by neighborhood' : 'Best bars'}</h1>
         <div className="flex items-center gap-3">
-          <button onClick={() => setEditing(true)} className="text-sm text-accent underline">Edit neighborhoods</button>
+          <button onClick={() => setEditing(true)} className="text-sm text-accent underline">Choose neighborhood or city</button>
           <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm">
             <button onClick={() => setTab('list')} className={`px-3 py-1 ${tab === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>List</button>
             <button onClick={() => setTab('map')} className={`px-3 py-1 ${tab === 'map' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Map</button>

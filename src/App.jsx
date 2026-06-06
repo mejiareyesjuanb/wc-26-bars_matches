@@ -25,7 +25,7 @@ export default function App() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-neutral-200">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
-          <span className="font-semibold">⚽ Seattle WC26</span>
+          <span className="font-semibold">⚽ Seattle and Eastside WC 26</span>
           <nav className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm">
             <button className={tabClass('matches')} onClick={() => setTab('matches')}>Matches</button>
             <button className={tabClass('bars')} onClick={() => setTab('bars')}>Bars</button>

@@ -14,6 +14,13 @@ export const NEIGHBORHOOD_CENTROIDS = {
   Wallingford: [47.6610, -122.3340],
   Downtown: [47.6080, -122.3360],
   'West Seattle': [47.5700, -122.3870],
+  // Eastside cities
+  Bellevue: [47.6101, -122.2015],
+  Kirkland: [47.6769, -122.2060],
+  Redmond: [47.6740, -122.1215],
+  'Mercer Island': [47.5707, -122.2221],
+  Issaquah: [47.5301, -122.0326],
+  Woodinville: [47.7543, -122.1635],
 }
 
 export function nearestNeighborhood(lat, lng) {

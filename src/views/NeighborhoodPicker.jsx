@@ -12,10 +12,11 @@ export default function NeighborhoodPicker({ initial, onSave }) {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold">Choose your preferred neighborhoods</h1>
+      <h1 className="text-2xl font-bold">Choose your neighborhoods or cities</h1>
       <p className="text-neutral-500 mt-2">
-        Pick up to 5, in order of preference. We use these to rank the best bars to watch the
-        World Cup near you. <strong>This is required to see the bars.</strong>
+        Pick up to 5, in order of preference (Seattle neighborhoods or Eastside cities). We use
+        these to rank the best bars to watch the World Cup near you.{' '}
+        <strong>This is required to see the bars.</strong>
       </p>
 
       <div className="flex flex-wrap gap-2 mt-6">
@@ -36,7 +37,7 @@ export default function NeighborhoodPicker({ initial, onSave }) {
         disabled={!hoods.length}
         className="mt-8 w-full bg-accent text-white rounded-lg py-3 font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {hoods.length ? 'See bars' : 'Pick at least one neighborhood'}
+        {hoods.length ? 'See bars' : 'Pick at least one neighborhood or city'}
       </button>
     </div>
   )

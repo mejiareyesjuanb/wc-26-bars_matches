@@ -119,7 +119,7 @@ export async function fetchSeattleVenues(apiKey) {
     // Google's own "sports bars in {neighborhood}" answer — catches sports bars
     // typed as generic bar/pub/grill, and improves per-neighborhood coverage.
     ...NEIGHBORHOODS.map((n) =>
-      searchText(`sports bars in ${n} Seattle`, apiKey, { sportsBar: true }).catch((e) => {
+      searchText(`sports bars in ${n}, WA`, apiKey, { sportsBar: true }).catch((e) => {
         console.error('[places] sports-bar query failed:', n, '-', e.message)
         return []
       }),
