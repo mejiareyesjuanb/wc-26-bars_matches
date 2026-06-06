@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { getTeam } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
 import { googleCalendarUrl, icsForMatch, ICS_FILENAME } from '../lib/calendar.js'
+import { stakesFor } from '../lib/stakes.js'
+import { MATCHES } from '../data/matches.js'
 
 function downloadIcs(match) {
   const blob = new Blob([icsForMatch(match)], { type: 'text/calendar;charset=utf-8' })
@@ -33,6 +35,7 @@ export default function MatchDetailModal({ match, onClose }) {
   if (!match) return null
   const home = getTeam(match.homeTeam)
   const away = getTeam(match.awayTeam)
+  const stakes = stakesFor(match, MATCHES)
 
   return (
     <div
@@ -81,6 +84,12 @@ export default function MatchDetailModal({ match, onClose }) {
             </div>
             <p className="mt-2 text-xs text-neutral-400">Includes a reminder 1 hour before kickoff.</p>
           </section>
+
+          {stakes && (
+            <section className="text-sm bg-accent/10 text-accent rounded-lg px-3 py-2">
+              ⚡ {stakes}
+            </section>
+          )}
         </div>
       </div>
     </div>
