@@ -8,7 +8,7 @@ import MatchTable from '../components/MatchTable.jsx'
 
 export default function Matches() {
   const [filters, setFilters] = useState({})
-  const [view, setView] = useState('list') // 'list' | 'cards'
+  const [view, setView] = useState('cards') // 'cards' | 'list'
   const dates = useMemo(
     () => [...new Set(MATCHES.map((m) => dateKey(m.datetime)))].sort(),
     [],
@@ -24,8 +24,8 @@ export default function Matches() {
       <div className="flex items-start justify-between gap-3">
         <h1 className="text-2xl font-bold">World Cup 2026 matches</h1>
         <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm shrink-0">
-          <button onClick={() => setView('list')} className={`px-3 py-1 ${view === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>List</button>
           <button onClick={() => setView('cards')} className={`px-3 py-1 ${view === 'cards' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Cards</button>
+          <button onClick={() => setView('list')} className={`px-3 py-1 ${view === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>List</button>
         </div>
       </div>
       <p className="text-sm text-neutral-500 mt-1 mb-4">
