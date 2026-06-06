@@ -8,7 +8,7 @@ function teamLabel(code) {
 
 // Compact, spreadsheet-style list of matches — quick to scan by date.
 // The date is shown only when it changes from the row above (merged-cell feel).
-export default function MatchTable({ matches }) {
+export default function MatchTable({ matches, onSelect }) {
   let lastDate = null
   return (
     <div className="overflow-x-auto rounded-xl border border-neutral-200 bg-white">
@@ -30,7 +30,8 @@ export default function MatchTable({ matches }) {
             return (
               <tr
                 key={m.id}
-                className={`hover:bg-neutral-50 ${newDay ? 'border-t border-neutral-200' : ''}`}
+                onClick={() => onSelect?.(m)}
+                className={`cursor-pointer hover:bg-neutral-50 ${newDay ? 'border-t border-neutral-200' : ''}`}
               >
                 <td className="px-3 py-2 whitespace-nowrap font-medium text-neutral-700">
                   {newDay ? formatDay(m.datetime) : ''}

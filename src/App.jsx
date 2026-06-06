@@ -33,7 +33,14 @@ export default function App() {
         </div>
       </header>
 
-      {tab === 'matches' && <Matches />}
+      {tab === 'matches' && (
+        <Matches
+          venues={venueData?.venues}
+          prefs={prefs}
+          onSavePrefs={savePreferences}
+          onGoToBars={() => setTab('bars')}
+        />
+      )}
       {tab === 'bars' && (
         <Bars
           prefs={prefs}

@@ -1,11 +1,14 @@
 import { getTeam } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
 
-export default function MatchCard({ match }) {
+export default function MatchCard({ match, onSelect }) {
   const home = getTeam(match.homeTeam)
   const away = getTeam(match.awayTeam)
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 p-4">
+    <div
+      onClick={() => onSelect?.(match)}
+      className="bg-white rounded-xl border border-neutral-200 p-4 cursor-pointer hover:shadow-md hover:border-accent transition"
+    >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-medium text-accent">
           {match.stage}{match.group ? ` · Group ${match.group}` : ''}
