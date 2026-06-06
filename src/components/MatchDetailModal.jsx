@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getTeam, isPlaceholder } from '../data/teams.js'
+import { teamInfo, TEAM_INFO_META } from '../data/teamInfo.js'
 import { formatKickoff } from '../lib/time.js'
 import { googleCalendarUrl, icsForMatch, ICS_FILENAME } from '../lib/calendar.js'
 import { stakesFor } from '../lib/stakes.js'
@@ -23,6 +24,25 @@ function downloadIcs(match) {
 
 function TeamName({ team }) {
   return <span>{team.flag ? `${team.flag} ` : ''}{team.name}</span>
+}
+
+function TeamColumn({ team, info }) {
+  return (
+    <div>
+      <div className="font-semibold text-sm"><TeamName team={team} /></div>
+      <div className="text-xs text-neutral-500 mt-0.5">
+        FIFA #{info.fifaRank} · Best: {info.bestFinish}
+      </div>
+      <div className="text-xs font-medium text-neutral-500 mt-2">Players to watch</div>
+      <div className="mt-1 flex flex-wrap gap-1">
+        {info.playersToWatch.map((p) => (
+          <span key={p.name} className="text-xs bg-neutral-100 rounded-full px-2 py-0.5">
+            <span className="text-neutral-700">{p.name}</span> <span className="text-neutral-400">{p.club}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 // Tappable when the team is known (group stage); plain text for knockout slots.
@@ -88,6 +108,9 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
   if (!match) return null
   const home = getTeam(match.homeTeam)
   const away = getTeam(match.awayTeam)
+  const homeInfo = teamInfo(match.homeTeam)
+  const awayInfo = teamInfo(match.awayTeam)
+  const showTeams = homeInfo && awayInfo && !isPlaceholder(home) && !isPlaceholder(away)
   const stakes = stakesFor(match, MATCHES)
   const top = ranked.slice(0, 3)
   const enriching = candidates.some((v) => checks[v.id] === undefined)
@@ -126,6 +149,17 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
         </div>
 
         <div className="p-5 space-y-6">
+          {/* Teams — FIFA rank, best World Cup finish, players to watch */}
+          {showTeams && (
+            <section>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <TeamColumn team={home} info={homeInfo} />
+                <TeamColumn team={away} info={awayInfo} />
+              </div>
+              <p className="mt-2 text-xs text-neutral-400">FIFA rank as of {TEAM_INFO_META.rankAsOf}.</p>
+            </section>
+          )}
+
           {/* Add to calendar (the .ics includes a 1-hour reminder alarm) */}
           <section>
             <h3 className="text-sm font-semibold mb-2">Add to calendar</h3>
