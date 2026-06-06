@@ -1,9 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getTeam } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
 import { googleCalendarUrl, icsForMatch, ICS_FILENAME } from '../lib/calendar.js'
 import { stakesFor } from '../lib/stakes.js'
+import { rankBars } from '../lib/scoring.js'
+import { confirmScreens } from '../lib/venues.js'
 import { MATCHES } from '../data/matches.js'
+import BarCard from './BarCard.jsx'
 
 function downloadIcs(match) {
   const blob = new Blob([icsForMatch(match)], { type: 'text/calendar;charset=utf-8' })
@@ -18,24 +21,52 @@ function downloadIcs(match) {
 }
 
 function TeamName({ team }) {
-  return (
-    <span>
-      {team.flag ? `${team.flag} ` : ''}{team.name}
-    </span>
-  )
+  return <span>{team.flag ? `${team.flag} ` : ''}{team.name}</span>
 }
 
-export default function MatchDetailModal({ match, onClose }) {
+export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, onClose, onSeeAllBars, onPickTeam }) {
+  const [checks, setChecks] = useState({})
+
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  const hoods = prefs?.neighborhoods || []
+  const hoodKey = hoods.join(',')
+
+  // Base ranking (no website checks) picks which venues are worth checking.
+  const baseRanked = useMemo(
+    () => (venues ? rankBars(venues.filter((v) => hoods.includes(v.neighborhood))) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [venues, hoodKey],
+  )
+  // Final ranking folds in confirmations and keeps only sports bars / confirmed.
+  const ranked = useMemo(
+    () => (venues ? rankBars(venues.filter((v) => hoods.includes(v.neighborhood)), checks).filter((v) => v.included) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [venues, hoodKey, checks],
+  )
+  const candidates = useMemo(() => baseRanked.filter((v) => v.website).slice(0, 20), [baseRanked])
+
+  useEffect(() => {
+    const need = candidates.filter((v) => checks[v.id] === undefined)
+    if (!need.length) return
+    let cancelled = false
+    confirmScreens(need).then((res) => {
+      if (!cancelled && res && Object.keys(res).length) setChecks((c) => ({ ...c, ...res }))
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidates.map((v) => v.id).join(',')])
+
   if (!match) return null
   const home = getTeam(match.homeTeam)
   const away = getTeam(match.awayTeam)
   const stakes = stakesFor(match, MATCHES)
+  const top = ranked.slice(0, 3)
+  const enriching = candidates.some((v) => checks[v.id] === undefined)
 
   return (
     <div
@@ -83,6 +114,33 @@ export default function MatchDetailModal({ match, onClose }) {
               </button>
             </div>
             <p className="mt-2 text-xs text-neutral-400">Includes a reminder 1 hour before kickoff.</p>
+          </section>
+
+          {/* Where to watch — top bars in the user's neighborhoods */}
+          <section>
+            <h3 className="text-sm font-semibold mb-2">Where to watch</h3>
+            {hoods.length === 0 ? (
+              <div className="text-sm text-neutral-500">
+                <p className="mb-2">Choose your neighborhoods to see the best nearby bars showing the World Cup.</p>
+                <button onClick={onSeeAllBars} className="text-sm bg-accent text-white rounded-lg px-3 py-2 hover:opacity-90">
+                  Choose neighborhoods
+                </button>
+              </div>
+            ) : !venues || (top.length === 0 && enriching) ? (
+              <div className="space-y-2">
+                <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
+                <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
+              </div>
+            ) : top.length === 0 ? (
+              <p className="text-sm text-neutral-400">No sports bars or confirmed World Cup venues in your areas yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {top.map((bar) => (
+                  <BarCard key={bar.id} bar={bar} check={checks[bar.id]} />
+                ))}
+                <button onClick={onSeeAllBars} className="text-sm text-accent hover:underline">See all bars →</button>
+              </div>
+            )}
           </section>
 
           {stakes && (
