@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { getTeam, isPlaceholder } from '../data/teams.js'
 import { formatKickoff } from '../lib/time.js'
 import { googleCalendarUrl, icsForMatch, ICS_FILENAME } from '../lib/calendar.js'
@@ -41,12 +41,20 @@ function TeamLabel({ team, onPick }) {
 
 export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, onClose, onSeeAllBars, onPickTeam }) {
   const [checks, setChecks] = useState({})
+  const contentRef = useRef(null)
 
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+
+  // Move focus into the dialog on open; restore it to the trigger on close.
+  useEffect(() => {
+    const prev = document.activeElement
+    contentRef.current?.focus()
+    return () => { if (prev && typeof prev.focus === 'function') prev.focus() }
+  }, [])
 
   const hoods = prefs?.neighborhoods || []
   const hoodKey = hoods.join(',')
@@ -89,11 +97,19 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
       onClick={onClose}
       role="dialog"
       aria-modal="true"
+      aria-label={`${home.name} vs ${away.name} — match details`}
     >
       <div
-        className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto"
+        ref={contentRef}
+        tabIndex={-1}
+        className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto outline-none"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile drag handle (decorative) */}
+        <div className="sm:hidden flex justify-center pt-2">
+          <div className="h-1 w-10 rounded-full bg-neutral-300" />
+        </div>
+
         {/* Header — renders instantly from the match data */}
         <div className="p-5 border-b border-neutral-100 flex items-start justify-between gap-3">
           <div>
@@ -149,6 +165,7 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
               <p className="text-sm text-neutral-400">No sports bars or confirmed World Cup venues in your areas yet.</p>
             ) : (
               <div className="space-y-3">
+                <p className="text-xs text-neutral-400">Bars that show the World Cup in your areas — not confirmation for this specific match.</p>
                 {top.map((bar) => (
                   <BarCard key={bar.id} bar={bar} check={checks[bar.id]} />
                 ))}
