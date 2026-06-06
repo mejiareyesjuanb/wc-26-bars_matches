@@ -106,6 +106,23 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
         {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? 'Live · Google' : 'Curated'}</span>}
       </p>
 
+      {hoods.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 mb-5">
+          <span aria-hidden="true" className="text-neutral-400">📍</span>
+          {hoods.map((h) => (
+            <button
+              key={h}
+              onClick={() => setEditing(true)}
+              title="Change areas"
+              aria-label={`${h} — change areas`}
+              className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
+            >
+              {h}
+            </button>
+          ))}
+        </div>
+      )}
+
       {multi && tab === 'list' && (
         <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm w-max mb-5">
           <button onClick={() => setGroup('combined')} className={`px-3 py-1 ${group === 'combined' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Combined</button>
