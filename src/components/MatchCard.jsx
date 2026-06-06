@@ -1,5 +1,12 @@
 import { getTeam } from '../data/teams.js'
+import { teamInfo } from '../data/teamInfo.js'
 import { formatKickoff } from '../lib/time.js'
+
+function Rank({ code }) {
+  const rank = teamInfo(code)?.fifaRank
+  if (!rank) return null
+  return <span className="ml-1 align-middle text-xs font-normal text-neutral-400">#{rank}</span>
+}
 
 export default function MatchCard({ match, onSelect }) {
   const home = getTeam(match.homeTeam)
@@ -16,9 +23,9 @@ export default function MatchCard({ match, onSelect }) {
         <span className="text-xs text-neutral-500">{match.venueCity}</span>
       </div>
       <div className="flex items-center gap-2 text-base sm:text-lg font-semibold">
-        <span>{home.flag ? `${home.flag} ` : ''}{home.name}</span>
+        <span>{home.flag ? `${home.flag} ` : ''}{home.name}<Rank code={match.homeTeam} /></span>
         <span className="text-neutral-400 text-sm">vs</span>
-        <span>{away.flag ? `${away.flag} ` : ''}{away.name}</span>
+        <span>{away.flag ? `${away.flag} ` : ''}{away.name}<Rank code={match.awayTeam} /></span>
       </div>
       <div className="mt-2 text-sm text-neutral-500">{formatKickoff(match.datetime)}</div>
     </div>
