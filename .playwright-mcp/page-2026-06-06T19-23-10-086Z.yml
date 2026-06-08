@@ -1,0 +1,1359 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: ⚽ Seattle and Eastside WC 26
+      - navigation [ref=e7]:
+        - button "Matches" [ref=e8] [cursor=pointer]
+        - button "Bars" [ref=e9] [cursor=pointer]
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - heading "World Cup 2026 matches" [level=1] [ref=e12]
+      - generic [ref=e13]:
+        - button "Cards" [ref=e14] [cursor=pointer]
+        - button "List" [ref=e15] [cursor=pointer]
+    - paragraph [ref=e16]: Every match, in Pacific (Seattle) time. Tap a match to add it to your calendar and find where to watch.
+    - generic [ref=e18]:
+      - combobox [ref=e19]:
+        - option "All teams" [selected]
+        - option "Algeria"
+        - option "Argentina"
+        - option "Australia"
+        - option "Austria"
+        - option "Belgium"
+        - option "Bosnia & Herzegovina"
+        - option "Brazil"
+        - option "Canada"
+        - option "Cape Verde"
+        - option "Colombia"
+        - option "Croatia"
+        - option "Curaçao"
+        - option "Czech Republic"
+        - option "DR Congo"
+        - option "Ecuador"
+        - option "Egypt"
+        - option "England"
+        - option "France"
+        - option "Germany"
+        - option "Ghana"
+        - option "Haiti"
+        - option "Iran"
+        - option "Iraq"
+        - option "Ivory Coast"
+        - option "Japan"
+        - option "Jordan"
+        - option "Mexico"
+        - option "Morocco"
+        - option "Netherlands"
+        - option "New Zealand"
+        - option "Norway"
+        - option "Panama"
+        - option "Paraguay"
+        - option "Portugal"
+        - option "Qatar"
+        - option "Saudi Arabia"
+        - option "Scotland"
+        - option "Senegal"
+        - option "South Africa"
+        - option "South Korea"
+        - option "Spain"
+        - option "Sweden"
+        - option "Switzerland"
+        - option "Tunisia"
+        - option "Turkey"
+        - option "United States"
+        - option "Uruguay"
+        - option "Uzbekistan"
+      - combobox [ref=e20]:
+        - option "All cities" [selected]
+        - option "Atlanta"
+        - option "Boston"
+        - option "Dallas"
+        - option "Guadalajara"
+        - option "Houston"
+        - option "Kansas City"
+        - option "Los Angeles"
+        - option "Mexico City"
+        - option "Miami"
+        - option "Monterrey"
+        - option "New York/NJ"
+        - option "Philadelphia"
+        - option "SF Bay Area"
+        - option "Seattle"
+        - option "Toronto"
+        - option "Vancouver"
+      - combobox [ref=e21]:
+        - option "All stages" [selected]
+        - option "Group"
+        - option "Round of 32"
+        - option "Round of 16"
+        - option "Quarter-final"
+        - option "Semi-final"
+        - option "Third place"
+        - option "Final"
+      - combobox [ref=e22]:
+        - option "All dates" [selected]
+        - option "2026-06-11"
+        - option "2026-06-12"
+        - option "2026-06-13"
+        - option "2026-06-14"
+        - option "2026-06-15"
+        - option "2026-06-16"
+        - option "2026-06-17"
+        - option "2026-06-18"
+        - option "2026-06-19"
+        - option "2026-06-20"
+        - option "2026-06-21"
+        - option "2026-06-22"
+        - option "2026-06-23"
+        - option "2026-06-24"
+        - option "2026-06-25"
+        - option "2026-06-26"
+        - option "2026-06-27"
+        - option "2026-06-28"
+        - option "2026-06-29"
+        - option "2026-06-30"
+        - option "2026-07-01"
+        - option "2026-07-02"
+        - option "2026-07-03"
+        - option "2026-07-04"
+        - option "2026-07-05"
+        - option "2026-07-06"
+        - option "2026-07-07"
+        - option "2026-07-09"
+        - option "2026-07-10"
+        - option "2026-07-11"
+        - option "2026-07-14"
+        - option "2026-07-15"
+        - option "2026-07-18"
+        - option "2026-07-19"
+      - combobox [ref=e23]:
+        - option "Any time" [selected]
+        - option "morning"
+        - option "afternoon"
+        - option "evening"
+    - paragraph [ref=e24]: 104 matches
+    - generic [ref=e25]:
+      - generic [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: Group · Group A
+          - generic [ref=e29]: Mexico City
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - text: 🇲🇽 Mexico
+            - generic [ref=e32]: "#15"
+          - generic [ref=e33]: vs
+          - generic [ref=e34]:
+            - text: 🇿🇦 South Africa
+            - generic [ref=e35]: "#60"
+        - generic [ref=e36]: Jun 11, 12:00 PM PT
+      - generic [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]:
+          - generic [ref=e39]: Group · Group A
+          - generic [ref=e40]: Guadalajara
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - text: 🇰🇷 South Korea
+            - generic [ref=e43]: "#25"
+          - generic [ref=e44]: vs
+          - generic [ref=e45]:
+            - text: 🇨🇿 Czech Republic
+            - generic [ref=e46]: "#41"
+        - generic [ref=e47]: Jun 11, 7:00 PM PT
+      - generic [ref=e48] [cursor=pointer]:
+        - generic [ref=e49]:
+          - generic [ref=e50]: Group · Group B
+          - generic [ref=e51]: Toronto
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - text: 🇨🇦 Canada
+            - generic [ref=e54]: "#30"
+          - generic [ref=e55]: vs
+          - generic [ref=e56]:
+            - text: 🇧🇦 Bosnia & Herzegovina
+            - generic [ref=e57]: "#65"
+        - generic [ref=e58]: Jun 12, 12:00 PM PT
+      - generic [ref=e59] [cursor=pointer]:
+        - generic [ref=e60]:
+          - generic [ref=e61]: Group · Group D
+          - generic [ref=e62]: Los Angeles
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - text: 🇺🇸 United States
+            - generic [ref=e65]: "#16"
+          - generic [ref=e66]: vs
+          - generic [ref=e67]:
+            - text: 🇵🇾 Paraguay
+            - generic [ref=e68]: "#40"
+        - generic [ref=e69]: Jun 12, 6:00 PM PT
+      - generic [ref=e70] [cursor=pointer]:
+        - generic [ref=e71]:
+          - generic [ref=e72]: Group · Group B
+          - generic [ref=e73]: SF Bay Area
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - text: 🇶🇦 Qatar
+            - generic [ref=e76]: "#55"
+          - generic [ref=e77]: vs
+          - generic [ref=e78]:
+            - text: 🇨🇭 Switzerland
+            - generic [ref=e79]: "#19"
+        - generic [ref=e80]: Jun 13, 12:00 PM PT
+      - generic [ref=e81] [cursor=pointer]:
+        - generic [ref=e82]:
+          - generic [ref=e83]: Group · Group C
+          - generic [ref=e84]: New York/NJ
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - text: 🇧🇷 Brazil
+            - generic [ref=e87]: "#6"
+          - generic [ref=e88]: vs
+          - generic [ref=e89]:
+            - text: 🇲🇦 Morocco
+            - generic [ref=e90]: "#8"
+        - generic [ref=e91]: Jun 13, 3:00 PM PT
+      - generic [ref=e92] [cursor=pointer]:
+        - generic [ref=e93]:
+          - generic [ref=e94]: Group · Group C
+          - generic [ref=e95]: Boston
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - text: 🇭🇹 Haiti
+            - generic [ref=e98]: "#83"
+          - generic [ref=e99]: vs
+          - generic [ref=e100]:
+            - text: 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland
+            - generic [ref=e101]: "#43"
+        - generic [ref=e102]: Jun 13, 6:00 PM PT
+      - generic [ref=e103] [cursor=pointer]:
+        - generic [ref=e104]:
+          - generic [ref=e105]: Group · Group D
+          - generic [ref=e106]: Vancouver
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - text: 🇦🇺 Australia
+            - generic [ref=e109]: "#27"
+          - generic [ref=e110]: vs
+          - generic [ref=e111]:
+            - text: 🇹🇷 Turkey
+            - generic [ref=e112]: "#22"
+        - generic [ref=e113]: Jun 13, 9:00 PM PT
+      - generic [ref=e114] [cursor=pointer]:
+        - generic [ref=e115]:
+          - generic [ref=e116]: Group · Group E
+          - generic [ref=e117]: Houston
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - text: 🇩🇪 Germany
+            - generic [ref=e120]: "#10"
+          - generic [ref=e121]: vs
+          - generic [ref=e122]:
+            - text: 🇨🇼 Curaçao
+            - generic [ref=e123]: "#82"
+        - generic [ref=e124]: Jun 14, 10:00 AM PT
+      - generic [ref=e125] [cursor=pointer]:
+        - generic [ref=e126]:
+          - generic [ref=e127]: Group · Group F
+          - generic [ref=e128]: Dallas
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - text: 🇳🇱 Netherlands
+            - generic [ref=e131]: "#7"
+          - generic [ref=e132]: vs
+          - generic [ref=e133]:
+            - text: 🇯🇵 Japan
+            - generic [ref=e134]: "#18"
+        - generic [ref=e135]: Jun 14, 1:00 PM PT
+      - generic [ref=e136] [cursor=pointer]:
+        - generic [ref=e137]:
+          - generic [ref=e138]: Group · Group E
+          - generic [ref=e139]: Philadelphia
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - text: 🇨🇮 Ivory Coast
+            - generic [ref=e142]: "#34"
+          - generic [ref=e143]: vs
+          - generic [ref=e144]:
+            - text: 🇪🇨 Ecuador
+            - generic [ref=e145]: "#23"
+        - generic [ref=e146]: Jun 14, 4:00 PM PT
+      - generic [ref=e147] [cursor=pointer]:
+        - generic [ref=e148]:
+          - generic [ref=e149]: Group · Group F
+          - generic [ref=e150]: Monterrey
+        - generic [ref=e151]:
+          - generic [ref=e152]:
+            - text: 🇸🇪 Sweden
+            - generic [ref=e153]: "#38"
+          - generic [ref=e154]: vs
+          - generic [ref=e155]:
+            - text: 🇹🇳 Tunisia
+            - generic [ref=e156]: "#44"
+        - generic [ref=e157]: Jun 14, 7:00 PM PT
+      - generic [ref=e158] [cursor=pointer]:
+        - generic [ref=e159]:
+          - generic [ref=e160]: Group · Group H
+          - generic [ref=e161]: Atlanta
+        - generic [ref=e162]:
+          - generic [ref=e163]:
+            - text: 🇪🇸 Spain
+            - generic [ref=e164]: "#2"
+          - generic [ref=e165]: vs
+          - generic [ref=e166]:
+            - text: 🇨🇻 Cape Verde
+            - generic [ref=e167]: "#69"
+        - generic [ref=e168]: Jun 15, 9:00 AM PT
+      - generic [ref=e169] [cursor=pointer]:
+        - generic [ref=e170]:
+          - generic [ref=e171]: Group · Group G
+          - generic [ref=e172]: Seattle
+        - generic [ref=e173]:
+          - generic [ref=e174]:
+            - text: 🇧🇪 Belgium
+            - generic [ref=e175]: "#9"
+          - generic [ref=e176]: vs
+          - generic [ref=e177]:
+            - text: 🇪🇬 Egypt
+            - generic [ref=e178]: "#29"
+        - generic [ref=e179]: Jun 15, 12:00 PM PT
+      - generic [ref=e180] [cursor=pointer]:
+        - generic [ref=e181]:
+          - generic [ref=e182]: Group · Group H
+          - generic [ref=e183]: Miami
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - text: 🇸🇦 Saudi Arabia
+            - generic [ref=e186]: "#61"
+          - generic [ref=e187]: vs
+          - generic [ref=e188]:
+            - text: 🇺🇾 Uruguay
+            - generic [ref=e189]: "#17"
+        - generic [ref=e190]: Jun 15, 3:00 PM PT
+      - generic [ref=e191] [cursor=pointer]:
+        - generic [ref=e192]:
+          - generic [ref=e193]: Group · Group G
+          - generic [ref=e194]: Los Angeles
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - text: 🇮🇷 Iran
+            - generic [ref=e197]: "#21"
+          - generic [ref=e198]: vs
+          - generic [ref=e199]:
+            - text: 🇳🇿 New Zealand
+            - generic [ref=e200]: "#85"
+        - generic [ref=e201]: Jun 15, 6:00 PM PT
+      - generic [ref=e202] [cursor=pointer]:
+        - generic [ref=e203]:
+          - generic [ref=e204]: Group · Group I
+          - generic [ref=e205]: New York/NJ
+        - generic [ref=e206]:
+          - generic [ref=e207]:
+            - text: 🇫🇷 France
+            - generic [ref=e208]: "#1"
+          - generic [ref=e209]: vs
+          - generic [ref=e210]:
+            - text: 🇸🇳 Senegal
+            - generic [ref=e211]: "#14"
+        - generic [ref=e212]: Jun 16, 12:00 PM PT
+      - generic [ref=e213] [cursor=pointer]:
+        - generic [ref=e214]:
+          - generic [ref=e215]: Group · Group I
+          - generic [ref=e216]: Boston
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - text: 🇮🇶 Iraq
+            - generic [ref=e219]: "#57"
+          - generic [ref=e220]: vs
+          - generic [ref=e221]:
+            - text: 🇳🇴 Norway
+            - generic [ref=e222]: "#31"
+        - generic [ref=e223]: Jun 16, 3:00 PM PT
+      - generic [ref=e224] [cursor=pointer]:
+        - generic [ref=e225]:
+          - generic [ref=e226]: Group · Group J
+          - generic [ref=e227]: Kansas City
+        - generic [ref=e228]:
+          - generic [ref=e229]:
+            - text: 🇦🇷 Argentina
+            - generic [ref=e230]: "#3"
+          - generic [ref=e231]: vs
+          - generic [ref=e232]:
+            - text: 🇩🇿 Algeria
+            - generic [ref=e233]: "#28"
+        - generic [ref=e234]: Jun 16, 6:00 PM PT
+      - generic [ref=e235] [cursor=pointer]:
+        - generic [ref=e236]:
+          - generic [ref=e237]: Group · Group J
+          - generic [ref=e238]: SF Bay Area
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - text: 🇦🇹 Austria
+            - generic [ref=e241]: "#24"
+          - generic [ref=e242]: vs
+          - generic [ref=e243]:
+            - text: 🇯🇴 Jordan
+            - generic [ref=e244]: "#63"
+        - generic [ref=e245]: Jun 16, 9:00 PM PT
+      - generic [ref=e246] [cursor=pointer]:
+        - generic [ref=e247]:
+          - generic [ref=e248]: Group · Group K
+          - generic [ref=e249]: Houston
+        - generic [ref=e250]:
+          - generic [ref=e251]:
+            - text: 🇵🇹 Portugal
+            - generic [ref=e252]: "#5"
+          - generic [ref=e253]: vs
+          - generic [ref=e254]:
+            - text: 🇨🇩 DR Congo
+            - generic [ref=e255]: "#46"
+        - generic [ref=e256]: Jun 17, 10:00 AM PT
+      - generic [ref=e257] [cursor=pointer]:
+        - generic [ref=e258]:
+          - generic [ref=e259]: Group · Group L
+          - generic [ref=e260]: Dallas
+        - generic [ref=e261]:
+          - generic [ref=e262]:
+            - text: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+            - generic [ref=e263]: "#4"
+          - generic [ref=e264]: vs
+          - generic [ref=e265]:
+            - text: 🇭🇷 Croatia
+            - generic [ref=e266]: "#11"
+        - generic [ref=e267]: Jun 17, 1:00 PM PT
+      - generic [ref=e268] [cursor=pointer]:
+        - generic [ref=e269]:
+          - generic [ref=e270]: Group · Group L
+          - generic [ref=e271]: Toronto
+        - generic [ref=e272]:
+          - generic [ref=e273]:
+            - text: 🇬🇭 Ghana
+            - generic [ref=e274]: "#74"
+          - generic [ref=e275]: vs
+          - generic [ref=e276]:
+            - text: 🇵🇦 Panama
+            - generic [ref=e277]: "#33"
+        - generic [ref=e278]: Jun 17, 4:00 PM PT
+      - generic [ref=e279] [cursor=pointer]:
+        - generic [ref=e280]:
+          - generic [ref=e281]: Group · Group K
+          - generic [ref=e282]: Mexico City
+        - generic [ref=e283]:
+          - generic [ref=e284]:
+            - text: 🇺🇿 Uzbekistan
+            - generic [ref=e285]: "#50"
+          - generic [ref=e286]: vs
+          - generic [ref=e287]:
+            - text: 🇨🇴 Colombia
+            - generic [ref=e288]: "#13"
+        - generic [ref=e289]: Jun 17, 7:00 PM PT
+      - generic [ref=e290] [cursor=pointer]:
+        - generic [ref=e291]:
+          - generic [ref=e292]: Group · Group A
+          - generic [ref=e293]: Atlanta
+        - generic [ref=e294]:
+          - generic [ref=e295]:
+            - text: 🇨🇿 Czech Republic
+            - generic [ref=e296]: "#41"
+          - generic [ref=e297]: vs
+          - generic [ref=e298]:
+            - text: 🇿🇦 South Africa
+            - generic [ref=e299]: "#60"
+        - generic [ref=e300]: Jun 18, 9:00 AM PT
+      - generic [ref=e301] [cursor=pointer]:
+        - generic [ref=e302]:
+          - generic [ref=e303]: Group · Group B
+          - generic [ref=e304]: Los Angeles
+        - generic [ref=e305]:
+          - generic [ref=e306]:
+            - text: 🇨🇭 Switzerland
+            - generic [ref=e307]: "#19"
+          - generic [ref=e308]: vs
+          - generic [ref=e309]:
+            - text: 🇧🇦 Bosnia & Herzegovina
+            - generic [ref=e310]: "#65"
+        - generic [ref=e311]: Jun 18, 12:00 PM PT
+      - generic [ref=e312] [cursor=pointer]:
+        - generic [ref=e313]:
+          - generic [ref=e314]: Group · Group B
+          - generic [ref=e315]: Vancouver
+        - generic [ref=e316]:
+          - generic [ref=e317]:
+            - text: 🇨🇦 Canada
+            - generic [ref=e318]: "#30"
+          - generic [ref=e319]: vs
+          - generic [ref=e320]:
+            - text: 🇶🇦 Qatar
+            - generic [ref=e321]: "#55"
+        - generic [ref=e322]: Jun 18, 3:00 PM PT
+      - generic [ref=e323] [cursor=pointer]:
+        - generic [ref=e324]:
+          - generic [ref=e325]: Group · Group A
+          - generic [ref=e326]: Guadalajara
+        - generic [ref=e327]:
+          - generic [ref=e328]:
+            - text: 🇲🇽 Mexico
+            - generic [ref=e329]: "#15"
+          - generic [ref=e330]: vs
+          - generic [ref=e331]:
+            - text: 🇰🇷 South Korea
+            - generic [ref=e332]: "#25"
+        - generic [ref=e333]: Jun 18, 6:00 PM PT
+      - generic [ref=e334] [cursor=pointer]:
+        - generic [ref=e335]:
+          - generic [ref=e336]: Group · Group D
+          - generic [ref=e337]: Seattle
+        - generic [ref=e338]:
+          - generic [ref=e339]:
+            - text: 🇺🇸 United States
+            - generic [ref=e340]: "#16"
+          - generic [ref=e341]: vs
+          - generic [ref=e342]:
+            - text: 🇦🇺 Australia
+            - generic [ref=e343]: "#27"
+        - generic [ref=e344]: Jun 19, 12:00 PM PT
+      - generic [ref=e345] [cursor=pointer]:
+        - generic [ref=e346]:
+          - generic [ref=e347]: Group · Group C
+          - generic [ref=e348]: Boston
+        - generic [ref=e349]:
+          - generic [ref=e350]:
+            - text: 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland
+            - generic [ref=e351]: "#43"
+          - generic [ref=e352]: vs
+          - generic [ref=e353]:
+            - text: 🇲🇦 Morocco
+            - generic [ref=e354]: "#8"
+        - generic [ref=e355]: Jun 19, 3:00 PM PT
+      - generic [ref=e356] [cursor=pointer]:
+        - generic [ref=e357]:
+          - generic [ref=e358]: Group · Group C
+          - generic [ref=e359]: Philadelphia
+        - generic [ref=e360]:
+          - generic [ref=e361]:
+            - text: 🇧🇷 Brazil
+            - generic [ref=e362]: "#6"
+          - generic [ref=e363]: vs
+          - generic [ref=e364]:
+            - text: 🇭🇹 Haiti
+            - generic [ref=e365]: "#83"
+        - generic [ref=e366]: Jun 19, 5:30 PM PT
+      - generic [ref=e367] [cursor=pointer]:
+        - generic [ref=e368]:
+          - generic [ref=e369]: Group · Group D
+          - generic [ref=e370]: SF Bay Area
+        - generic [ref=e371]:
+          - generic [ref=e372]:
+            - text: 🇹🇷 Turkey
+            - generic [ref=e373]: "#22"
+          - generic [ref=e374]: vs
+          - generic [ref=e375]:
+            - text: 🇵🇾 Paraguay
+            - generic [ref=e376]: "#40"
+        - generic [ref=e377]: Jun 19, 8:00 PM PT
+      - generic [ref=e378] [cursor=pointer]:
+        - generic [ref=e379]:
+          - generic [ref=e380]: Group · Group F
+          - generic [ref=e381]: Houston
+        - generic [ref=e382]:
+          - generic [ref=e383]:
+            - text: 🇳🇱 Netherlands
+            - generic [ref=e384]: "#7"
+          - generic [ref=e385]: vs
+          - generic [ref=e386]:
+            - text: 🇸🇪 Sweden
+            - generic [ref=e387]: "#38"
+        - generic [ref=e388]: Jun 20, 10:00 AM PT
+      - generic [ref=e389] [cursor=pointer]:
+        - generic [ref=e390]:
+          - generic [ref=e391]: Group · Group E
+          - generic [ref=e392]: Toronto
+        - generic [ref=e393]:
+          - generic [ref=e394]:
+            - text: 🇩🇪 Germany
+            - generic [ref=e395]: "#10"
+          - generic [ref=e396]: vs
+          - generic [ref=e397]:
+            - text: 🇨🇮 Ivory Coast
+            - generic [ref=e398]: "#34"
+        - generic [ref=e399]: Jun 20, 1:00 PM PT
+      - generic [ref=e400] [cursor=pointer]:
+        - generic [ref=e401]:
+          - generic [ref=e402]: Group · Group E
+          - generic [ref=e403]: Kansas City
+        - generic [ref=e404]:
+          - generic [ref=e405]:
+            - text: 🇪🇨 Ecuador
+            - generic [ref=e406]: "#23"
+          - generic [ref=e407]: vs
+          - generic [ref=e408]:
+            - text: 🇨🇼 Curaçao
+            - generic [ref=e409]: "#82"
+        - generic [ref=e410]: Jun 20, 5:00 PM PT
+      - generic [ref=e411] [cursor=pointer]:
+        - generic [ref=e412]:
+          - generic [ref=e413]: Group · Group F
+          - generic [ref=e414]: Monterrey
+        - generic [ref=e415]:
+          - generic [ref=e416]:
+            - text: 🇹🇳 Tunisia
+            - generic [ref=e417]: "#44"
+          - generic [ref=e418]: vs
+          - generic [ref=e419]:
+            - text: 🇯🇵 Japan
+            - generic [ref=e420]: "#18"
+        - generic [ref=e421]: Jun 20, 9:00 PM PT
+      - generic [ref=e422] [cursor=pointer]:
+        - generic [ref=e423]:
+          - generic [ref=e424]: Group · Group H
+          - generic [ref=e425]: Atlanta
+        - generic [ref=e426]:
+          - generic [ref=e427]:
+            - text: 🇪🇸 Spain
+            - generic [ref=e428]: "#2"
+          - generic [ref=e429]: vs
+          - generic [ref=e430]:
+            - text: 🇸🇦 Saudi Arabia
+            - generic [ref=e431]: "#61"
+        - generic [ref=e432]: Jun 21, 9:00 AM PT
+      - generic [ref=e433] [cursor=pointer]:
+        - generic [ref=e434]:
+          - generic [ref=e435]: Group · Group G
+          - generic [ref=e436]: Los Angeles
+        - generic [ref=e437]:
+          - generic [ref=e438]:
+            - text: 🇧🇪 Belgium
+            - generic [ref=e439]: "#9"
+          - generic [ref=e440]: vs
+          - generic [ref=e441]:
+            - text: 🇮🇷 Iran
+            - generic [ref=e442]: "#21"
+        - generic [ref=e443]: Jun 21, 12:00 PM PT
+      - generic [ref=e444] [cursor=pointer]:
+        - generic [ref=e445]:
+          - generic [ref=e446]: Group · Group H
+          - generic [ref=e447]: Miami
+        - generic [ref=e448]:
+          - generic [ref=e449]:
+            - text: 🇺🇾 Uruguay
+            - generic [ref=e450]: "#17"
+          - generic [ref=e451]: vs
+          - generic [ref=e452]:
+            - text: 🇨🇻 Cape Verde
+            - generic [ref=e453]: "#69"
+        - generic [ref=e454]: Jun 21, 3:00 PM PT
+      - generic [ref=e455] [cursor=pointer]:
+        - generic [ref=e456]:
+          - generic [ref=e457]: Group · Group G
+          - generic [ref=e458]: Vancouver
+        - generic [ref=e459]:
+          - generic [ref=e460]:
+            - text: 🇳🇿 New Zealand
+            - generic [ref=e461]: "#85"
+          - generic [ref=e462]: vs
+          - generic [ref=e463]:
+            - text: 🇪🇬 Egypt
+            - generic [ref=e464]: "#29"
+        - generic [ref=e465]: Jun 21, 6:00 PM PT
+      - generic [ref=e466] [cursor=pointer]:
+        - generic [ref=e467]:
+          - generic [ref=e468]: Group · Group J
+          - generic [ref=e469]: Dallas
+        - generic [ref=e470]:
+          - generic [ref=e471]:
+            - text: 🇦🇷 Argentina
+            - generic [ref=e472]: "#3"
+          - generic [ref=e473]: vs
+          - generic [ref=e474]:
+            - text: 🇦🇹 Austria
+            - generic [ref=e475]: "#24"
+        - generic [ref=e476]: Jun 22, 10:00 AM PT
+      - generic [ref=e477] [cursor=pointer]:
+        - generic [ref=e478]:
+          - generic [ref=e479]: Group · Group I
+          - generic [ref=e480]: Philadelphia
+        - generic [ref=e481]:
+          - generic [ref=e482]:
+            - text: 🇫🇷 France
+            - generic [ref=e483]: "#1"
+          - generic [ref=e484]: vs
+          - generic [ref=e485]:
+            - text: 🇮🇶 Iraq
+            - generic [ref=e486]: "#57"
+        - generic [ref=e487]: Jun 22, 2:00 PM PT
+      - generic [ref=e488] [cursor=pointer]:
+        - generic [ref=e489]:
+          - generic [ref=e490]: Group · Group I
+          - generic [ref=e491]: Toronto
+        - generic [ref=e492]:
+          - generic [ref=e493]:
+            - text: 🇳🇴 Norway
+            - generic [ref=e494]: "#31"
+          - generic [ref=e495]: vs
+          - generic [ref=e496]:
+            - text: 🇸🇳 Senegal
+            - generic [ref=e497]: "#14"
+        - generic [ref=e498]: Jun 22, 5:00 PM PT
+      - generic [ref=e499] [cursor=pointer]:
+        - generic [ref=e500]:
+          - generic [ref=e501]: Group · Group J
+          - generic [ref=e502]: SF Bay Area
+        - generic [ref=e503]:
+          - generic [ref=e504]:
+            - text: 🇯🇴 Jordan
+            - generic [ref=e505]: "#63"
+          - generic [ref=e506]: vs
+          - generic [ref=e507]:
+            - text: 🇩🇿 Algeria
+            - generic [ref=e508]: "#28"
+        - generic [ref=e509]: Jun 22, 8:00 PM PT
+      - generic [ref=e510] [cursor=pointer]:
+        - generic [ref=e511]:
+          - generic [ref=e512]: Group · Group K
+          - generic [ref=e513]: Houston
+        - generic [ref=e514]:
+          - generic [ref=e515]:
+            - text: 🇵🇹 Portugal
+            - generic [ref=e516]: "#5"
+          - generic [ref=e517]: vs
+          - generic [ref=e518]:
+            - text: 🇺🇿 Uzbekistan
+            - generic [ref=e519]: "#50"
+        - generic [ref=e520]: Jun 23, 10:00 AM PT
+      - generic [ref=e521] [cursor=pointer]:
+        - generic [ref=e522]:
+          - generic [ref=e523]: Group · Group L
+          - generic [ref=e524]: Boston
+        - generic [ref=e525]:
+          - generic [ref=e526]:
+            - text: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+            - generic [ref=e527]: "#4"
+          - generic [ref=e528]: vs
+          - generic [ref=e529]:
+            - text: 🇬🇭 Ghana
+            - generic [ref=e530]: "#74"
+        - generic [ref=e531]: Jun 23, 1:00 PM PT
+      - generic [ref=e532] [cursor=pointer]:
+        - generic [ref=e533]:
+          - generic [ref=e534]: Group · Group L
+          - generic [ref=e535]: Boston
+        - generic [ref=e536]:
+          - generic [ref=e537]:
+            - text: 🇵🇦 Panama
+            - generic [ref=e538]: "#33"
+          - generic [ref=e539]: vs
+          - generic [ref=e540]:
+            - text: 🇭🇷 Croatia
+            - generic [ref=e541]: "#11"
+        - generic [ref=e542]: Jun 23, 4:00 PM PT
+      - generic [ref=e543] [cursor=pointer]:
+        - generic [ref=e544]:
+          - generic [ref=e545]: Group · Group K
+          - generic [ref=e546]: Guadalajara
+        - generic [ref=e547]:
+          - generic [ref=e548]:
+            - text: 🇨🇴 Colombia
+            - generic [ref=e549]: "#13"
+          - generic [ref=e550]: vs
+          - generic [ref=e551]:
+            - text: 🇨🇩 DR Congo
+            - generic [ref=e552]: "#46"
+        - generic [ref=e553]: Jun 23, 7:00 PM PT
+      - generic [ref=e554] [cursor=pointer]:
+        - generic [ref=e555]:
+          - generic [ref=e556]: Group · Group B
+          - generic [ref=e557]: Vancouver
+        - generic [ref=e558]:
+          - generic [ref=e559]:
+            - text: 🇨🇭 Switzerland
+            - generic [ref=e560]: "#19"
+          - generic [ref=e561]: vs
+          - generic [ref=e562]:
+            - text: 🇨🇦 Canada
+            - generic [ref=e563]: "#30"
+        - generic [ref=e564]: Jun 24, 12:00 PM PT
+      - generic [ref=e565] [cursor=pointer]:
+        - generic [ref=e566]:
+          - generic [ref=e567]: Group · Group B
+          - generic [ref=e568]: Seattle
+        - generic [ref=e569]:
+          - generic [ref=e570]:
+            - text: 🇧🇦 Bosnia & Herzegovina
+            - generic [ref=e571]: "#65"
+          - generic [ref=e572]: vs
+          - generic [ref=e573]:
+            - text: 🇶🇦 Qatar
+            - generic [ref=e574]: "#55"
+        - generic [ref=e575]: Jun 24, 12:00 PM PT
+      - generic [ref=e576] [cursor=pointer]:
+        - generic [ref=e577]:
+          - generic [ref=e578]: Group · Group C
+          - generic [ref=e579]: Atlanta
+        - generic [ref=e580]:
+          - generic [ref=e581]:
+            - text: 🇲🇦 Morocco
+            - generic [ref=e582]: "#8"
+          - generic [ref=e583]: vs
+          - generic [ref=e584]:
+            - text: 🇭🇹 Haiti
+            - generic [ref=e585]: "#83"
+        - generic [ref=e586]: Jun 24, 3:00 PM PT
+      - generic [ref=e587] [cursor=pointer]:
+        - generic [ref=e588]:
+          - generic [ref=e589]: Group · Group C
+          - generic [ref=e590]: Miami
+        - generic [ref=e591]:
+          - generic [ref=e592]:
+            - text: 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland
+            - generic [ref=e593]: "#43"
+          - generic [ref=e594]: vs
+          - generic [ref=e595]:
+            - text: 🇧🇷 Brazil
+            - generic [ref=e596]: "#6"
+        - generic [ref=e597]: Jun 24, 3:00 PM PT
+      - generic [ref=e598] [cursor=pointer]:
+        - generic [ref=e599]:
+          - generic [ref=e600]: Group · Group A
+          - generic [ref=e601]: Monterrey
+        - generic [ref=e602]:
+          - generic [ref=e603]:
+            - text: 🇿🇦 South Africa
+            - generic [ref=e604]: "#60"
+          - generic [ref=e605]: vs
+          - generic [ref=e606]:
+            - text: 🇰🇷 South Korea
+            - generic [ref=e607]: "#25"
+        - generic [ref=e608]: Jun 24, 6:00 PM PT
+      - generic [ref=e609] [cursor=pointer]:
+        - generic [ref=e610]:
+          - generic [ref=e611]: Group · Group A
+          - generic [ref=e612]: Mexico City
+        - generic [ref=e613]:
+          - generic [ref=e614]:
+            - text: 🇨🇿 Czech Republic
+            - generic [ref=e615]: "#41"
+          - generic [ref=e616]: vs
+          - generic [ref=e617]:
+            - text: 🇲🇽 Mexico
+            - generic [ref=e618]: "#15"
+        - generic [ref=e619]: Jun 24, 6:00 PM PT
+      - generic [ref=e620] [cursor=pointer]:
+        - generic [ref=e621]:
+          - generic [ref=e622]: Group · Group E
+          - generic [ref=e623]: Philadelphia
+        - generic [ref=e624]:
+          - generic [ref=e625]:
+            - text: 🇨🇼 Curaçao
+            - generic [ref=e626]: "#82"
+          - generic [ref=e627]: vs
+          - generic [ref=e628]:
+            - text: 🇨🇮 Ivory Coast
+            - generic [ref=e629]: "#34"
+        - generic [ref=e630]: Jun 25, 1:00 PM PT
+      - generic [ref=e631] [cursor=pointer]:
+        - generic [ref=e632]:
+          - generic [ref=e633]: Group · Group E
+          - generic [ref=e634]: New York/NJ
+        - generic [ref=e635]:
+          - generic [ref=e636]:
+            - text: 🇪🇨 Ecuador
+            - generic [ref=e637]: "#23"
+          - generic [ref=e638]: vs
+          - generic [ref=e639]:
+            - text: 🇩🇪 Germany
+            - generic [ref=e640]: "#10"
+        - generic [ref=e641]: Jun 25, 1:00 PM PT
+      - generic [ref=e642] [cursor=pointer]:
+        - generic [ref=e643]:
+          - generic [ref=e644]: Group · Group F
+          - generic [ref=e645]: Kansas City
+        - generic [ref=e646]:
+          - generic [ref=e647]:
+            - text: 🇹🇳 Tunisia
+            - generic [ref=e648]: "#44"
+          - generic [ref=e649]: vs
+          - generic [ref=e650]:
+            - text: 🇳🇱 Netherlands
+            - generic [ref=e651]: "#7"
+        - generic [ref=e652]: Jun 25, 4:00 PM PT
+      - generic [ref=e653] [cursor=pointer]:
+        - generic [ref=e654]:
+          - generic [ref=e655]: Group · Group F
+          - generic [ref=e656]: Dallas
+        - generic [ref=e657]:
+          - generic [ref=e658]:
+            - text: 🇯🇵 Japan
+            - generic [ref=e659]: "#18"
+          - generic [ref=e660]: vs
+          - generic [ref=e661]:
+            - text: 🇸🇪 Sweden
+            - generic [ref=e662]: "#38"
+        - generic [ref=e663]: Jun 25, 4:00 PM PT
+      - generic [ref=e664] [cursor=pointer]:
+        - generic [ref=e665]:
+          - generic [ref=e666]: Group · Group D
+          - generic [ref=e667]: Los Angeles
+        - generic [ref=e668]:
+          - generic [ref=e669]:
+            - text: 🇹🇷 Turkey
+            - generic [ref=e670]: "#22"
+          - generic [ref=e671]: vs
+          - generic [ref=e672]:
+            - text: 🇺🇸 United States
+            - generic [ref=e673]: "#16"
+        - generic [ref=e674]: Jun 25, 7:00 PM PT
+      - generic [ref=e675] [cursor=pointer]:
+        - generic [ref=e676]:
+          - generic [ref=e677]: Group · Group D
+          - generic [ref=e678]: SF Bay Area
+        - generic [ref=e679]:
+          - generic [ref=e680]:
+            - text: 🇵🇾 Paraguay
+            - generic [ref=e681]: "#40"
+          - generic [ref=e682]: vs
+          - generic [ref=e683]:
+            - text: 🇦🇺 Australia
+            - generic [ref=e684]: "#27"
+        - generic [ref=e685]: Jun 25, 7:00 PM PT
+      - generic [ref=e686] [cursor=pointer]:
+        - generic [ref=e687]:
+          - generic [ref=e688]: Group · Group I
+          - generic [ref=e689]: Boston
+        - generic [ref=e690]:
+          - generic [ref=e691]:
+            - text: 🇳🇴 Norway
+            - generic [ref=e692]: "#31"
+          - generic [ref=e693]: vs
+          - generic [ref=e694]:
+            - text: 🇫🇷 France
+            - generic [ref=e695]: "#1"
+        - generic [ref=e696]: Jun 26, 12:00 PM PT
+      - generic [ref=e697] [cursor=pointer]:
+        - generic [ref=e698]:
+          - generic [ref=e699]: Group · Group I
+          - generic [ref=e700]: Toronto
+        - generic [ref=e701]:
+          - generic [ref=e702]:
+            - text: 🇸🇳 Senegal
+            - generic [ref=e703]: "#14"
+          - generic [ref=e704]: vs
+          - generic [ref=e705]:
+            - text: 🇮🇶 Iraq
+            - generic [ref=e706]: "#57"
+        - generic [ref=e707]: Jun 26, 12:00 PM PT
+      - generic [ref=e708] [cursor=pointer]:
+        - generic [ref=e709]:
+          - generic [ref=e710]: Group · Group H
+          - generic [ref=e711]: Houston
+        - generic [ref=e712]:
+          - generic [ref=e713]:
+            - text: 🇨🇻 Cape Verde
+            - generic [ref=e714]: "#69"
+          - generic [ref=e715]: vs
+          - generic [ref=e716]:
+            - text: 🇸🇦 Saudi Arabia
+            - generic [ref=e717]: "#61"
+        - generic [ref=e718]: Jun 26, 5:00 PM PT
+      - generic [ref=e719] [cursor=pointer]:
+        - generic [ref=e720]:
+          - generic [ref=e721]: Group · Group H
+          - generic [ref=e722]: Guadalajara
+        - generic [ref=e723]:
+          - generic [ref=e724]:
+            - text: 🇺🇾 Uruguay
+            - generic [ref=e725]: "#17"
+          - generic [ref=e726]: vs
+          - generic [ref=e727]:
+            - text: 🇪🇸 Spain
+            - generic [ref=e728]: "#2"
+        - generic [ref=e729]: Jun 26, 5:00 PM PT
+      - generic [ref=e730] [cursor=pointer]:
+        - generic [ref=e731]:
+          - generic [ref=e732]: Group · Group G
+          - generic [ref=e733]: Vancouver
+        - generic [ref=e734]:
+          - generic [ref=e735]:
+            - text: 🇳🇿 New Zealand
+            - generic [ref=e736]: "#85"
+          - generic [ref=e737]: vs
+          - generic [ref=e738]:
+            - text: 🇧🇪 Belgium
+            - generic [ref=e739]: "#9"
+        - generic [ref=e740]: Jun 26, 8:00 PM PT
+      - generic [ref=e741] [cursor=pointer]:
+        - generic [ref=e742]:
+          - generic [ref=e743]: Group · Group G
+          - generic [ref=e744]: Seattle
+        - generic [ref=e745]:
+          - generic [ref=e746]:
+            - text: 🇪🇬 Egypt
+            - generic [ref=e747]: "#29"
+          - generic [ref=e748]: vs
+          - generic [ref=e749]:
+            - text: 🇮🇷 Iran
+            - generic [ref=e750]: "#21"
+        - generic [ref=e751]: Jun 26, 8:00 PM PT
+      - generic [ref=e752] [cursor=pointer]:
+        - generic [ref=e753]:
+          - generic [ref=e754]: Group · Group L
+          - generic [ref=e755]: New York/NJ
+        - generic [ref=e756]:
+          - generic [ref=e757]:
+            - text: 🇵🇦 Panama
+            - generic [ref=e758]: "#33"
+          - generic [ref=e759]: vs
+          - generic [ref=e760]:
+            - text: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England
+            - generic [ref=e761]: "#4"
+        - generic [ref=e762]: Jun 27, 2:00 PM PT
+      - generic [ref=e763] [cursor=pointer]:
+        - generic [ref=e764]:
+          - generic [ref=e765]: Group · Group L
+          - generic [ref=e766]: Philadelphia
+        - generic [ref=e767]:
+          - generic [ref=e768]:
+            - text: 🇭🇷 Croatia
+            - generic [ref=e769]: "#11"
+          - generic [ref=e770]: vs
+          - generic [ref=e771]:
+            - text: 🇬🇭 Ghana
+            - generic [ref=e772]: "#74"
+        - generic [ref=e773]: Jun 27, 2:00 PM PT
+      - generic [ref=e774] [cursor=pointer]:
+        - generic [ref=e775]:
+          - generic [ref=e776]: Group · Group K
+          - generic [ref=e777]: Miami
+        - generic [ref=e778]:
+          - generic [ref=e779]:
+            - text: 🇨🇴 Colombia
+            - generic [ref=e780]: "#13"
+          - generic [ref=e781]: vs
+          - generic [ref=e782]:
+            - text: 🇵🇹 Portugal
+            - generic [ref=e783]: "#5"
+        - generic [ref=e784]: Jun 27, 4:30 PM PT
+      - generic [ref=e785] [cursor=pointer]:
+        - generic [ref=e786]:
+          - generic [ref=e787]: Group · Group K
+          - generic [ref=e788]: Atlanta
+        - generic [ref=e789]:
+          - generic [ref=e790]:
+            - text: 🇨🇩 DR Congo
+            - generic [ref=e791]: "#46"
+          - generic [ref=e792]: vs
+          - generic [ref=e793]:
+            - text: 🇺🇿 Uzbekistan
+            - generic [ref=e794]: "#50"
+        - generic [ref=e795]: Jun 27, 4:30 PM PT
+      - generic [ref=e796] [cursor=pointer]:
+        - generic [ref=e797]:
+          - generic [ref=e798]: Group · Group J
+          - generic [ref=e799]: Kansas City
+        - generic [ref=e800]:
+          - generic [ref=e801]:
+            - text: 🇩🇿 Algeria
+            - generic [ref=e802]: "#28"
+          - generic [ref=e803]: vs
+          - generic [ref=e804]:
+            - text: 🇦🇹 Austria
+            - generic [ref=e805]: "#24"
+        - generic [ref=e806]: Jun 27, 7:00 PM PT
+      - generic [ref=e807] [cursor=pointer]:
+        - generic [ref=e808]:
+          - generic [ref=e809]: Group · Group J
+          - generic [ref=e810]: Dallas
+        - generic [ref=e811]:
+          - generic [ref=e812]:
+            - text: 🇯🇴 Jordan
+            - generic [ref=e813]: "#63"
+          - generic [ref=e814]: vs
+          - generic [ref=e815]:
+            - text: 🇦🇷 Argentina
+            - generic [ref=e816]: "#3"
+        - generic [ref=e817]: Jun 27, 7:00 PM PT
+      - generic [ref=e818] [cursor=pointer]:
+        - generic [ref=e819]:
+          - generic [ref=e820]: Round of 32
+          - generic [ref=e821]: Los Angeles
+        - generic [ref=e822]:
+          - generic [ref=e823]: A runner-up
+          - generic [ref=e824]: vs
+          - generic [ref=e825]: B runner-up
+        - generic [ref=e826]: Jun 28, 12:00 PM PT
+      - generic [ref=e827] [cursor=pointer]:
+        - generic [ref=e828]:
+          - generic [ref=e829]: Round of 32
+          - generic [ref=e830]: Houston
+        - generic [ref=e831]:
+          - generic [ref=e832]: C winner
+          - generic [ref=e833]: vs
+          - generic [ref=e834]: F runner-up
+        - generic [ref=e835]: Jun 29, 10:00 AM PT
+      - generic [ref=e836] [cursor=pointer]:
+        - generic [ref=e837]:
+          - generic [ref=e838]: Round of 32
+          - generic [ref=e839]: Boston
+        - generic [ref=e840]:
+          - generic [ref=e841]: E winner
+          - generic [ref=e842]: vs
+          - generic [ref=e843]: "3rd: A/B/C/D/F"
+        - generic [ref=e844]: Jun 29, 1:30 PM PT
+      - generic [ref=e845] [cursor=pointer]:
+        - generic [ref=e846]:
+          - generic [ref=e847]: Round of 32
+          - generic [ref=e848]: Monterrey
+        - generic [ref=e849]:
+          - generic [ref=e850]: F winner
+          - generic [ref=e851]: vs
+          - generic [ref=e852]: C runner-up
+        - generic [ref=e853]: Jun 29, 6:00 PM PT
+      - generic [ref=e854] [cursor=pointer]:
+        - generic [ref=e855]:
+          - generic [ref=e856]: Round of 32
+          - generic [ref=e857]: Dallas
+        - generic [ref=e858]:
+          - generic [ref=e859]: E runner-up
+          - generic [ref=e860]: vs
+          - generic [ref=e861]: I runner-up
+        - generic [ref=e862]: Jun 30, 10:00 AM PT
+      - generic [ref=e863] [cursor=pointer]:
+        - generic [ref=e864]:
+          - generic [ref=e865]: Round of 32
+          - generic [ref=e866]: New York/NJ
+        - generic [ref=e867]:
+          - generic [ref=e868]: I winner
+          - generic [ref=e869]: vs
+          - generic [ref=e870]: "3rd: C/D/F/G/H"
+        - generic [ref=e871]: Jun 30, 2:00 PM PT
+      - generic [ref=e872] [cursor=pointer]:
+        - generic [ref=e873]:
+          - generic [ref=e874]: Round of 32
+          - generic [ref=e875]: Mexico City
+        - generic [ref=e876]:
+          - generic [ref=e877]: A winner
+          - generic [ref=e878]: vs
+          - generic [ref=e879]: "3rd: C/E/F/H/I"
+        - generic [ref=e880]: Jun 30, 6:00 PM PT
+      - generic [ref=e881] [cursor=pointer]:
+        - generic [ref=e882]:
+          - generic [ref=e883]: Round of 32
+          - generic [ref=e884]: Atlanta
+        - generic [ref=e885]:
+          - generic [ref=e886]: L winner
+          - generic [ref=e887]: vs
+          - generic [ref=e888]: "3rd: E/H/I/J/K"
+        - generic [ref=e889]: Jul 1, 9:00 AM PT
+      - generic [ref=e890] [cursor=pointer]:
+        - generic [ref=e891]:
+          - generic [ref=e892]: Round of 32
+          - generic [ref=e893]: Seattle
+        - generic [ref=e894]:
+          - generic [ref=e895]: G winner
+          - generic [ref=e896]: vs
+          - generic [ref=e897]: "3rd: A/E/H/I/J"
+        - generic [ref=e898]: Jul 1, 1:00 PM PT
+      - generic [ref=e899] [cursor=pointer]:
+        - generic [ref=e900]:
+          - generic [ref=e901]: Round of 32
+          - generic [ref=e902]: SF Bay Area
+        - generic [ref=e903]:
+          - generic [ref=e904]: D winner
+          - generic [ref=e905]: vs
+          - generic [ref=e906]: "3rd: B/E/F/I/J"
+        - generic [ref=e907]: Jul 1, 5:00 PM PT
+      - generic [ref=e908] [cursor=pointer]:
+        - generic [ref=e909]:
+          - generic [ref=e910]: Round of 32
+          - generic [ref=e911]: Los Angeles
+        - generic [ref=e912]:
+          - generic [ref=e913]: H winner
+          - generic [ref=e914]: vs
+          - generic [ref=e915]: J runner-up
+        - generic [ref=e916]: Jul 2, 12:00 PM PT
+      - generic [ref=e917] [cursor=pointer]:
+        - generic [ref=e918]:
+          - generic [ref=e919]: Round of 32
+          - generic [ref=e920]: Toronto
+        - generic [ref=e921]:
+          - generic [ref=e922]: K runner-up
+          - generic [ref=e923]: vs
+          - generic [ref=e924]: L runner-up
+        - generic [ref=e925]: Jul 2, 4:00 PM PT
+      - generic [ref=e926] [cursor=pointer]:
+        - generic [ref=e927]:
+          - generic [ref=e928]: Round of 32
+          - generic [ref=e929]: Vancouver
+        - generic [ref=e930]:
+          - generic [ref=e931]: B winner
+          - generic [ref=e932]: vs
+          - generic [ref=e933]: "3rd: E/F/G/I/J"
+        - generic [ref=e934]: Jul 2, 8:00 PM PT
+      - generic [ref=e935] [cursor=pointer]:
+        - generic [ref=e936]:
+          - generic [ref=e937]: Round of 32
+          - generic [ref=e938]: Dallas
+        - generic [ref=e939]:
+          - generic [ref=e940]: D runner-up
+          - generic [ref=e941]: vs
+          - generic [ref=e942]: G runner-up
+        - generic [ref=e943]: Jul 3, 11:00 AM PT
+      - generic [ref=e944] [cursor=pointer]:
+        - generic [ref=e945]:
+          - generic [ref=e946]: Round of 32
+          - generic [ref=e947]: Miami
+        - generic [ref=e948]:
+          - generic [ref=e949]: J winner
+          - generic [ref=e950]: vs
+          - generic [ref=e951]: H runner-up
+        - generic [ref=e952]: Jul 3, 3:00 PM PT
+      - generic [ref=e953] [cursor=pointer]:
+        - generic [ref=e954]:
+          - generic [ref=e955]: Round of 32
+          - generic [ref=e956]: Kansas City
+        - generic [ref=e957]:
+          - generic [ref=e958]: K winner
+          - generic [ref=e959]: vs
+          - generic [ref=e960]: "3rd: D/E/I/J/L"
+        - generic [ref=e961]: Jul 3, 6:30 PM PT
+      - generic [ref=e962] [cursor=pointer]:
+        - generic [ref=e963]:
+          - generic [ref=e964]: Round of 16
+          - generic [ref=e965]: Houston
+        - generic [ref=e966]:
+          - generic [ref=e967]: Winner M73
+          - generic [ref=e968]: vs
+          - generic [ref=e969]: Winner M75
+        - generic [ref=e970]: Jul 4, 10:00 AM PT
+      - generic [ref=e971] [cursor=pointer]:
+        - generic [ref=e972]:
+          - generic [ref=e973]: Round of 16
+          - generic [ref=e974]: Philadelphia
+        - generic [ref=e975]:
+          - generic [ref=e976]: Winner M74
+          - generic [ref=e977]: vs
+          - generic [ref=e978]: Winner M77
+        - generic [ref=e979]: Jul 4, 2:00 PM PT
+      - generic [ref=e980] [cursor=pointer]:
+        - generic [ref=e981]:
+          - generic [ref=e982]: Round of 16
+          - generic [ref=e983]: New York/NJ
+        - generic [ref=e984]:
+          - generic [ref=e985]: Winner M76
+          - generic [ref=e986]: vs
+          - generic [ref=e987]: Winner M78
+        - generic [ref=e988]: Jul 5, 1:00 PM PT
+      - generic [ref=e989] [cursor=pointer]:
+        - generic [ref=e990]:
+          - generic [ref=e991]: Round of 16
+          - generic [ref=e992]: Mexico City
+        - generic [ref=e993]:
+          - generic [ref=e994]: Winner M79
+          - generic [ref=e995]: vs
+          - generic [ref=e996]: Winner M80
+        - generic [ref=e997]: Jul 5, 5:00 PM PT
+      - generic [ref=e998] [cursor=pointer]:
+        - generic [ref=e999]:
+          - generic [ref=e1000]: Round of 16
+          - generic [ref=e1001]: Dallas
+        - generic [ref=e1002]:
+          - generic [ref=e1003]: Winner M83
+          - generic [ref=e1004]: vs
+          - generic [ref=e1005]: Winner M84
+        - generic [ref=e1006]: Jul 6, 12:00 PM PT
+      - generic [ref=e1007] [cursor=pointer]:
+        - generic [ref=e1008]:
+          - generic [ref=e1009]: Round of 16
+          - generic [ref=e1010]: Seattle
+        - generic [ref=e1011]:
+          - generic [ref=e1012]: Winner M81
+          - generic [ref=e1013]: vs
+          - generic [ref=e1014]: Winner M82
+        - generic [ref=e1015]: Jul 6, 5:00 PM PT
+      - generic [ref=e1016] [cursor=pointer]:
+        - generic [ref=e1017]:
+          - generic [ref=e1018]: Round of 16
+          - generic [ref=e1019]: Atlanta
+        - generic [ref=e1020]:
+          - generic [ref=e1021]: Winner M86
+          - generic [ref=e1022]: vs
+          - generic [ref=e1023]: Winner M88
+        - generic [ref=e1024]: Jul 7, 9:00 AM PT
+      - generic [ref=e1025] [cursor=pointer]:
+        - generic [ref=e1026]:
+          - generic [ref=e1027]: Round of 16
+          - generic [ref=e1028]: Vancouver
+        - generic [ref=e1029]:
+          - generic [ref=e1030]: Winner M85
+          - generic [ref=e1031]: vs
+          - generic [ref=e1032]: Winner M87
+        - generic [ref=e1033]: Jul 7, 1:00 PM PT
+      - generic [ref=e1034] [cursor=pointer]:
+        - generic [ref=e1035]:
+          - generic [ref=e1036]: Quarter-final
+          - generic [ref=e1037]: Boston
+        - generic [ref=e1038]:
+          - generic [ref=e1039]: Winner M89
+          - generic [ref=e1040]: vs
+          - generic [ref=e1041]: Winner M90
+        - generic [ref=e1042]: Jul 9, 1:00 PM PT
+      - generic [ref=e1043] [cursor=pointer]:
+        - generic [ref=e1044]:
+          - generic [ref=e1045]: Quarter-final
+          - generic [ref=e1046]: Los Angeles
+        - generic [ref=e1047]:
+          - generic [ref=e1048]: Winner M93
+          - generic [ref=e1049]: vs
+          - generic [ref=e1050]: Winner M94
+        - generic [ref=e1051]: Jul 10, 12:00 PM PT
+      - generic [ref=e1052] [cursor=pointer]:
+        - generic [ref=e1053]:
+          - generic [ref=e1054]: Quarter-final
+          - generic [ref=e1055]: Miami
+        - generic [ref=e1056]:
+          - generic [ref=e1057]: Winner M91
+          - generic [ref=e1058]: vs
+          - generic [ref=e1059]: Winner M92
+        - generic [ref=e1060]: Jul 11, 2:00 PM PT
+      - generic [ref=e1061] [cursor=pointer]:
+        - generic [ref=e1062]:
+          - generic [ref=e1063]: Quarter-final
+          - generic [ref=e1064]: Kansas City
+        - generic [ref=e1065]:
+          - generic [ref=e1066]: Winner M95
+          - generic [ref=e1067]: vs
+          - generic [ref=e1068]: Winner M96
+        - generic [ref=e1069]: Jul 11, 6:00 PM PT
+      - generic [ref=e1070] [cursor=pointer]:
+        - generic [ref=e1071]:
+          - generic [ref=e1072]: Semi-final
+          - generic [ref=e1073]: Dallas
+        - generic [ref=e1074]:
+          - generic [ref=e1075]: Winner M97
+          - generic [ref=e1076]: vs
+          - generic [ref=e1077]: Winner M98
+        - generic [ref=e1078]: Jul 14, 12:00 PM PT
+      - generic [ref=e1079] [cursor=pointer]:
+        - generic [ref=e1080]:
+          - generic [ref=e1081]: Semi-final
+          - generic [ref=e1082]: Atlanta
+        - generic [ref=e1083]:
+          - generic [ref=e1084]: Winner M99
+          - generic [ref=e1085]: vs
+          - generic [ref=e1086]: Winner M100
+        - generic [ref=e1087]: Jul 15, 12:00 PM PT
+      - generic [ref=e1088] [cursor=pointer]:
+        - generic [ref=e1089]:
+          - generic [ref=e1090]: Third place
+          - generic [ref=e1091]: Miami
+        - generic [ref=e1092]:
+          - generic [ref=e1093]: Loser M101
+          - generic [ref=e1094]: vs
+          - generic [ref=e1095]: Loser M102
+        - generic [ref=e1096]: Jul 18, 2:00 PM PT
+      - generic [ref=e1097] [cursor=pointer]:
+        - generic [ref=e1098]:
+          - generic [ref=e1099]: Final
+          - generic [ref=e1100]: New York/NJ
+        - generic [ref=e1101]:
+          - generic [ref=e1102]: Winner M101
+          - generic [ref=e1103]: vs
+          - generic [ref=e1104]: Winner M102
+        - generic [ref=e1105]: Jul 19, 12:00 PM PT

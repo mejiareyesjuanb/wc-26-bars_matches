@@ -45,14 +45,10 @@ function escapeICS(s) {
     .replace(/\n/g, '\\n')
 }
 
-// An .ics with a 1-hour-before reminder alarm (this IS the "remind me").
-export function icsForMatch(match) {
+// One VEVENT (with a 1-hour reminder alarm) — shared by single + bulk export.
+function veventLines(match) {
   const e = eventForMatch(match)
   return [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Seattle and Eastside WC 26//EN',
-    'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
     `UID:${match.id}@wc2026-seattle`,
     `DTSTAMP:${icsStamp(e.start)}`,
@@ -67,8 +63,28 @@ export function icsForMatch(match) {
     'TRIGGER:-PT1H',
     'END:VALARM',
     'END:VEVENT',
+  ]
+}
+
+function wrapCalendar(eventLineGroups) {
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Seattle and Eastside WC 26//EN',
+    'CALSCALE:GREGORIAN',
+    ...eventLineGroups.flat(),
     'END:VCALENDAR',
   ].join('\r\n')
+}
+
+// An .ics for a single match (timezone-correct anywhere via UTC stamps).
+export function icsForMatch(match) {
+  return wrapCalendar([veventLines(match)])
+}
+
+// An .ics containing many matches — one VCALENDAR, one VEVENT each.
+export function icsForMatches(matches) {
+  return wrapCalendar(matches.map(veventLines))
 }
 
 export const ICS_FILENAME = (match) => `${match.id}-wc2026.ics`

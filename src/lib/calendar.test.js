@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { eventForMatch, icsStamp, googleCalendarUrl, icsForMatch } from './calendar.js'
+import { eventForMatch, icsStamp, googleCalendarUrl, icsForMatch, icsForMatches } from './calendar.js'
 
 // Mexico vs South Africa — 2026-06-11 12:00 PM PT (PDT, UTC-7) => 19:00 UTC.
 const groupMatch = {
@@ -55,5 +55,23 @@ describe('icsForMatch', () => {
     expect(ics).toContain('SUMMARY:Mexico vs South Africa — World Cup 2026')
     expect(ics).toContain('BEGIN:VALARM')
     expect(ics).toContain('TRIGGER:-PT1H')
+  })
+})
+
+describe('icsForMatches (bulk)', () => {
+  const many = [groupMatch, koMatch]
+  it('wraps N matches in a single VCALENDAR with one VEVENT each', () => {
+    const ics = icsForMatches(many)
+    expect((ics.match(/BEGIN:VCALENDAR/g) || []).length).toBe(1)
+    expect((ics.match(/END:VCALENDAR/g) || []).length).toBe(1)
+    expect((ics.match(/BEGIN:VEVENT/g) || []).length).toBe(2)
+    expect((ics.match(/BEGIN:VALARM/g) || []).length).toBe(2) // one reminder each
+  })
+  it('includes each match: UTC times + both titles', () => {
+    const ics = icsForMatches(many)
+    expect(ics).toContain('DTSTART:20260611T190000Z') // group match
+    expect(ics).toContain('DTSTART:20260719T190000Z') // final, 12pm PT -> 19:00Z
+    expect(ics).toContain('SUMMARY:Mexico vs South Africa — World Cup 2026')
+    expect(ics).toContain('SUMMARY:Winner M101 vs Winner M102 — World Cup 2026')
   })
 })
