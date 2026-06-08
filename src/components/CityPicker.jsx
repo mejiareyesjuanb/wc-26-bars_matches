@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { CITY_LIST } from '../lib/city.js'
+import { useScrollLock } from '../lib/useScrollLock.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 // City sheet (bottom-sheet on mobile, centered card on desktop). The short,
@@ -8,6 +9,7 @@ import { useI18n } from '../lib/i18n/react.jsx'
 export default function CityPicker({ currentId, nearestId, onPick, onClose }) {
   const { t } = useI18n()
   const contentRef = useRef(null)
+  useScrollLock()
 
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { isIOS, isAndroid } from '../lib/platform.js'
 import { addMatchesToCalendar } from '../lib/addToCalendar.js'
+import { useScrollLock } from '../lib/useScrollLock.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 const GOOGLE_IMPORT_URL = 'https://calendar.google.com/calendar/u/0/r/settings/export'
@@ -13,6 +14,7 @@ export default function AddToCalendarModal({ matches, all = false, onClose }) {
   const { t, lang } = useI18n()
   const contentRef = useRef(null)
   const count = matches?.length || 0
+  useScrollLock()
 
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()

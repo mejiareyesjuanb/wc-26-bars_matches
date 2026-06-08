@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { mapsUrl } from '../lib/venues.js'
+import { useScrollLock } from '../lib/useScrollLock.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 const TIER_STYLE = {
@@ -10,6 +11,7 @@ const TIER_STYLE = {
 
 export default function VenueModal({ venue, check, onClose }) {
   const { t } = useI18n()
+  useScrollLock()
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)

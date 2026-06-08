@@ -11,6 +11,7 @@ import { MATCHES } from '../data/matches.js'
 import BarCard from './BarCard.jsx'
 import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
 import { getActiveCity, cityNeighborhoods, isCityLevel } from '../lib/city.js'
+import { useScrollLock } from '../lib/useScrollLock.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 function TeamName({ team }) {
@@ -56,6 +57,7 @@ export default function MatchDetailModal({ match, venues, neighborhoods, onSaveN
   const { t, lang, stage } = useI18n()
   const [editingHoods, setEditingHoods] = useState(false)
   const contentRef = useRef(null)
+  useScrollLock()
 
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
