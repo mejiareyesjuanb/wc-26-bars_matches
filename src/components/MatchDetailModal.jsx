@@ -52,9 +52,8 @@ function TeamLabel({ team, onPick }) {
   )
 }
 
-export default function MatchDetailModal({ match, venues, neighborhoods, onSaveNeighborhoods, onClose, onSeeAllBars, onPickTeam }) {
+export default function MatchDetailModal({ match, venues, neighborhoods, onSaveNeighborhoods, onClose, onSeeAllBars, onPickTeam, checks = {}, onChecks }) {
   const { t, lang, stage } = useI18n()
-  const [checks, setChecks] = useState({})
   const [editingHoods, setEditingHoods] = useState(false)
   const contentRef = useRef(null)
 
@@ -99,7 +98,7 @@ export default function MatchDetailModal({ match, venues, neighborhoods, onSaveN
     if (!need.length) return
     let cancelled = false
     confirmScreens(need).then((res) => {
-      if (!cancelled && res && Object.keys(res).length) setChecks((c) => ({ ...c, ...res }))
+      if (!cancelled && res && Object.keys(res).length) onChecks?.(res)
     })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps

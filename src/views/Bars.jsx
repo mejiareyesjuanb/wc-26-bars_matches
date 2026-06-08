@@ -16,15 +16,15 @@ const ENRICH_CAP = 60 // max venues we website-check per view
 const BAR_CATEGORIES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'wine bar', 'beer hall', 'night club'])
 const isBarish = (v) => BAR_CATEGORIES.has(v.type)
 
-export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason }) {
+export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason, checks = {}, onChecks }) {
   const { t } = useI18n()
   const [editing, setEditing] = useState(false)
   const [tab, setTab] = useState('list')
   const [group, setGroup] = useState('combined') // 'combined' | 'byHood'
   const [selected, setSelected] = useState(null)
-  const [checks, setChecks] = useState({})
   const [expanded, setExpanded] = useState({})
   const [shownCount, setShownCount] = useState(PAGE)
+  const [timedOut, setTimedOut] = useState(false)
 
   const city = getActiveCity()
   const hoods = neighborhoods || []
@@ -65,18 +65,31 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
     return [...withWeb.filter(isBarish), ...withWeb.filter((v) => !isBarish(v))].slice(0, ENRICH_CAP)
   }, [baseVenues])
 
+  const candKey = candidates.map((v) => v.id).join(',')
+
   useEffect(() => {
     const need = candidates.filter((v) => checks[v.id] === undefined)
     if (!need.length) return
     let cancelled = false
     confirmScreens(need).then((res) => {
-      if (!cancelled && res && Object.keys(res).length) setChecks((c) => ({ ...c, ...res }))
+      if (!cancelled && res && Object.keys(res).length) onChecks?.(res)
     })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [candidates.map((v) => v.id).join(',')])
+  }, [candKey])
 
   useEffect(() => setShownCount(PAGE), [hoodKey, group])
+
+  // "Wait for a clean list": hold a skeleton until the visible venues' checks
+  // resolve (so the list renders once, settled) — or a short fallback timeout for a
+  // cold cache. With the per-city checks cache, warm revisits skip the skeleton.
+  const enriching = useMemo(() => candidates.some((v) => checks[v.id] === undefined), [candidates, checks])
+  useEffect(() => {
+    setTimedOut(false)
+    const id = setTimeout(() => setTimedOut(true), 5000)
+    return () => clearTimeout(id)
+  }, [candKey])
+  const showSkeleton = !!venues && tab === 'list' && enriching && !timedOut
 
   // Editing the neighborhood selection (only offered when not city-level).
   if (editing && !cityLevel) {
@@ -116,20 +129,32 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
         {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? t('bars.sourceLive') : t('bars.sourceCurated')}</span>}
       </p>
 
-      {hasHoods && (
+      {!cityLevel && (
         <div className="flex flex-wrap items-center gap-2 mb-5">
           <span aria-hidden="true" className="text-neutral-400">📍</span>
-          {hoods.map((h) => (
-            <button
-              key={h}
-              onClick={() => setEditing(true)}
-              title={t('bars.changeAreas', { h })}
-              aria-label={t('bars.changeAreas', { h })}
-              className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
-            >
-              {h}
-            </button>
-          ))}
+          {hasHoods ? (
+            <>
+              <button
+                onClick={() => onSaveNeighborhoods([])}
+                className="text-sm rounded-full px-3 py-1 bg-neutral-100 text-neutral-600 border border-neutral-200 hover:bg-neutral-200 transition"
+              >
+                {t('bars.clearToAll')}
+              </button>
+              {hoods.map((h) => (
+                <button
+                  key={h}
+                  onClick={() => setEditing(true)}
+                  title={t('bars.changeAreas', { h })}
+                  aria-label={t('bars.changeAreas', { h })}
+                  className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
+                >
+                  {h}
+                </button>
+              ))}
+            </>
+          ) : (
+            <span className="text-sm text-neutral-500">{t('bars.allOfCity', { city: city.name })}</span>
+          )}
         </div>
       )}
 
@@ -148,6 +173,12 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
 
       {!venues ? (
         <p className="text-center text-neutral-400 py-12">{t('bars.finding')}</p>
+      ) : showSkeleton ? (
+        <div className="grid gap-3" aria-busy="true" aria-label={t('bars.finding')}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-24 bg-neutral-100 rounded-xl animate-pulse" />
+          ))}
+        </div>
       ) : tab === 'map' ? (
         <VenueMap venues={mapVenues} onSelect={setSelected} />
       ) : grouped ? (

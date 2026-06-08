@@ -85,14 +85,15 @@ describe('nearestCity (haversine, visible only)', () => {
   })
 })
 
-describe('boroughs (two-level)', () => {
+describe('boroughs (two-level) — count only core (always-shown) venues', () => {
   const nyc = [
-    { borough: 'Manhattan', neighborhood: 'SoHo' }, { borough: 'Manhattan', neighborhood: 'SoHo' },
-    { borough: 'Manhattan', neighborhood: 'Midtown' }, { borough: 'Manhattan', neighborhood: 'Midtown' },
-    { borough: 'Manhattan', neighborhood: 'Manhattan' }, // fallback (no fine area)
-    { borough: 'Brooklyn', neighborhood: 'Williamsburg' }, { borough: 'Brooklyn', neighborhood: 'Williamsburg' },
+    { borough: 'Manhattan', neighborhood: 'SoHo', type: 'sports bar' }, { borough: 'Manhattan', neighborhood: 'SoHo', type: 'pub' },
+    { borough: 'Manhattan', neighborhood: 'Midtown', type: 'pub' }, { borough: 'Manhattan', neighborhood: 'Midtown', type: 'brewery' },
+    { borough: 'Manhattan', neighborhood: 'Manhattan', type: 'pub' }, // fallback (no fine area)
+    { borough: 'Brooklyn', neighborhood: 'Williamsburg', type: 'sports bar' }, { borough: 'Brooklyn', neighborhood: 'Williamsburg', type: 'pub' },
+    { borough: 'Queens', neighborhood: 'Astoria', type: 'cocktail bar' }, // no core venue → borough dropped
   ]
-  it('lists boroughs with >=2 venues', () => {
+  it('lists boroughs with a core bar, sorted by count', () => {
     expect(boroughsFromVenues(nyc)).toEqual(['Manhattan', 'Brooklyn'])
   })
   it('lists fine neighborhoods in a borough (excludes the borough fallback)', () => {
@@ -102,19 +103,32 @@ describe('boroughs (two-level)', () => {
 })
 
 describe('neighborhoodsFromVenues / cityNeighborhoods / isCityLevel', () => {
+  // Only "core" venues (sports bar / pub / brewery / bar & grill / curated-confirmed)
+  // count toward a neighborhood having bars; generic bars/restaurants/cocktail bars
+  // need website signals so they don't count here.
   const venues = [
-    { neighborhood: 'SoHo' }, { neighborhood: 'SoHo' },
-    { neighborhood: 'Midtown' }, { neighborhood: 'Midtown' }, { neighborhood: 'Midtown' },
-    { neighborhood: 'Harlem' }, { neighborhood: 'Harlem' },
-    { neighborhood: 'Tribeca' }, // only 1 → dropped
-    { neighborhood: null },
+    { neighborhood: 'SoHo', type: 'pub' }, { neighborhood: 'SoHo', type: 'bar' }, // generic bar: not core
+    { neighborhood: 'Midtown', type: 'sports bar' }, { neighborhood: 'Midtown', type: 'pub' }, { neighborhood: 'Midtown', type: 'brewery' },
+    { neighborhood: 'Harlem', type: 'pub' }, { neighborhood: 'Harlem', type: 'restaurant' }, // restaurant: not core
+    { neighborhood: 'Tribeca', type: 'cocktail bar' }, // no core → dropped
+    { neighborhood: null, type: 'pub' },
   ]
-  it('keeps neighborhoods with >=2 venues, sorted by count', () => {
+  it('keeps neighborhoods with >=1 core bar, sorted by core count', () => {
     expect(neighborhoodsFromVenues(venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
   })
-  it('curated cities use their config list; non-curated discover from venues', () => {
-    expect(cityNeighborhoods(getCity('seattle'), venues)).toEqual(getCity('seattle').neighborhoods)
-    // Mountain View has no curated centroids → derive from venues.
+  it('curated cities keep config order but drop neighborhoods with no core bar', () => {
+    const sea = [
+      { neighborhood: 'Ballard', type: 'sports bar' },
+      { neighborhood: 'Fremont', type: 'pub' },
+      { neighborhood: 'Capitol Hill', type: 'brewery' },
+      { neighborhood: 'Downtown', type: 'restaurant' }, // not core → Downtown dropped
+    ]
+    expect(cityNeighborhoods(getCity('seattle'), sea)).toEqual(['Capitol Hill', 'Ballard', 'Fremont'])
+  })
+  it('curated city falls back to the full config list before venues load', () => {
+    expect(cityNeighborhoods(getCity('seattle'), null)).toEqual(getCity('seattle').neighborhoods)
+  })
+  it('non-curated cities discover from venues (core only)', () => {
     expect(cityNeighborhoods(getCity('mountain-view'), venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
   })
   it('city-level when <3 neighborhoods', () => {

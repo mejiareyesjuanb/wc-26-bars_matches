@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { scoreBar, rankBars, isSportsBar, isConfirmedWorldCup, venueClass } from './scoring.js'
+import { scoreBar, rankBars, isSportsBar, isConfirmedWorldCup, venueClass, isCoreVenue } from './scoring.js'
 
 const venue = (over) => ({
   id: 'x', name: 'X', neighborhood: 'Ballard', type: 'restaurant',
@@ -141,6 +141,23 @@ describe('band scoring (category dominates; signals + reviews order within a ban
     const highRevPub = scoreBar(venue({ type: 'pub', rating: 5, reviewCount: 5000 }), undefined).score
     const lowRevSports = scoreBar(venue({ type: 'sports bar', rating: 3, reviewCount: 0 }), undefined).score
     expect(lowRevSports).toBeGreaterThan(highRevPub)
+  })
+})
+
+describe('isCoreVenue (always-shown set, no website checks needed)', () => {
+  it('true for sports bars / pubs / breweries / bar & grills', () => {
+    expect(isCoreVenue(venue({ type: 'sports bar' }))).toBe(true)
+    expect(isCoreVenue(venue({ type: 'pub' }))).toBe(true)
+    expect(isCoreVenue(venue({ type: 'brewery' }))).toBe(true)
+    expect(isCoreVenue(venue({ type: 'bar and grill' }))).toBe(true)
+  })
+  it('false for generic bars, restaurants, and cocktail bars (need a website signal)', () => {
+    expect(isCoreVenue(venue({ type: 'bar' }))).toBe(false)
+    expect(isCoreVenue(venue({ type: 'mexican restaurant' }))).toBe(false)
+    expect(isCoreVenue(venue({ type: 'cocktail bar' }))).toBe(false)
+  })
+  it('true for a curated-confirmed venue regardless of category', () => {
+    expect(isCoreVenue(venue({ type: 'bar', confirmedViewing: true }))).toBe(true)
   })
 })
 

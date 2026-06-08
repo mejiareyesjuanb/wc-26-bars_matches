@@ -17,7 +17,7 @@ function LangToggle({ lang, setLang, langClass }) {
   )
 }
 
-function Shell({ prefs, onSavePrefs, venues, source, reason }) {
+function Shell({ prefs, onSavePrefs, venues, source, reason, checks, onChecks }) {
   const { t, lang, setLang } = useI18n()
   const [tab, setTab] = useState('matches')
   const [cityPickerOpen, setCityPickerOpen] = useState(false)
@@ -109,6 +109,8 @@ function Shell({ prefs, onSavePrefs, venues, source, reason }) {
           neighborhoods={neighborhoods}
           onSaveNeighborhoods={saveNeighborhoods}
           onGoToBars={() => setTab('bars')}
+          checks={checks}
+          onChecks={onChecks}
         />
       )}
       {tab === 'bars' && (
@@ -118,6 +120,8 @@ function Shell({ prefs, onSavePrefs, venues, source, reason }) {
           venues={venues}
           source={source}
           reason={reason}
+          checks={checks}
+          onChecks={onChecks}
         />
       )}
 
@@ -136,6 +140,11 @@ function Shell({ prefs, onSavePrefs, venues, source, reason }) {
 export default function App() {
   const [prefs, setPrefs] = useState(loadPrefs)
   const [venueData, setVenueData] = useState(null)
+  // Website "screens/World Cup" checks, cached per session (keyed by venue id) so
+  // tab-switches and revisits don't re-fetch or re-churn the bar list. Cleared on
+  // city change alongside the venue list.
+  const [checks, setChecks] = useState({})
+  const mergeChecks = (res) => setChecks((c) => ({ ...c, ...res }))
 
   // Keep the active-city module in sync so non-React helpers read the right city.
   const cityId = detectCity(prefs)
@@ -144,6 +153,7 @@ export default function App() {
   // Reload venues whenever the city changes (clear first → loading states show).
   useEffect(() => {
     setVenueData(null)
+    setChecks({})
     loadVenues(cityId).then(setVenueData)
   }, [cityId])
 
@@ -165,7 +175,7 @@ export default function App() {
 
   return (
     <I18nProvider lang={lang} setLang={setLang}>
-      <Shell prefs={prefs} onSavePrefs={savePreferences} venues={venues} source={source} reason={reason} />
+      <Shell prefs={prefs} onSavePrefs={savePreferences} venues={venues} source={source} reason={reason} checks={checks} onChecks={mergeChecks} />
     </I18nProvider>
   )
 }

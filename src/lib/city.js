@@ -2,6 +2,7 @@
 // code (time.js, venues.js) can read the active city without a hook. The app
 // keeps this in sync during render; components re-render via prefs/state.
 import { CITIES, DEFAULT_CITY, getCityConfig } from '../data/cities.js'
+import { isCoreVenue } from './scoring.js'
 
 export { DEFAULT_CITY, getCityConfig }
 export const CITY_IDS = Object.keys(CITIES)
@@ -46,24 +47,35 @@ export function geolocateCity() {
   })
 }
 
-// Neighborhoods present in a discovered city's venues — sorted by venue count,
-// kept if ≥2 venues. (Seattle uses its curated config list instead.)
-export function neighborhoodsFromVenues(venues) {
+// Count "core" (always-shown, check-independent) venues per neighborhood. A
+// neighborhood is worth showing only if it actually has bars in the list.
+function coreCountsByNeighborhood(venues) {
   const counts = new Map()
   for (const v of venues || []) {
-    if (v.neighborhood) counts.set(v.neighborhood, (counts.get(v.neighborhood) || 0) + 1)
+    if (v.neighborhood && isCoreVenue(v)) counts.set(v.neighborhood, (counts.get(v.neighborhood) || 0) + 1)
   }
-  return [...counts.entries()]
-    .filter(([, n]) => n >= 2)
+  return counts
+}
+
+// Neighborhoods present in a discovered city's venues that have ≥1 core (always-shown)
+// bar, sorted by core-bar count. (Seattle uses its curated config list instead.)
+export function neighborhoodsFromVenues(venues) {
+  return [...coreCountsByNeighborhood(venues).entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([name]) => name)
 }
 
-// The neighborhood option list for a city given its loaded venues.
+// The neighborhood option list for a city given its loaded venues. Curated cities
+// keep their config order but drop neighborhoods with no core bars; discovered cities
+// derive the list from venues. Before venues load, fall back to the full config list
+// so the picker is never momentarily empty.
 export function cityNeighborhoods(city, venues) {
-  return city.neighborhoods && city.neighborhoods.length
-    ? city.neighborhoods
-    : neighborhoodsFromVenues(venues)
+  if (city.neighborhoods && city.neighborhoods.length) {
+    if (!venues) return city.neighborhoods
+    const counts = coreCountsByNeighborhood(venues)
+    return city.neighborhoods.filter((n) => counts.get(n) > 0)
+  }
+  return neighborhoodsFromVenues(venues)
 }
 
 // City-level mode = too few usable neighborhoods to bother with a picker.
@@ -73,29 +85,27 @@ export function isCityLevel(list) {
 
 // --- Two-level (borough → neighborhood) cities, e.g. New York ---
 
-// Boroughs present in the venues (≥2 venues), sorted by count.
+// Boroughs that have ≥1 core (always-shown) bar, sorted by count.
 export function boroughsFromVenues(venues) {
   const counts = new Map()
   for (const v of venues || []) {
-    if (v.borough) counts.set(v.borough, (counts.get(v.borough) || 0) + 1)
+    if (v.borough && isCoreVenue(v)) counts.set(v.borough, (counts.get(v.borough) || 0) + 1)
   }
   return [...counts.entries()]
-    .filter(([, n]) => n >= 2)
     .sort((a, b) => b[1] - a[1])
     .map(([name]) => name)
 }
 
-// Fine neighborhoods within a borough (≥2 venues; excludes the borough itself,
-// i.e. venues that had no finer area).
+// Fine neighborhoods within a borough that have ≥1 core bar (excludes the borough
+// itself, i.e. venues that had no finer area).
 export function neighborhoodsInBorough(venues, borough) {
   const counts = new Map()
   for (const v of venues || []) {
-    if (v.borough === borough && v.neighborhood && v.neighborhood !== borough) {
+    if (v.borough === borough && v.neighborhood && v.neighborhood !== borough && isCoreVenue(v)) {
       counts.set(v.neighborhood, (counts.get(v.neighborhood) || 0) + 1)
     }
   }
   return [...counts.entries()]
-    .filter(([, n]) => n >= 2)
     .sort((a, b) => b[1] - a[1])
     .map(([name]) => name)
 }

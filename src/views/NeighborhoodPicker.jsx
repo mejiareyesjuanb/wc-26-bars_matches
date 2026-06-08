@@ -12,9 +12,7 @@ export default function NeighborhoodPicker({ initial, onSave, onSkip, neighborho
   const [borough, setBorough] = useState(null)
 
   const toggle = (h) =>
-    setHoods((prev) =>
-      prev.includes(h) ? prev.filter((x) => x !== h) : prev.length < 5 ? [...prev, h] : prev,
-    )
+    setHoods((prev) => (prev.includes(h) ? prev.filter((x) => x !== h) : [...prev, h]))
 
   const flatList = neighborhoods || getActiveCity().neighborhoods
 
@@ -31,10 +29,15 @@ export default function NeighborhoodPicker({ initial, onSave, onSkip, neighborho
       {children}
       <button
         onClick={() => onSave(hoods)}
-        disabled={!hoods.length}
-        className={`${compact ? 'mt-4' : 'mt-8'} w-full bg-accent text-white rounded-lg py-3 font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed`}
+        className={`${compact ? 'mt-4' : 'mt-8'} w-full bg-accent text-white rounded-lg py-3 font-semibold hover:opacity-90`}
       >
-        {hoods.length ? t('picker.see') : t('picker.pickAtLeast')}
+        {hoods.length ? t('picker.see') : t('picker.seeAll')}
+      </button>
+      <button
+        onClick={() => onSave([])}
+        className="mt-3 w-full text-sm text-neutral-500 hover:text-accent"
+      >
+        {t('picker.allNeighborhoods')}
       </button>
       {onSkip && (
         <button onClick={onSkip} className="mt-3 w-full text-sm text-neutral-500 hover:text-accent">
@@ -68,13 +71,8 @@ export default function NeighborhoodPicker({ initial, onSave, onSkip, neighborho
             </div>
             <div className="flex flex-wrap gap-2">
               {options.map((h) => (
-                <Chip
-                  key={h}
-                  active={hoods.includes(h)}
-                  disabled={!hoods.includes(h) && hoods.length >= 5}
-                  onClick={() => toggle(h)}
-                >
-                  {hoods.includes(h) ? `${hoods.indexOf(h) + 1}. ${h}` : h}
+                <Chip key={h} active={hoods.includes(h)} onClick={() => toggle(h)}>
+                  {h}
                 </Chip>
               ))}
             </div>
@@ -89,13 +87,8 @@ export default function NeighborhoodPicker({ initial, onSave, onSkip, neighborho
     <Wrapper>
       <div className={`flex flex-wrap gap-2 ${compact ? '' : 'mt-6'}`}>
         {flatList.map((h) => (
-          <Chip
-            key={h}
-            active={hoods.includes(h)}
-            disabled={!hoods.includes(h) && hoods.length >= 5}
-            onClick={() => toggle(h)}
-          >
-            {hoods.includes(h) ? `${hoods.indexOf(h) + 1}. ${h}` : h}
+          <Chip key={h} active={hoods.includes(h)} onClick={() => toggle(h)}>
+            {h}
           </Chip>
         ))}
       </div>
