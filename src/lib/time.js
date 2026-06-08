@@ -1,4 +1,4 @@
-import { REGION } from './region.js'
+import { getActiveCity } from './city.js'
 import { getCurrentLang } from './i18n/index.js'
 
 // Hour as written in the ISO string (the local kickoff hour for the host city).
@@ -36,13 +36,13 @@ function parts(iso) {
 }
 
 // "Jun 15, 3:00 PM PT" (en) / "15 jun, 3:00 p. m. PT" (es). The timezone label
-// comes from REGION (Pacific today; per-city in P2).
+// comes from the active city (Seattle → "PT"; per-city via cities.js).
 export function formatKickoff(iso, lang) {
   const L = lang || getCurrentLang()
   const { mo, d, hh, mm, h12 } = parts(iso)
   const mon = months(L)[mo - 1]
   const date = L === 'es' ? `${d} ${mon}` : `${mon} ${d}`
-  return `${date}, ${h12}:${mm} ${ampm(hh, L)} ${REGION.tzShort}`
+  return `${date}, ${h12}:${mm} ${ampm(hh, L)} ${getActiveCity().tzShort}`
 }
 
 export function dateKey(iso) {

@@ -1,6 +1,6 @@
 import { getTeam } from '../data/teams.js'
 import { formatDay, formatClock, dateKey } from '../lib/time.js'
-import { REGION } from '../lib/region.js'
+import { getActiveCity } from '../lib/city.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 function teamLabel(code) {
@@ -19,7 +19,7 @@ export default function MatchTable({ matches, onSelect }) {
         <thead>
           <tr className="text-left text-neutral-500 border-b border-neutral-200">
             <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.date')}</th>
-            <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.time', { tz: REGION.tzShort })}</th>
+            <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.time', { tz: getActiveCity().tzShort })}</th>
             <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.stage')}</th>
             <th className="font-medium px-3 py-2">{t('table.match')}</th>
             <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.city')}</th>

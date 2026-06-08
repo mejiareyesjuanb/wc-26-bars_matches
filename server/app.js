@@ -2,35 +2,39 @@ import 'dotenv/config'
 import express from 'express'
 import { BARS } from '../src/data/bars.js'
 import { MATCHES } from '../src/data/matches.js'
+import { getCityConfig, DEFAULT_CITY } from '../src/data/cities.js'
 import { icsForMatches } from '../src/lib/calendar.js'
 import { SIGNALS } from './venueSignals.js'
-import { fetchSeattleVenues } from './places.js'
+import { fetchCityVenues } from './places.js'
 import { mergeVenue } from './merge.js'
 import { nearestNeighborhood, decorateCurated } from './neighborhoods.js'
 import { checkVenue } from './enrich.js'
 
-const TTL_MS = 6 * 60 * 60 * 1000 // cache live results 6h to limit API cost
-let cache = null // { at, venues, source }
+const TTL_MS = 24 * 60 * 60 * 1000 // cache live results 24h to limit API cost
+const caches = new Map() // cityId -> { at, venues, source, reason, detail }
 
-const curated = () => decorateCurated(BARS)
+const curated = (city) => decorateCurated(BARS, city)
 
-async function getVenues() {
+async function getVenues(cityId) {
+  const city = getCityConfig(cityId)
   const key = process.env.GOOGLE_MAPS_API_KEY
-  if (!key) return { venues: curated(), source: 'curated', reason: 'no_key' }
-  if (cache && Date.now() - cache.at < TTL_MS) return cache
+  if (!key) return { venues: curated(city), source: 'curated', reason: 'no_key' }
+  const cached = caches.get(city.id)
+  if (cached && Date.now() - cached.at < TTL_MS) return cached
   try {
-    const places = await fetchSeattleVenues(key)
+    const places = await fetchCityVenues(city, key)
     if (!places.length) {
-      return { venues: curated(), source: 'curated', reason: 'no_results' }
+      return { venues: curated(city), source: 'curated', reason: 'no_results' }
     }
     const venues = places.map((p) =>
-      mergeVenue(p, nearestNeighborhood(p.lat, p.lng), SIGNALS),
+      mergeVenue(p, nearestNeighborhood(p.lat, p.lng, city.centroids), SIGNALS),
     )
-    cache = { at: Date.now(), venues, source: 'google', reason: null }
-    return cache
+    const result = { at: Date.now(), venues, source: 'google', reason: null }
+    caches.set(city.id, result)
+    return result
   } catch (e) {
     console.error('[venues] falling back to curated:', e.message)
-    return { venues: curated(), source: 'curated', reason: 'api_error', detail: e.message }
+    return { venues: curated(city), source: 'curated', reason: 'api_error', detail: e.message }
   }
 }
 
@@ -58,9 +62,10 @@ export function createApiApp() {
   const app = express()
   app.use(express.json())
 
-  app.get('/api/venues', async (_req, res) => {
-    const { venues, source, reason, detail } = await getVenues()
-    res.json({ venues, source, reason: reason ?? null, detail: detail ?? null, count: venues.length })
+  app.get('/api/venues', async (req, res) => {
+    const cityId = typeof req.query.city === 'string' ? req.query.city : DEFAULT_CITY
+    const { venues, source, reason, detail } = await getVenues(cityId)
+    res.json({ venues, source, reason: reason ?? null, detail: detail ?? null, count: venues.length, city: getCityConfig(cityId).id })
   })
 
   app.post('/api/venue-screens', async (req, res) => {

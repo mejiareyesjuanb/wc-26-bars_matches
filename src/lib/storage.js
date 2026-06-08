@@ -5,6 +5,7 @@ const KEY = 'wc26_prefs'
 export const DEFAULT_PREFS = {
   neighborhoods: [],
   language: null, // null = auto-detect (Spanish browser → es, else en); set on toggle
+  city: null, // null = default city (Seattle today); P3 sets via geolocation/picker
 }
 
 export function loadPrefs() {

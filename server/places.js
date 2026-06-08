@@ -8,24 +8,12 @@
 // venue categorization directly. A few Text Searches are added on top to catch
 // prominent / explicitly "World Cup viewing" spots. Results are deduped by id.
 
-import { NEIGHBORHOOD_CENTROIDS } from '../src/data/geo.js'
-
-const SEATTLE = { latitude: 47.6062, longitude: -122.3321 }
-
 // Bar-focused place types. Deliberately excludes the broad `restaurant` type,
 // which floods each tile with non-sports restaurants and pushes pubs past the
 // 20-result cap. Sports-showing restaurants (e.g. Kangaroo & Kiwi, an
 // "australian_restaurant") still appear because Google also tags them bar/pub/
 // sports_bar.
 const BAR_TYPES = ['sports_bar', 'pub', 'bar', 'brewery', 'bar_and_grill']
-
-const NEIGHBORHOODS = Object.keys(NEIGHBORHOOD_CENTROIDS)
-
-// Supplemental text queries for prominence + explicit viewing-experience spots.
-const TEXT_QUERIES = [
-  'World Cup viewing party bars Seattle',
-  'restaurants showing soccer matches Seattle',
-]
 
 const FIELD_MASK = [
   'places.id', 'places.displayName', 'places.formattedAddress', 'places.location',
@@ -69,10 +57,10 @@ async function googlePlaces(endpoint, body, apiKey) {
   return (data.places || []).map(normalizePlace)
 }
 
-async function searchText(query, apiKey, { sportsBar = false } = {}) {
+async function searchText(query, apiKey, center, { sportsBar = false } = {}) {
   const places = await googlePlaces('searchText', {
     textQuery: query,
-    locationBias: { circle: { center: SEATTLE, radius: 14000 } },
+    locationBias: { circle: { center, radius: 14000 } },
     maxResultCount: 20,
   }, apiKey)
   // Tag venues that Google itself returns for a "sports bars in …" query, even
@@ -107,10 +95,14 @@ export function dedupeById(places) {
   return [...byId.values()]
 }
 
-export async function fetchSeattleVenues(apiKey) {
+// Discover venues for a city config (centroids + queries + region). Seattle's
+// config reproduces the previous Seattle-only queries exactly (parity).
+export async function fetchCityVenues(city, apiKey) {
+  const center = { latitude: city.center[0], longitude: city.center[1] }
+  const centroids = Object.values(city.centroids)
   const batches = await Promise.all([
     // Geographic coverage: nearest bars to each neighborhood centroid.
-    ...Object.values(NEIGHBORHOOD_CENTROIDS).map((c) =>
+    ...centroids.map((c) =>
       searchNearby(c, 2000, apiKey).catch((e) => {
         console.error('[places] nearby failed:', e.message)
         return []
@@ -118,15 +110,15 @@ export async function fetchSeattleVenues(apiKey) {
     ),
     // Google's own "sports bars in {neighborhood}" answer — catches sports bars
     // typed as generic bar/pub/grill, and improves per-neighborhood coverage.
-    ...NEIGHBORHOODS.map((n) =>
-      searchText(`sports bars in ${n}, WA`, apiKey, { sportsBar: true }).catch((e) => {
+    ...city.neighborhoods.map((n) =>
+      searchText(`sports bars in ${n}, ${city.nearbyRegion}`, apiKey, center, { sportsBar: true }).catch((e) => {
         console.error('[places] sports-bar query failed:', n, '-', e.message)
         return []
       }),
     ),
     // Prominence + explicit viewing-experience discovery.
-    ...TEXT_QUERIES.map((q) =>
-      searchText(q, apiKey).catch((e) => {
+    ...city.textQueries.map((q) =>
+      searchText(q, apiKey, center).catch((e) => {
         console.error('[places] text query failed:', q, '-', e.message)
         return []
       }),

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import Chip from '../components/Chip.jsx'
-import { NEIGHBORHOODS } from '../data/neighborhoods.js'
+import { getActiveCity } from '../lib/city.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 // `compact` renders an embeddable version (no full-page wrapper / heading) for
 // use inside the match-detail modal.
 export default function NeighborhoodPicker({ initial, onSave, compact = false }) {
   const { t } = useI18n()
+  const NEIGHBORHOODS = getActiveCity().neighborhoods
   const [hoods, setHoods] = useState(initial || [])
 
   const toggle = (h) =>
