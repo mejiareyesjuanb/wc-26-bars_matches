@@ -1,5 +1,27 @@
 import { describe, it, expect } from 'vitest'
-import { dedupeById } from './places.js'
+import { dedupeById, descriptorArea } from './places.js'
+
+const area = (text, containment) => ({ displayName: { text }, containment })
+
+describe('descriptorArea', () => {
+  it('picks the first WITHIN area that is not the borough', () => {
+    // Hoops Cabaret (Manhattan): Koreatown is OUTSKIRTS; Midtown South is WITHIN.
+    const ad = { areas: [area('Koreatown', 'OUTSKIRTS'), area('Midtown South', 'WITHIN'), area('Midtown Manhattan', 'WITHIN')] }
+    expect(descriptorArea(ad, 'Manhattan')).toBe('Midtown South')
+  })
+  it('skips a WITHIN area equal to the borough', () => {
+    const ad = { areas: [area('Manhattan', 'WITHIN'), area('Chelsea', 'WITHIN')] }
+    expect(descriptorArea(ad, 'Manhattan')).toBe('Chelsea')
+  })
+  it('falls back to the first WITHIN, then the first area', () => {
+    expect(descriptorArea({ areas: [area('Queens', 'WITHIN')] }, 'Queens')).toBe('Queens')
+    expect(descriptorArea({ areas: [area('Somewhere', 'NEAR')] }, 'Bronx')).toBe('Somewhere')
+  })
+  it('returns null when there are no areas', () => {
+    expect(descriptorArea(undefined, 'Manhattan')).toBeNull()
+    expect(descriptorArea({ areas: [] }, 'Manhattan')).toBeNull()
+  })
+})
 
 describe('dedupeById', () => {
   it('keeps the first occurrence of each id and drops repeats', () => {

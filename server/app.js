@@ -37,7 +37,7 @@ async function getVenues(cityId) {
         neighborhood = nearestNeighborhood(p.lat, p.lng, city.centroids)
       } else if (city.twoLevel) {
         borough = p.sublocality || null
-        neighborhood = p.fineArea || p.sublocality || null
+        neighborhood = p.fineArea || p.descriptorArea || p.sublocality || null
       } else {
         neighborhood = p.sublocality || p.fineArea || null
       }

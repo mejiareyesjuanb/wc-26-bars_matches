@@ -20,7 +20,7 @@ const FIELD_MASK = [
   'places.rating', 'places.userRatingCount', 'places.priceLevel', 'places.types',
   'places.primaryType', 'places.reservable', 'places.editorialSummary',
   'places.businessStatus', 'places.websiteUri', 'places.googleMapsUri',
-  'places.addressComponents',
+  'places.addressComponents', 'places.addressDescriptor',
 ].join(',')
 
 // Extract area names from Google address components. `sublocality` is the broad
@@ -35,7 +35,21 @@ function componentText(components, ...types) {
   return null
 }
 
+// Some cities (e.g. Manhattan) carry no `neighborhood` address component — the
+// fine neighborhood lives in addressDescriptor.areas instead. Pick the first
+// area the venue is WITHIN (most specific first) that isn't the broad sublocality
+// itself; fall back to the first listed area. Pure — unit tested.
+export function descriptorArea(addressDescriptor, sublocality) {
+  const areas = addressDescriptor?.areas || []
+  if (!areas.length) return null
+  const name = (a) => a?.displayName?.text || null
+  const within = areas.filter((a) => a.containment === 'WITHIN')
+  const pick = within.find((a) => name(a) && name(a) !== sublocality) || within[0] || areas[0]
+  return name(pick)
+}
+
 function normalizePlace(p) {
+  const sublocality = componentText(p.addressComponents, 'sublocality', 'sublocality_level_1')
   return {
     id: p.id,
     name: p.displayName?.text || '',
@@ -52,8 +66,10 @@ function normalizePlace(p) {
     businessStatus: p.businessStatus,
     website: p.websiteUri,
     googleMapsUri: p.googleMapsUri,
-    sublocality: componentText(p.addressComponents, 'sublocality', 'sublocality_level_1'),
+    sublocality,
     fineArea: componentText(p.addressComponents, 'neighborhood'),
+    descriptorArea: descriptorArea(p.addressDescriptor, sublocality),
+    state: componentText(p.addressComponents, 'administrative_area_level_1'),
   }
 }
 
@@ -127,7 +143,9 @@ export function dedupeById(places) {
 export async function fetchCityVenues(city, apiKey) {
   const center = { latitude: city.center[0], longitude: city.center[1] }
   const curated = !!city.centroids
-  const tiles = curated ? Object.values(city.centroids) : gridTiles(city.center)
+  // Tiles: Seattle's curated centroids → an explicit per-city tile set (e.g. NYC's
+  // 5 boroughs) → else a generic grid around the center.
+  const tiles = curated ? Object.values(city.centroids) : city.tiles || gridTiles(city.center)
   const tileRadius = curated ? 2000 : 4000
 
   // Google's own "sports bars in …" answer — catches sports bars typed as a
@@ -160,6 +178,10 @@ export async function fetchCityVenues(city, apiKey) {
   ])
 
   return dedupeById(batches.flat()).filter(
-    (p) => p.lat != null && p.businessStatus !== 'CLOSED_PERMANENTLY',
+    (p) =>
+      p.lat != null &&
+      p.businessStatus !== 'CLOSED_PERMANENTLY' &&
+      // Drop out-of-state venues (e.g. Jersey City leaking into the NYC tiles).
+      (!city.stateFilter || !p.state || p.state === city.stateFilter),
   )
 }

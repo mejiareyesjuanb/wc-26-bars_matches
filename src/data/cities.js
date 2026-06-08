@@ -64,7 +64,25 @@ export const CITIES = {
   },
 
   // North America
-  'new-york': { ...city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'), twoLevel: true },
+  'new-york': {
+    ...city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'),
+    twoLevel: true,
+    stateFilter: 'New York', // drop Jersey City venues that the tiles can reach
+    // Explicit tiles covering all five boroughs (the generic grid missed the
+    // Bronx, most of Queens, and Staten Island).
+    tiles: [
+      // Manhattan
+      [40.715, -74.005], [40.742, -73.989], [40.775, -73.965], [40.808, -73.945],
+      // Brooklyn
+      [40.690, -73.990], [40.708, -73.957], [40.668, -73.978], [40.640, -73.985],
+      // Queens
+      [40.752, -73.930], [40.748, -73.880], [40.722, -73.845], [40.760, -73.830],
+      // Bronx
+      [40.832, -73.918], [40.862, -73.895],
+      // Staten Island
+      [40.630, -74.090], [40.580, -74.150],
+    ],
+  },
   'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
   boston: city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'),
   denver: city('denver', 'Denver', 'USA', 'MT', 'Mountain', 'America/Denver', [39.7392, -104.9903], 'Denver, CO'),
