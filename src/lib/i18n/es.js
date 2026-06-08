@@ -123,9 +123,11 @@ export default {
 
   venue: {
     watchScore: 'Puntuación',
-    tierA: 'Confirmado: pasa el Mundial',
-    tierB: 'Bar deportivo',
-    tierC: 'Bar / pub / cervecería',
+    tierSports: 'Bar deportivo',
+    tierPub: 'Pub',
+    tierBarGrill: 'Bar y parrilla',
+    tierBrewery: 'Cervecería',
+    tierBar: 'Bar',
     why: 'Por qué aparece aquí:',
     critConfirms: 'Confirma que pasa el Mundial (sitio web)',
     critSportsBar: 'Bar deportivo (por nombre o categoría de Google: {type})',

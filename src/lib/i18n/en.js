@@ -125,9 +125,11 @@ export default {
 
   venue: {
     watchScore: 'Watch score',
-    tierA: 'Confirmed: showing the World Cup',
-    tierB: 'Sports bar',
-    tierC: 'Bar / pub / brewery',
+    tierSports: 'Sports bar',
+    tierPub: 'Pub',
+    tierBarGrill: 'Bar & grill',
+    tierBrewery: 'Brewery',
+    tierBar: 'Bar',
     why: 'Why it ranks here:',
     critConfirms: 'Confirms World Cup viewing (website)',
     critSportsBar: 'Sports bar (by name or Google category: {type})',

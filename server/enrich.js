@@ -5,8 +5,11 @@
 
 const SCREEN_RE =
   /(big screens?|projector|flat[- ]?screens?|\btvs?\b|televisions?|\bscreens?\b|watch part(?:y|ies)|game ?day|live sports|sports bar|every match)/i
+// Strict World-Cup terms only. Bare "soccer / fútbol / watch party / usmnt" were
+// removed — they over-matched (a brewery's "Summer of Soccer" or a generic "watch
+// party" is not a World Cup commitment), which floated non-fits to the top.
 const WORLDCUP_RE =
-  /(world cup|fifa|wc ?'?26|2026 world cup|copa mundial|usmnt|us men'?s national|watch part(?:y|ies)|soccer|f[úu]tbol)/i
+  /(world cup|fifa|wc ?'?26|2026 world cup|copa mundial|mundial)/i
 
 function stripHtml(html) {
   return html

@@ -1,25 +1,30 @@
-// Ranking model. Eligible = drinking venues likely to show the World Cup;
-// restaurants/cafés are excluded unless they confirm WC viewing.
+// Ranking model — category-primary. A venue's fit-class (from Google's category)
+// sets a non-overlapping score band; WC-confirmation, screens, and reviews only
+// ORDER venues WITHIN their band (category always dominates).
 //
-//   Confirmed World Cup:            score 60–100  (top group)
-//   Sports bar, not confirmed:      score 30–60   (bonus — more screens)
-//   Other drinking venue (bar/pub/  score  0–30
-//     brewery/bar-and-grill):
-//   Anything else (restaurant/…):   excluded (included = false)
-// Reviews only break ties within a group.
+//   Sports bar       80–93   (top)
+//   Pub              64–77
+//   Bar & grill      48–61
+//   Brewery          32–45   (middle — play matches but few screens)
+//   Generic bar      16–29   (only if it has a screens/WC signal)
+//   Restaurants/etc. excluded (unless a real watch signal)
+//
+// Within a band: confirmed (+7) > screens (+4) > reviews (≤2, tie-break only).
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x))
 
-// Drinking venues that count even without a WC confirmation (they typically show
-// big matches). A venue qualifies by its primary category OR a strong bar signal
-// in Google's types[] (barType — catches gastropubs typed as a restaurant, e.g.
-// Kangaroo & Kiwi). Fine-dining is never a bar (excludes Canlis-style venues even
-// when their site mentions a one-off watch party).
-const DRINKING_TYPES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'bar and grill'])
-export function isDrinkingVenue(bar) {
-  if (bar.fineDining) return false
-  return DRINKING_TYPES.has(bar.type) || bar.barType === true
-}
+// Drinking-venue primary categories (from Google primaryType). Plain `bar` is in
+// here but gated separately (it's ambiguous). Cocktail/wine/lounge bars are NOT —
+// they're poor fits and need an explicit watch signal to appear.
+const DRINK_PRIMARY = new Set([
+  'sports bar', 'pub', 'irish pub', 'bar', 'bar and grill',
+  'brewery', 'brewpub', 'taproom', 'beer hall',
+])
+
+// Non-overlapping band bases; gap (16) exceeds the max within-band sub-score (13).
+const BANDS = { sports: 80, pub: 64, barGrill: 48, brewery: 32, bar: 16, other: 16 }
+
+const nameSportsBar = (bar) => /sports\s*bar/i.test(bar.name || '')
 
 // 0..1 from rating (3.0→0, 5.0→1) scaled by review-count confidence.
 export function reviewsScore(bar) {
@@ -28,51 +33,69 @@ export function reviewsScore(bar) {
   return quality * (0.6 + 0.4 * confidence)
 }
 
-// A venue counts as a sports bar if Google returns it for a "sports bars in
-// {neighborhood}" search (googleSportsBar), if its primaryType is sports_bar
-// (bar.type), or if its name says so — covering sports bars that Google types
-// as a generic bar/pub/grill (Old County Bar, Bad Albert's, 4Bs Tavern, …).
+// A venue is a sports bar if its category is sports_bar, its Google types[] include
+// sports_bar (sportsType — catches sports taverns typed as a generic bar/restaurant,
+// e.g. Bad Albert's, Kangaroo & Kiwi), or its name says so. The loose Google "sports
+// bars in {area}" text-search tag (googleSportsBar) is deliberately NOT used — it
+// pulled in plain bars and even burger joints.
 export function isSportsBar(bar) {
-  if (bar.type === 'sports bar' || bar.sportsType === true) return true
-  if (/sports\s*bar/i.test(bar.name || '')) return true
-  // Trust the "sports bars in {area}" tag only for actual drinking venues —
-  // Google's text search loosely returns prominent non-bars for that query.
-  return bar.googleSportsBar === true && isDrinkingVenue(bar)
+  return bar.type === 'sports bar' || bar.sportsType === true || nameSportsBar(bar)
 }
 
 export function isConfirmedWorldCup(bar, check) {
   return check?.worldCup === true || bar.confirmedViewing === true
 }
 
-// A venue is shown if it's a sports bar, a drinking venue, or hand-curated as a
-// confirmed WC spot. A WEBSITE confirmation alone does NOT include a non-bar.
+// Fit-class → score band. Pure.
+export function venueClass(bar) {
+  if (isSportsBar(bar)) return 'sports'
+  if (bar.type === 'pub' || bar.type === 'irish pub') return 'pub'
+  if (bar.type === 'bar and grill') return 'barGrill'
+  if (bar.type === 'brewery' || bar.type === 'brewpub' || bar.type === 'taproom' || bar.type === 'beer hall')
+    return 'brewery'
+  if (bar.type === 'bar') return 'bar'
+  return 'other'
+}
+
+// Whether a venue should appear at all.
+//  - fine dining: never.
+//  - sports bars / pubs / bar & grills / breweries: always.
+//  - generic `bar` (no sports signal): only with screens or WC confirmation.
+//  - restaurants / cocktail-lounge-wine bars / other: only with a real watch signal
+//    (name says sports bar, WC-confirmed, or sports_bar type AND screens).
 export function isRanked(bar, check) {
-  return isSportsBar(bar) || isDrinkingVenue(bar) || bar.confirmedViewing === true
+  if (bar.fineDining) return false
+  const screens = check?.screens === true
+  const confirmed = isConfirmedWorldCup(bar, check)
+  if (isSportsBar(bar)) {
+    // A restaurant with only a stray sports_bar type needs screens to qualify
+    // (drops Giddy Up Burgers; keeps Kangaroo & Kiwi which has screens).
+    if (!DRINK_PRIMARY.has(bar.type) && !nameSportsBar(bar)) return screens || confirmed
+    return true
+  }
+  if (bar.type === 'bar') return screens || confirmed // generic bar gate
+  if (DRINK_PRIMARY.has(bar.type)) return true // pub / brewery / bar & grill
+  return confirmed // restaurant / other: only when confirmed
 }
 
 export function scoreBar(bar, check) {
-  const sports = isSportsBar(bar)
-  const drinking = isDrinkingVenue(bar)
-  const curatedConfirmed = bar.confirmedViewing === true
-  const webConfirmed = check?.worldCup === true
-  // Eligibility: must be a real bar (or a hand-curated exception). A website
-  // "watch party" mention only ELEVATES an already-eligible venue — it never makes
-  // a fine-dining restaurant eligible.
-  const included = sports || drinking || curatedConfirmed
-  const confirmed = included && (curatedConfirmed || webConfirmed)
-  const r = reviewsScore(bar)
-  let score
-  if (!included) score = 0 // excluded
-  else if (confirmed) score = 60 + r * 40 // 60–100 (top)
-  else if (sports) score = 30 + r * 30 // 30–60 (sports-bar bonus)
-  else score = r * 30 // 0–30 (other drinking venue)
+  const included = isRanked(bar, check)
+  const cls = venueClass(bar)
+  const confirmed = isConfirmedWorldCup(bar, check)
+  const screens = check?.screens === true
+  const sports = cls === 'sports'
+  let score = 0
+  if (included) {
+    const sub = (confirmed ? 7 : 0) + (screens ? 4 : 0) + reviewsScore(bar) * 2 // 0–13
+    score = Math.round(BANDS[cls] + sub)
+  }
   return {
-    score: Math.round(score),
+    score,
     included,
-    confirmed,
+    confirmed: included && confirmed,
     sports,
     reasons: buildReasons(bar, check, confirmed, sports),
-    breakdown: buildBreakdown(bar, check, confirmed, sports, included),
+    breakdown: buildBreakdown(bar, cls, confirmed, included),
   }
 }
 
@@ -86,16 +109,19 @@ function buildReasons(bar, check, confirmed, sports) {
   return r
 }
 
-function buildBreakdown(bar, check, confirmed, sports, included) {
-  // A confirmed · B sports bar · C other drinking venue (bar/pub/brewery).
-  const tier = confirmed ? 'A' : sports ? 'B' : 'C'
+const TIER_KEY = {
+  sports: 'tierSports', pub: 'tierPub', barGrill: 'tierBarGrill',
+  brewery: 'tierBrewery', bar: 'tierBar', other: 'tierBar',
+}
+
+function buildBreakdown(bar, cls, confirmed, included) {
   return {
-    tier,
-    tierKey: confirmed ? 'tierA' : sports ? 'tierB' : 'tierC',
+    tier: cls,
+    tierKey: TIER_KEY[cls],
     included,
     criteria: [
       { key: 'critConfirms', met: confirmed },
-      { key: 'critSportsBar', met: sports, vars: { type: bar.type || 'unknown' } },
+      { key: 'critSportsBar', met: cls === 'sports', vars: { type: bar.type || 'unknown' } },
     ],
     rating: bar.rating,
     reviewCount: bar.reviewCount,
