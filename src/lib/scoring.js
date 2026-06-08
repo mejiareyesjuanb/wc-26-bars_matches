@@ -1,12 +1,21 @@
-// Ranking model (strict): only show sports bars and venues that CONFIRM they're
-// showing the World Cup. Everything else is excluded from the ranking entirely.
+// Ranking model. Eligible = drinking venues likely to show the World Cup;
+// restaurants/cafés are excluded unless they confirm WC viewing.
 //
-//   Confirmed World Cup:        score 60–100  (top group)
-//   Sports bar, not confirmed:  score  0–55
-//   Anything else:              excluded (included = false)
+//   Confirmed World Cup:            score 60–100  (top group)
+//   Sports bar, not confirmed:      score 30–60   (bonus — more screens)
+//   Other drinking venue (bar/pub/  score  0–30
+//     brewery/bar-and-grill):
+//   Anything else (restaurant/…):   excluded (included = false)
 // Reviews only break ties within a group.
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x))
+
+// Drinking venues that count even without a WC confirmation (they typically show
+// big matches). Excludes restaurants/cafés (those need confirmation).
+const DRINKING_TYPES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'bar and grill'])
+export function isDrinkingVenue(bar) {
+  return DRINKING_TYPES.has(bar.type)
+}
 
 // 0..1 from rating (3.0→0, 5.0→1) scaled by review-count confidence.
 export function reviewsScore(bar) {
@@ -27,19 +36,22 @@ export function isConfirmedWorldCup(bar, check) {
   return check?.worldCup === true || bar.confirmedViewing === true
 }
 
-// A venue is shown only if it's a sports bar OR confirms World Cup viewing.
+// A venue is shown if it confirms WC viewing, is a sports bar, or is a drinking
+// venue (bar/pub/brewery/bar-and-grill).
 export function isRanked(bar, check) {
-  return isSportsBar(bar) || isConfirmedWorldCup(bar, check)
+  return isConfirmedWorldCup(bar, check) || isSportsBar(bar) || isDrinkingVenue(bar)
 }
 
 export function scoreBar(bar, check) {
   const confirmed = isConfirmedWorldCup(bar, check)
   const sports = isSportsBar(bar)
-  const included = confirmed || sports
+  const drinking = isDrinkingVenue(bar)
+  const included = confirmed || sports || drinking
   const r = reviewsScore(bar)
   let score
-  if (confirmed) score = 60 + r * 40 // 60–100
-  else if (sports) score = r * 55 // 0–55
+  if (confirmed) score = 60 + r * 40 // 60–100 (top)
+  else if (sports) score = 30 + r * 30 // 30–60 (sports-bar bonus)
+  else if (drinking) score = r * 30 // 0–30
   else score = 0 // excluded
   return {
     score: Math.round(score),
@@ -62,6 +74,7 @@ function buildReasons(bar, check, confirmed, sports) {
 }
 
 function buildBreakdown(bar, check, confirmed, sports, included) {
+  // A confirmed · B sports bar · C other drinking venue (bar/pub/brewery).
   const tier = confirmed ? 'A' : sports ? 'B' : 'C'
   return {
     tier,

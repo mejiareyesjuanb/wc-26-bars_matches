@@ -112,9 +112,10 @@ describe('neighborhoodsFromVenues / cityNeighborhoods / isCityLevel', () => {
   it('keeps neighborhoods with >=2 venues, sorted by count', () => {
     expect(neighborhoodsFromVenues(venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
   })
-  it('Seattle uses its config list; discovered cities use venues', () => {
+  it('curated cities use their config list; non-curated discover from venues', () => {
     expect(cityNeighborhoods(getCity('seattle'), venues)).toEqual(getCity('seattle').neighborhoods)
-    expect(cityNeighborhoods(getCity('new-york'), venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
+    // Mountain View has no curated centroids → derive from venues.
+    expect(cityNeighborhoods(getCity('mountain-view'), venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
   })
   it('city-level when <3 neighborhoods', () => {
     expect(isCityLevel([])).toBe(true)

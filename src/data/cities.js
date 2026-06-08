@@ -11,6 +11,8 @@
 // mapsRegion (Google Maps fallback search suffix), textQueries (prominence
 // searches), nearbyRegion (Seattle only — "sports bars in {hood}, {region}").
 
+import { CITY_CENTROIDS, CITY_BOROUGH_OF } from './cityCentroids.js'
+
 const SEATTLE_CENTROIDS = {
   'Capitol Hill': [47.6230, -122.3210],
   Ballard: [47.6680, -122.3840],
@@ -68,21 +70,9 @@ export const CITIES = {
     ...city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'),
     twoLevel: true,
     hidden: true,
-    stateFilter: 'New York', // drop Jersey City venues that the tiles can reach
-    // Explicit tiles covering all five boroughs (the generic grid missed the
-    // Bronx, most of Queens, and Staten Island).
-    tiles: [
-      // Manhattan
-      [40.715, -74.005], [40.742, -73.989], [40.775, -73.965], [40.808, -73.945],
-      // Brooklyn
-      [40.690, -73.990], [40.708, -73.957], [40.668, -73.978], [40.640, -73.985],
-      // Queens
-      [40.752, -73.930], [40.748, -73.880], [40.722, -73.845], [40.760, -73.830],
-      // Bronx
-      [40.832, -73.918], [40.862, -73.895],
-      // Staten Island
-      [40.630, -74.090], [40.580, -74.150],
-    ],
+    stateFilter: 'New York', // drop any Jersey City venues from city-wide queries
+    // Curated per-neighborhood centroids + boroughOf are attached below from the
+    // generated cityCentroids.js (replaces the coarse borough tiles).
   },
   'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
   boston: { ...city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'), hidden: true },
@@ -106,6 +96,25 @@ export const CITIES = {
   copenhagen: { ...city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'), hidden: true },
   london: { ...city('london', 'London', 'UK', 'BST', 'British', 'Europe/London', [51.5074, -0.1278], 'London, UK'), hidden: true },
   'st-andrews': city('st-andrews', 'St Andrews', 'UK', 'BST', 'British', 'Europe/London', [56.3398, -2.7967], 'St Andrews, Scotland'),
+}
+
+// Attach curated, geocoded neighborhood centroids (built by
+// scripts/build-city-neighborhoods.mjs). A city with `centroids` runs the
+// Seattle-style per-neighborhood pipeline (per-centroid searchNearby +
+// per-neighborhood "sports bars in {n}" + nearest-centroid labeling), which gives
+// complete, correctly-named neighborhoods with real bar density.
+const REGION_BY_CITY = {
+  'los-angeles': 'CA', chicago: 'IL', denver: 'CO', austin: 'TX',
+  'washington-dc': 'DC', miami: 'FL', portland: 'OR', 'san-francisco': 'CA',
+  'new-york': 'NY',
+}
+for (const [id, centroids] of Object.entries(CITY_CENTROIDS)) {
+  const c = CITIES[id]
+  if (!c || !centroids || !Object.keys(centroids).length) continue
+  c.centroids = centroids
+  c.neighborhoods = Object.keys(centroids)
+  c.nearbyRegion = REGION_BY_CITY[id] || null
+  if (CITY_BOROUGH_OF[id]) c.boroughOf = CITY_BOROUGH_OF[id] // two-level (NYC)
 }
 
 export const DEFAULT_CITY = 'seattle'

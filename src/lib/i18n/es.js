@@ -125,7 +125,7 @@ export default {
     watchScore: 'Puntuación',
     tierA: 'Confirmado: pasa el Mundial',
     tierB: 'Bar deportivo',
-    tierC: 'No se muestra (no es bar deportivo ni está confirmado)',
+    tierC: 'Bar / pub / cervecería',
     why: 'Por qué aparece aquí:',
     critConfirms: 'Confirma que pasa el Mundial (sitio web)',
     critSportsBar: 'Bar deportivo (por nombre o categoría de Google: {type})',

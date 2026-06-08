@@ -27,19 +27,21 @@ async function getVenues(cityId) {
       return { venues: curated(city), source: 'curated', reason: 'no_results' }
     }
     // Neighborhood per city mode:
-    //  - Seattle (curated centroids): nearest named neighborhood.
-    //  - Two-level (NYC): borough = sublocality, neighborhood = fine area (fallback borough).
-    //  - Other discovered: neighborhood = sublocality (fallback fine area).
+    //  - Curated centroids (Seattle + curated cities): nearest named neighborhood;
+    //    for curated two-level cities (NYC) map it to its borough via boroughOf.
+    //  - Two-level without centroids: borough = sublocality, neighborhood = fine area.
+    //  - Other discovered: prefer the finer addressDescriptor label, then sublocality.
     const venues = places.map((p) => {
       let neighborhood
       let borough = null
       if (city.centroids) {
         neighborhood = nearestNeighborhood(p.lat, p.lng, city.centroids)
+        if (city.twoLevel && city.boroughOf) borough = city.boroughOf[neighborhood] || null
       } else if (city.twoLevel) {
         borough = p.sublocality || null
         neighborhood = p.fineArea || p.descriptorArea || p.sublocality || null
       } else {
-        neighborhood = p.sublocality || p.fineArea || null
+        neighborhood = p.descriptorArea || p.sublocality || p.fineArea || null
       }
       return mergeVenue({ ...p, borough }, neighborhood, SIGNALS)
     })
