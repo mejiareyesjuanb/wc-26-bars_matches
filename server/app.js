@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 import { BARS } from '../src/data/bars.js'
+import { MATCHES } from '../src/data/matches.js'
+import { icsForMatches } from '../src/lib/calendar.js'
 import { SIGNALS } from './venueSignals.js'
 import { fetchSeattleVenues } from './places.js'
 import { mergeVenue } from './merge.js'
@@ -76,6 +78,27 @@ export function createApiApp() {
       checks[v.id] = result
     })
     res.json({ checks })
+  })
+
+  // Serve an .ics for all matches (?set=all) or a subset (?ids=M001,M002).
+  // Used for the iOS "open as a link" path so Safari hands it to Apple Calendar.
+  app.get('/api/calendar.ics', (req, res) => {
+    const idsParam = typeof req.query.ids === 'string' ? req.query.ids : ''
+    const ids = idsParam.split(',').map((s) => s.trim()).filter(Boolean)
+    let matches
+    if (ids.length) {
+      const wanted = new Set(ids)
+      matches = MATCHES.filter((m) => wanted.has(m.id))
+    } else {
+      matches = MATCHES // default / ?set=all
+    }
+    if (!matches.length) {
+      res.status(400).type('text/plain').send('No matching matches')
+      return
+    }
+    res.setHeader('Content-Type', 'text/calendar; charset=utf-8')
+    res.setHeader('Content-Disposition', 'inline; filename="wc2026-matches.ics"')
+    res.send(icsForMatches(matches))
   })
 
   app.get('/api/health', (_req, res) => {
