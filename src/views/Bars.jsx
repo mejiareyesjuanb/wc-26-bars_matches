@@ -181,7 +181,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
       {!venues ? (
         <p className="text-center text-neutral-400 py-12">{t('bars.finding')}</p>
       ) : showSkeleton ? (
-        <div className="grid gap-3 sm:grid-cols-2" aria-busy="true" aria-label={t('bars.finding')}>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-busy="true" aria-label={t('bars.finding')}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-24 bg-neutral-100 rounded-xl animate-pulse" />
           ))}
@@ -201,7 +201,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
                 {list.length === 0 ? (
                   <p className="text-neutral-400 text-sm">{t('bars.sectionEmpty', { h })}</p>
                 ) : (
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {shown.map((bar) => (
                       <BarCard key={bar.id} bar={bar} check={checks[bar.id]} onClick={() => setSelected(bar)} />
                     ))}
@@ -224,7 +224,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
           {combined.length === 0 ? (
             <p className="text-neutral-400 text-sm py-8 text-center">{t('bars.emptyAll')}</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {combined.slice(0, shownCount).map((bar) => (
                 <BarCard key={bar.id} bar={bar} check={checks[bar.id]} onClick={() => setSelected(bar)} />
               ))}
