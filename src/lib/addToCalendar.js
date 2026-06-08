@@ -4,9 +4,9 @@ import { isIOS } from './platform.js'
 // Server route that returns a text/calendar response. On iOS we navigate to it
 // as a normal link so Safari hands the file straight to Apple Calendar's
 // "Add All Events" sheet (a forced Blob+download tends to detour through Files).
-export function calendarApiUrl({ all, ids }) {
-  if (all) return '/api/calendar.ics?set=all'
-  return `/api/calendar.ics?ids=${ids.join(',')}`
+export function calendarApiUrl({ all, ids, lang }) {
+  const base = all ? '/api/calendar.ics?set=all' : `/api/calendar.ics?ids=${ids.join(',')}`
+  return lang ? `${base}&lang=${lang}` : base
 }
 
 function blobDownload(matches, filename) {
@@ -25,9 +25,9 @@ function blobDownload(matches, filename) {
 // link (one tap into Apple Calendar); everywhere else → in-browser .ics download
 // (Apple/Outlook open it; Android imports into Google Calendar; desktop Google
 // uses the import shortcut shown in AddToCalendarModal).
-export function addMatchesToCalendar(matches, { filename, all = false } = {}) {
+export function addMatchesToCalendar(matches, { filename, all = false, lang } = {}) {
   if (isIOS()) {
-    window.location.href = calendarApiUrl({ all, ids: matches.map((m) => m.id) })
+    window.location.href = calendarApiUrl({ all, ids: matches.map((m) => m.id), lang })
     return
   }
   blobDownload(matches, filename || 'wc2026-matches.ics')

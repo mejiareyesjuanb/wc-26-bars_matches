@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { isIOS, isAndroid } from '../lib/platform.js'
 import { addMatchesToCalendar } from '../lib/addToCalendar.js'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 const GOOGLE_IMPORT_URL = 'https://calendar.google.com/calendar/u/0/r/settings/export'
 
@@ -9,6 +10,7 @@ const GOOGLE_IMPORT_URL = 'https://calendar.google.com/calendar/u/0/r/settings/e
 // which runs the existing addMatchesToCalendar() delivery (iOS → Apple Calendar
 // link; desktop/Android → .ics download). Instructions stay visible afterward.
 export default function AddToCalendarModal({ matches, all = false, onClose }) {
+  const { t, lang } = useI18n()
   const contentRef = useRef(null)
   const count = matches?.length || 0
 
@@ -28,11 +30,12 @@ export default function AddToCalendarModal({ matches, all = false, onClose }) {
 
   const ios = isIOS()
   const android = isAndroid()
-  const heading = all ? 'Add all matches to your calendar' : `Add these ${count} matches to your calendar`
+  const heading = all ? t('addCal.headingAll') : t('addCal.headingThese', { n: count })
 
   const onDownload = () =>
     addMatchesToCalendar(matches, {
       all,
+      lang,
       filename: all ? 'wc2026-all-matches.ics' : 'wc2026-matches.ics',
     })
 
@@ -59,7 +62,7 @@ export default function AddToCalendarModal({ matches, all = false, onClose }) {
           <h2 className="text-lg font-semibold">{heading}</h2>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('detail.close')}
             className="text-neutral-400 hover:text-neutral-700 text-xl leading-none"
           >
             ×
@@ -70,42 +73,27 @@ export default function AddToCalendarModal({ matches, all = false, onClose }) {
           <div className="text-sm text-neutral-600 leading-relaxed space-y-2">
             {ios ? (
               <>
-                <p>
-                  Tap <span className="font-medium">Download</span> — the matches open in
-                  Apple Calendar; tap <span className="font-medium">“Add All”</span> to save them.
-                </p>
-                <p className="text-neutral-500">
-                  Using Google Calendar? Bulk import is desktop-only — open this site on a
-                  computer, or add games one-by-one from a match.
-                </p>
+                <p>{t('addCal.iosLead')}</p>
+                <p className="text-neutral-500">{t('addCal.iosGoogle')}</p>
               </>
             ) : android ? (
-              <p>
-                Tap <span className="font-medium">Download</span>, then open the downloaded
-                file — Google Calendar imports your matches (choose Google Calendar if asked).
-              </p>
+              <p>{t('addCal.android')}</p>
             ) : (
               <>
-                <p>
-                  Click <span className="font-medium">Download</span> to save a calendar file
-                  with your matches.
-                </p>
+                <p>{t('addCal.desktopLead')}</p>
                 <ul className="space-y-1 text-neutral-500">
+                  <li>{t('addCal.desktopApple')}</li>
                   <li>
-                    <span className="font-medium text-neutral-600">Apple Calendar / Outlook</span> —
-                    open the downloaded file; it imports automatically.
-                  </li>
-                  <li>
-                    <span className="font-medium text-neutral-600">Google Calendar</span> — open{' '}
+                    {t('addCal.desktopGoogle1')}{' '}
                     <a
                       href={GOOGLE_IMPORT_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-accent hover:underline"
                     >
-                      Google Calendar import ↗
+                      {t('addCal.desktopGoogleLink')}
                     </a>
-                    , choose the downloaded <code>.ics</code>, then Import.
+                    {t('addCal.desktopGoogle2')}
                   </li>
                 </ul>
               </>
@@ -116,7 +104,7 @@ export default function AddToCalendarModal({ matches, all = false, onClose }) {
             onClick={onDownload}
             className="w-full inline-flex items-center justify-center gap-1 text-sm bg-accent text-white rounded-lg px-4 py-2.5 hover:opacity-90"
           >
-            📅 Download
+            {t('addCal.download')}
           </button>
         </div>
       </div>

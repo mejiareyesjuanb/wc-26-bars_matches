@@ -1,9 +1,11 @@
 import { TEAMS } from '../data/teams.js'
 import { STAGE_ORDER } from '../data/matches.js'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 const TIMES = ['morning', 'afternoon', 'evening']
 
 export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
+  const { t, stage } = useI18n()
   const update = (patch) => setFilters({ ...filters, ...patch })
   const teamCodes = Object.keys(TEAMS).sort((a, b) =>
     TEAMS[a].name.localeCompare(TEAMS[b].name),
@@ -17,7 +19,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
           value={filters.team || ''}
           onChange={(e) => update({ team: e.target.value || undefined })}
         >
-          <option value="">All teams</option>
+          <option value="">{t('filters.allTeams')}</option>
           {teamCodes.map((c) => (
             <option key={c} value={c}>{TEAMS[c].name}</option>
           ))}
@@ -28,7 +30,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
           value={filters.city || ''}
           onChange={(e) => update({ city: e.target.value || undefined })}
         >
-          <option value="">All cities</option>
+          <option value="">{t('filters.allCities')}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
 
@@ -37,8 +39,8 @@ export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
           value={filters.stage || ''}
           onChange={(e) => update({ stage: e.target.value || undefined })}
         >
-          <option value="">All stages</option>
-          {STAGE_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
+          <option value="">{t('filters.allStages')}</option>
+          {STAGE_ORDER.map((s) => <option key={s} value={s}>{stage(s)}</option>)}
         </select>
 
         <select
@@ -46,7 +48,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
           value={filters.date || ''}
           onChange={(e) => update({ date: e.target.value || undefined })}
         >
-          <option value="">All dates</option>
+          <option value="">{t('filters.allDates')}</option>
           {dates.map((d) => <option key={d} value={d}>{d}</option>)}
         </select>
 
@@ -55,8 +57,8 @@ export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
           value={filters.timeOfDay || ''}
           onChange={(e) => update({ timeOfDay: e.target.value || undefined })}
         >
-          <option value="">Any time</option>
-          {TIMES.map((t) => <option key={t} value={t} className="capitalize">{t}</option>)}
+          <option value="">{t('filters.anyTime')}</option>
+          {TIMES.map((to) => <option key={to} value={to} className="capitalize">{t(`filters.${to}`)}</option>)}
         </select>
       </div>
       {hasFilters && (
@@ -64,7 +66,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [] }) {
           onClick={() => setFilters({})}
           className="mt-2 text-sm text-neutral-500 hover:text-accent underline"
         >
-          Clear filters
+          {t('filters.clear')}
         </button>
       )}
     </div>

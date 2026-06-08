@@ -1,0 +1,147 @@
+// Spanish strings. Same key structure as en.js (en.js is the fallback).
+export default {
+  app: { brand: '⚽ WC26 Watch', tabMatches: 'Partidos', tabBars: 'Bares' },
+
+  common: { vs: 'vs', v: 'v' },
+
+  matches: {
+    title: 'Partidos del Mundial 2026',
+    subtitle: 'Escoge un partido para ver más',
+    cards: 'Tarjetas',
+    list: 'Lista',
+    count: '{n} partidos',
+    addAll: '📅 Añadir todos los partidos a mi calendario',
+    addThese: '📅 Añadir estos {n} partidos a mi calendario',
+    empty: 'Ningún partido coincide con estos filtros.',
+  },
+
+  filters: {
+    allTeams: 'Todos los equipos',
+    allCities: 'Todas las ciudades',
+    allStages: 'Todas las fases',
+    allDates: 'Todas las fechas',
+    anyTime: 'Cualquier hora',
+    clear: 'Borrar filtros',
+    morning: 'mañana',
+    afternoon: 'tarde',
+    evening: 'noche',
+  },
+
+  table: { date: 'Fecha', time: 'Hora ({tz})', stage: 'Fase', match: 'Partido', city: 'Ciudad' },
+
+  stages: {
+    Group: 'Grupo',
+    'Round of 32': 'Dieciseisavos',
+    'Round of 16': 'Octavos',
+    'Quarter-final': 'Cuartos',
+    'Semi-final': 'Semifinal',
+    'Third place': 'Tercer puesto',
+    Final: 'Final',
+  },
+  match: { group: 'Grupo {g}' },
+
+  detail: {
+    close: 'Cerrar',
+    fifaLine: 'FIFA #{rank} · Mejor: {finish}',
+    playersToWatch: 'Jugadores a seguir',
+    fifaAsOf: 'Ranking FIFA al {date}.',
+    addToCalendar: 'Añadir al calendario',
+    addGoogle: 'Añadir a Google Calendar ↗',
+    downloadIcs: 'Descargar .ics (Apple/Outlook)',
+    reminderNote: 'Incluye un recordatorio 1 hora antes del inicio.',
+    whereToWatch: 'Dónde verlo',
+    noVenuesArea: 'Aún no hay bares deportivos ni sedes confirmadas del Mundial en tus zonas.',
+    barsNote: 'Bares que muestran el Mundial en tus zonas — no específico de este partido.',
+    seeAllBars: 'Ver todos los bares →',
+    seeSchedule: 'Ver el calendario de {team}',
+  },
+
+  addCal: {
+    headingAll: 'Añade todos los partidos a tu calendario',
+    headingThese: 'Añade estos {n} partidos a tu calendario',
+    download: '📅 Descargar',
+    desktopLead: 'Haz clic en Descargar para guardar un archivo de calendario con tus partidos.',
+    desktopApple: 'Apple Calendar / Outlook: abre el archivo descargado; se importa automáticamente.',
+    desktopGoogle1: 'Google Calendar: abre',
+    desktopGoogleLink: 'la importación de Google Calendar ↗',
+    desktopGoogle2: ', elige el .ics descargado y pulsa Importar.',
+    iosLead: 'Toca Descargar: los partidos se abren en Apple Calendar; toca “Añadir todo” para guardarlos.',
+    iosGoogle: '¿Usas Google Calendar? La importación masiva solo funciona en computadora; abre este sitio en una computadora o añade los partidos uno por uno.',
+    android: 'Toca Descargar y abre el archivo descargado: Google Calendar importará tus partidos (elige Google Calendar si te lo pide).',
+  },
+
+  bars: {
+    titleCombined: 'Mejores bares',
+    titleByHood: 'Mejores bares por zona',
+    choose: 'Elegir zona o ciudad',
+    list: 'Lista',
+    map: 'Mapa',
+    subtitle: 'Bares deportivos y sedes confirmadas del Mundial — los mejores primero.',
+    sourceLive: 'En vivo · Google',
+    sourceCurated: 'Seleccionados',
+    combined: 'Combinado',
+    byHood: 'Por zona',
+    finding: 'Buscando bares…',
+    sectionEmpty: 'No hay bares deportivos ni sedes confirmadas del Mundial en {h}.',
+    showAllIn: 'Ver los {n} de {h}',
+    emptyAll: 'No hay bares deportivos ni sedes confirmadas del Mundial en tus zonas.',
+    showMore: 'Ver más ({n} más)',
+    changeAreas: '{h} — cambiar zonas',
+  },
+
+  picker: {
+    compactPrompt: 'Elige hasta 5 zonas para ver los mejores bares cercanos para el Mundial.',
+    title: 'Elige tus zonas o ciudades',
+    blurb: 'Elige hasta 5, en orden de preferencia — las usamos para ordenar los mejores bares cerca de ti.',
+    see: 'Ver bares',
+    pickAtLeast: 'Elige al menos una zona',
+  },
+
+  barCard: {
+    sportsBar: 'Bar deportivo',
+    showsMatches: 'Pasa partidos',
+    rating: '{r}★',
+    showingWC: '📺 Pasa el Mundial',
+    screensConfirmed: '✓ Pantallas confirmadas',
+    openMaps: 'Abrir en Google Maps ↗',
+  },
+
+  venue: {
+    watchScore: 'Puntuación',
+    tierA: 'Confirmado: pasa el Mundial',
+    tierB: 'Bar deportivo',
+    tierC: 'No se muestra (no es bar deportivo ni está confirmado)',
+    why: 'Por qué aparece aquí:',
+    critConfirms: 'Confirma que pasa el Mundial (sitio web)',
+    critSportsBar: 'Bar deportivo (por nombre o categoría de Google: {type})',
+    reviewsTiebreak: 'Reseñas (desempate): {rating}★ ({count})',
+    websiteEvidence: 'Sitio web: “…{evidence}…”',
+    openMaps: 'Abrir en Google Maps ↗',
+    visitWebsite: 'Visitar sitio web ↗',
+  },
+
+  fallback: {
+    no_key: 'Los datos en vivo están desactivados — no hay clave de API de Google en el servidor. Mostrando la lista seleccionada.',
+    api_error: 'No se pudo conectar con Google Places. Mostrando la lista seleccionada.',
+    no_results: 'No se encontraron sedes en vivo. Mostrando la lista seleccionada.',
+    unreachable: 'El servicio de sedes no está disponible. Mostrando la lista seleccionada.',
+    default: 'Mostrando la lista seleccionada.',
+  },
+
+  stakes: {
+    'Round of 32': 'Dieciseisavos de final — ganar o a casa.',
+    'Round of 16': 'Octavos de final — ganar o a casa.',
+    'Quarter-final': 'Cuartos de final — ganar para llegar a semis.',
+    'Semi-final': 'Semifinal — ganar para jugar el título.',
+    'Third place': 'Partido por el tercer puesto.',
+    Final: 'La final — el ganador levanta la Copa. 🏆',
+    knockout: 'Eliminatoria — ganar o a casa.',
+    groupDecider: 'Último partido de grupo — define quién avanza.',
+  },
+
+  calendar: {
+    eventTitle: '{home} vs {away} — Copa Mundial 2026',
+    eventDesc: '{stage} — Copa Mundial FIFA 2026.',
+    reminder: 'El partido empieza en 1 hora',
+  },
+}

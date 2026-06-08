@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { rankBars } from '../lib/scoring.js'
-import { confirmScreens, FALLBACK_MESSAGES } from '../lib/venues.js'
+import { confirmScreens } from '../lib/venues.js'
 import BarCard from '../components/BarCard.jsx'
 import VenueMap from '../components/VenueMap.jsx'
 import VenueModal from '../components/VenueModal.jsx'
 import NeighborhoodPicker from './NeighborhoodPicker.jsx'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 const PER_HOOD = 10 // bars shown per neighborhood before "show all"
 const PAGE = 10 // combined-view page size
@@ -16,6 +17,7 @@ const BAR_CATEGORIES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'wine bar
 const isBarish = (v) => BAR_CATEGORIES.has(v.type)
 
 export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
+  const { t } = useI18n()
   const [editing, setEditing] = useState(false)
   const [tab, setTab] = useState('list')
   const [group, setGroup] = useState('combined') // 'combined' | 'byHood'
@@ -91,19 +93,19 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold">{grouped ? 'Best bars by neighborhood' : 'Best bars'}</h1>
+        <h1 className="text-2xl font-bold">{grouped ? t('bars.titleByHood') : t('bars.titleCombined')}</h1>
         <div className="flex items-center gap-3">
-          <button onClick={() => setEditing(true)} className="text-sm text-accent underline">Choose neighborhood or city</button>
+          <button onClick={() => setEditing(true)} className="text-sm text-accent underline">{t('bars.choose')}</button>
           <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm">
-            <button onClick={() => setTab('list')} className={`px-3 py-1 ${tab === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>List</button>
-            <button onClick={() => setTab('map')} className={`px-3 py-1 ${tab === 'map' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Map</button>
+            <button onClick={() => setTab('list')} className={`px-3 py-1 ${tab === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.list')}</button>
+            <button onClick={() => setTab('map')} className={`px-3 py-1 ${tab === 'map' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.map')}</button>
           </div>
         </div>
       </div>
 
       <p className="text-sm text-neutral-500 mb-3">
-        Sports bars and venues confirmed showing the World Cup — confirmed first, then by reviews.
-        {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? 'Live · Google' : 'Curated'}</span>}
+        {t('bars.subtitle')}
+        {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? t('bars.sourceLive') : t('bars.sourceCurated')}</span>}
       </p>
 
       {hoods.length > 0 && (
@@ -113,8 +115,8 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
             <button
               key={h}
               onClick={() => setEditing(true)}
-              title="Change areas"
-              aria-label={`${h} — change areas`}
+              title={t('bars.changeAreas', { h })}
+              aria-label={t('bars.changeAreas', { h })}
               className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
             >
               {h}
@@ -125,19 +127,19 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
 
       {multi && tab === 'list' && (
         <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm w-max mb-5">
-          <button onClick={() => setGroup('combined')} className={`px-3 py-1 ${group === 'combined' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Combined</button>
-          <button onClick={() => setGroup('byHood')} className={`px-3 py-1 ${group === 'byHood' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>By neighborhood</button>
+          <button onClick={() => setGroup('combined')} className={`px-3 py-1 ${group === 'combined' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.combined')}</button>
+          <button onClick={() => setGroup('byHood')} className={`px-3 py-1 ${group === 'byHood' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.byHood')}</button>
         </div>
       )}
 
       {source === 'curated' && (
         <div className="mb-4 text-sm bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-3 py-2">
-          {FALLBACK_MESSAGES[reason] || 'Showing the curated venue list.'}
+          {t(reason ? `fallback.${reason}` : 'fallback.default')}
         </div>
       )}
 
       {!venues ? (
-        <p className="text-center text-neutral-400 py-12">Finding bars…</p>
+        <p className="text-center text-neutral-400 py-12">{t('bars.finding')}</p>
       ) : tab === 'map' ? (
         <VenueMap venues={mapVenues} onSelect={setSelected} />
       ) : grouped ? (
@@ -151,7 +153,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
                   {h} <span className="text-neutral-400 font-normal">({list.length})</span>
                 </h2>
                 {list.length === 0 ? (
-                  <p className="text-neutral-400 text-sm">No sports bars or confirmed World Cup venues found in {h}.</p>
+                  <p className="text-neutral-400 text-sm">{t('bars.sectionEmpty', { h })}</p>
                 ) : (
                   <div className="grid gap-3">
                     {shown.map((bar) => (
@@ -164,7 +166,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
                     onClick={() => setExpanded((e) => ({ ...e, [h]: true }))}
                     className="mt-3 text-sm text-accent hover:underline"
                   >
-                    Show all {list.length} in {h}
+                    {t('bars.showAllIn', { n: list.length, h })}
                   </button>
                 )}
               </section>
@@ -174,7 +176,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
       ) : (
         <>
           {combined.length === 0 ? (
-            <p className="text-neutral-400 text-sm py-8 text-center">No sports bars or confirmed World Cup venues found in your neighborhoods.</p>
+            <p className="text-neutral-400 text-sm py-8 text-center">{t('bars.emptyAll')}</p>
           ) : (
             <div className="grid gap-3">
               {combined.slice(0, combinedShown).map((bar) => (
@@ -187,7 +189,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
               onClick={() => setCombinedShown((n) => n + PAGE)}
               className="mt-4 w-full border border-neutral-300 rounded-lg py-2.5 text-sm font-medium hover:border-accent hover:text-accent"
             >
-              Show more results ({combined.length - combinedShown} more)
+              {t('bars.showMore', { n: combined.length - combinedShown })}
             </button>
           )}
         </>

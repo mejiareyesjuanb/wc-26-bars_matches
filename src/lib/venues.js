@@ -49,10 +49,3 @@ export function mapsUrl(v) {
   const base = `https://www.google.com/maps/search/?api=1&query=${q}`
   return v.placeId ? `${base}&query_place_id=${v.placeId}` : base
 }
-
-export const FALLBACK_MESSAGES = {
-  no_key: 'Live data is off — no Google API key is configured on the server. Showing the curated venue list.',
-  api_error: 'Couldn’t reach Google Places (see server logs). Showing the curated venue list.',
-  no_results: 'Google returned no venues for Seattle. Showing the curated venue list.',
-  unreachable: 'The venues API isn’t reachable. Showing the bundled curated list.',
-}

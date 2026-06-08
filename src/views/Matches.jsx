@@ -7,8 +7,10 @@ import MatchCard from '../components/MatchCard.jsx'
 import MatchTable from '../components/MatchTable.jsx'
 import MatchDetailModal from '../components/MatchDetailModal.jsx'
 import AddToCalendarModal from '../components/AddToCalendarModal.jsx'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
+  const { t } = useI18n()
   const [filters, setFilters] = useState({})
   const [view, setView] = useState('cards') // 'cards' | 'list'
   const [selected, setSelected] = useState(null)
@@ -35,33 +37,29 @@ export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
   return (
     <div className="max-w-5xl mx-auto p-6">
       <div className="flex items-start justify-between gap-3">
-        <h1 className="text-2xl font-bold">World Cup 2026 matches</h1>
+        <h1 className="text-2xl font-bold">{t('matches.title')}</h1>
         <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm shrink-0">
-          <button onClick={() => setView('cards')} className={`px-3 py-1 ${view === 'cards' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>Cards</button>
-          <button onClick={() => setView('list')} className={`px-3 py-1 ${view === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>List</button>
+          <button onClick={() => setView('cards')} className={`px-3 py-1 ${view === 'cards' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('matches.cards')}</button>
+          <button onClick={() => setView('list')} className={`px-3 py-1 ${view === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('matches.list')}</button>
         </div>
       </div>
-      <p className="text-sm text-neutral-500 mt-1 mb-4">
-        Every match, in Pacific (Seattle) time. Tap a match to add it to your calendar and find where to watch.
-      </p>
+      <p className="text-sm text-neutral-500 mt-1 mb-4">{t('matches.subtitle')}</p>
       <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} />
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <p className="text-sm text-neutral-500">{results.length} matches</p>
+        <p className="text-sm text-neutral-500">{t('matches.count', { n: results.length })}</p>
         {showBulk && (
           <button
             onClick={() => setCalendarOpen(true)}
             className="text-sm rounded-lg px-3 py-1.5 border border-neutral-300 hover:border-accent"
           >
-            {filtered
-              ? `📅 Add these ${results.length} matches to my calendar`
-              : '📅 Add all matches to my calendar'}
+            {filtered ? t('matches.addThese', { n: results.length }) : t('matches.addAll')}
           </button>
         )}
       </div>
 
       {results.length === 0 ? (
-        <p className="text-center text-neutral-400 py-12">No matches fit these filters.</p>
+        <p className="text-center text-neutral-400 py-12">{t('matches.empty')}</p>
       ) : view === 'list' ? (
         <MatchTable matches={results} onSelect={setSelected} />
       ) : (

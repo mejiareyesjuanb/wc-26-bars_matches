@@ -1,14 +1,5 @@
 import { dateKey } from './time.js'
-
-// One short "what's at stake" line per knockout stage.
-const KO_STAKES = {
-  'Round of 32': 'Round of 32 — win or go home.',
-  'Round of 16': 'Round of 16 — win or go home.',
-  'Quarter-final': 'Quarter-final — win to reach the semis.',
-  'Semi-final': 'Semi-final — win to play for the title.',
-  'Third place': 'Third-place play-off.',
-  Final: 'The final — the winner lifts the World Cup. 🏆',
-}
+import { translate, getCurrentLang } from './i18n/index.js'
 
 // A group match is a "decider" if it's on the final matchday of its group.
 // There's no matchday field, so derive it: the latest date within the group.
@@ -23,10 +14,14 @@ export function isGroupDecider(match, matches) {
 }
 
 // Short stakes line, or null when there's nothing special on the line
-// (i.e. a non-decider group-stage match).
-export function stakesFor(match, matches) {
-  if (match.stage !== 'Group') return KO_STAKES[match.stage] || 'Knockout — win or go home.'
-  return isGroupDecider(match, matches)
-    ? 'Final group-stage match — decides who advances.'
-    : null
+// (i.e. a non-decider group-stage match). Localized via the i18n dictionary;
+// `lang` defaults to the active language (English in tests / non-React callers).
+export function stakesFor(match, matches, lang) {
+  const L = lang || getCurrentLang()
+  if (match.stage !== 'Group') {
+    const key = `stakes.${match.stage}`
+    const line = translate(L, key)
+    return line === key ? translate(L, 'stakes.knockout') : line
+  }
+  return isGroupDecider(match, matches) ? translate(L, 'stakes.groupDecider') : null
 }

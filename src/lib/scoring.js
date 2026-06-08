@@ -51,28 +51,25 @@ export function scoreBar(bar, check) {
   }
 }
 
+// Reasons are emitted as i18n codes (translated at render) so the bar UI is
+// language-agnostic. `rating` carries the formatted value as a var.
 function buildReasons(bar, check, confirmed, sports) {
   const r = []
-  if (sports) r.push('Sports bar')
-  if (bar.confirmedViewing && check?.worldCup !== true) r.push('Shows matches')
-  if (bar.rating >= 4.5) r.push(`${bar.rating.toFixed(1)}★`)
+  if (sports) r.push({ code: 'sportsBar' })
+  if (bar.confirmedViewing && check?.worldCup !== true) r.push({ code: 'showsMatches' })
+  if (bar.rating >= 4.5) r.push({ code: 'rating', vars: { r: bar.rating.toFixed(1) } })
   return r
 }
 
 function buildBreakdown(bar, check, confirmed, sports, included) {
   const tier = confirmed ? 'A' : sports ? 'B' : 'C'
-  const tierLabel = confirmed
-    ? 'Confirmed: showing the World Cup'
-    : sports
-      ? 'Sports bar'
-      : 'Not shown (not a sports bar, not confirmed)'
   return {
     tier,
-    tierLabel,
+    tierKey: confirmed ? 'tierA' : sports ? 'tierB' : 'tierC',
     included,
     criteria: [
-      { label: 'Confirms World Cup viewing (website)', met: confirmed },
-      { label: `Sports bar (by name or Google category: ${bar.type || 'unknown'})`, met: sports },
+      { key: 'critConfirms', met: confirmed },
+      { key: 'critSportsBar', met: sports, vars: { type: bar.type || 'unknown' } },
     ],
     rating: bar.rating,
     reviewCount: bar.reviewCount,

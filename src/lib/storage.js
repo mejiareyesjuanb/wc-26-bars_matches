@@ -4,6 +4,7 @@ const KEY = 'wc26_prefs'
 // order). Older fields (venue type, atmosphere, etc.) are no longer used.
 export const DEFAULT_PREFS = {
   neighborhoods: [],
+  language: null, // null = auto-detect (Spanish browser → es, else en); set on toggle
 }
 
 export function loadPrefs() {

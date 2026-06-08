@@ -10,19 +10,21 @@ import { confirmScreens } from '../lib/venues.js'
 import { MATCHES } from '../data/matches.js'
 import BarCard from './BarCard.jsx'
 import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 function TeamName({ team }) {
   return <span>{team.flag ? `${team.flag} ` : ''}{team.name}</span>
 }
 
 function TeamColumn({ team, info }) {
+  const { t } = useI18n()
   return (
     <div>
       <div className="font-semibold text-sm"><TeamName team={team} /></div>
       <div className="text-xs text-neutral-500 mt-0.5">
-        FIFA #{info.fifaRank} · Best: {info.bestFinish}
+        {t('detail.fifaLine', { rank: info.fifaRank, finish: info.bestFinish })}
       </div>
-      <div className="text-xs font-medium text-neutral-500 mt-2">Players to watch</div>
+      <div className="text-xs font-medium text-neutral-500 mt-2">{t('detail.playersToWatch')}</div>
       <div className="mt-1 flex flex-wrap gap-1">
         {info.playersToWatch.map((p) => (
           <span key={p.name} className="text-xs bg-neutral-100 rounded-full px-2 py-0.5">
@@ -36,11 +38,12 @@ function TeamColumn({ team, info }) {
 
 // Tappable when the team is known (group stage); plain text for knockout slots.
 function TeamLabel({ team, onPick }) {
+  const { t } = useI18n()
   if (isPlaceholder(team) || !onPick) return <TeamName team={team} />
   return (
     <button
       onClick={() => onPick(team.code)}
-      aria-label={`See ${team.name}'s schedule`}
+      aria-label={t('detail.seeSchedule', { team: team.name })}
       className="hover:text-accent underline-offset-2 hover:underline"
     >
       <TeamName team={team} />
@@ -49,6 +52,7 @@ function TeamLabel({ team, onPick }) {
 }
 
 export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, onClose, onSeeAllBars, onPickTeam }) {
+  const { t, lang, stage } = useI18n()
   const [checks, setChecks] = useState({})
   const [editingHoods, setEditingHoods] = useState(false)
   const contentRef = useRef(null)
@@ -100,7 +104,7 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
   const homeInfo = teamInfo(match.homeTeam)
   const awayInfo = teamInfo(match.awayTeam)
   const showTeams = homeInfo && awayInfo && !isPlaceholder(home) && !isPlaceholder(away)
-  const stakes = stakesFor(match, MATCHES)
+  const stakes = stakesFor(match, MATCHES, lang)
   const top = ranked.slice(0, 3)
   const enriching = candidates.some((v) => checks[v.id] === undefined)
 
@@ -110,7 +114,7 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label={`${home.name} vs ${away.name} — match details`}
+      aria-label={`${home.name} ${t('common.vs')} ${away.name}`}
     >
       <div
         ref={contentRef}
@@ -127,14 +131,14 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
         <div className="p-5 border-b border-neutral-100 flex items-start justify-between gap-3">
           <div>
             <div className="text-xs font-medium text-accent">
-              {match.stage}{match.group ? ` · Group ${match.group}` : ''}
+              {stage(match.stage)}{match.group ? ` · ${t('match.group', { g: match.group })}` : ''}
             </div>
             <h2 className="text-lg font-semibold mt-1">
-              <TeamLabel team={home} onPick={onPickTeam} /> <span className="text-neutral-400 font-normal">vs</span> <TeamLabel team={away} onPick={onPickTeam} />
+              <TeamLabel team={home} onPick={onPickTeam} /> <span className="text-neutral-400 font-normal">{t('common.vs')}</span> <TeamLabel team={away} onPick={onPickTeam} />
             </h2>
-            <p className="text-sm text-neutral-500 mt-1">{formatKickoff(match.datetime)} · {match.venueCity}</p>
+            <p className="text-sm text-neutral-500 mt-1">{formatKickoff(match.datetime, lang)} · {match.venueCity}</p>
           </div>
-          <button onClick={onClose} aria-label="Close" className="text-neutral-400 hover:text-neutral-700 text-xl leading-none">×</button>
+          <button onClick={onClose} aria-label={t('detail.close')} className="text-neutral-400 hover:text-neutral-700 text-xl leading-none">×</button>
         </div>
 
         <div className="p-5 space-y-6">
@@ -145,32 +149,30 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
                 <TeamColumn team={home} info={homeInfo} />
                 <TeamColumn team={away} info={awayInfo} />
               </div>
-              <p className="mt-2 text-xs text-neutral-400">FIFA rank as of {TEAM_INFO_META.rankAsOf}.</p>
+              <p className="mt-2 text-xs text-neutral-400">{t('detail.fifaAsOf', { date: TEAM_INFO_META.rankAsOf })}</p>
             </section>
           )}
 
           {/* Add to calendar (the .ics includes a 1-hour reminder alarm) */}
           <section>
-            <h3 className="text-sm font-semibold mb-2">Add to calendar</h3>
+            <h3 className="text-sm font-semibold mb-2">{t('detail.addToCalendar')}</h3>
             <div className="flex flex-col sm:flex-row gap-2">
               <a
-                href={googleCalendarUrl(match)}
+                href={googleCalendarUrl(match, lang)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-1 text-sm bg-accent text-white rounded-lg px-3 py-2 hover:opacity-90"
               >
-                Add to Google Calendar ↗
+                {t('detail.addGoogle')}
               </a>
               <button
                 onClick={() => addMatchesToCalendar([match], { filename: ICS_FILENAME(match) })}
                 className="inline-flex items-center justify-center gap-1 text-sm border border-neutral-300 rounded-lg px-3 py-2 hover:border-accent"
               >
-                Download .ics (Apple/Outlook)
+                {t('detail.downloadIcs')}
               </button>
             </div>
-            <p className="mt-2 text-xs text-neutral-400">
-              Includes a reminder 1 hour before kickoff.
-            </p>
+            <p className="mt-2 text-xs text-neutral-400">{t('detail.reminderNote')}</p>
           </section>
 
           {/* Stage stakes — banner above where-to-watch */}
@@ -182,7 +184,7 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
 
           {/* Where to watch — top bars in the user's neighborhoods */}
           <section>
-            <h3 className="text-sm font-semibold mb-2">Where to watch</h3>
+            <h3 className="text-sm font-semibold mb-2">{t('detail.whereToWatch')}</h3>
             {hoods.length === 0 || editingHoods ? (
               <NeighborhoodPicker
                 initial={hoods}
@@ -198,8 +200,8 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
                     <button
                       key={h}
                       onClick={() => setEditingHoods(true)}
-                      title="Change areas"
-                      aria-label={`${h} — change areas`}
+                      title={t('bars.changeAreas', { h })}
+                      aria-label={t('bars.changeAreas', { h })}
                       className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
                     >
                       {h}
@@ -213,14 +215,14 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
                     <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
                   </div>
                 ) : top.length === 0 ? (
-                  <p className="text-sm text-neutral-400">No sports bars or confirmed World Cup venues in your areas yet.</p>
+                  <p className="text-sm text-neutral-400">{t('detail.noVenuesArea')}</p>
                 ) : (
                   <div className="space-y-3">
-                    <p className="text-xs text-neutral-400">Bars that show the World Cup in your areas — not confirmation for this specific match.</p>
+                    <p className="text-xs text-neutral-400">{t('detail.barsNote')}</p>
                     {top.map((bar) => (
                       <BarCard key={bar.id} bar={bar} check={checks[bar.id]} />
                     ))}
-                    <button onClick={onSeeAllBars} className="text-sm text-accent hover:underline">See all bars →</button>
+                    <button onClick={onSeeAllBars} className="text-sm text-accent hover:underline">{t('detail.seeAllBars')}</button>
                   </div>
                 )}
               </>

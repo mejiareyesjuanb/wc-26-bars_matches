@@ -1,6 +1,8 @@
 import { mapsUrl } from '../lib/venues.js'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 export default function BarCard({ bar, check, onClick }) {
+  const { t } = useI18n()
   const top3 = bar.rank <= 3
   return (
     <div
@@ -21,13 +23,13 @@ export default function BarCard({ bar, check, onClick }) {
         <p className="text-sm text-neutral-600 mt-1">{bar.blurb}</p>
         <div className="flex flex-wrap gap-1.5 mt-2">
           {bar.reasons.map((r, i) => (
-            <span key={i} className="text-xs bg-neutral-100 text-neutral-700 rounded-full px-2 py-0.5">{r}</span>
+            <span key={i} className="text-xs bg-neutral-100 text-neutral-700 rounded-full px-2 py-0.5">{t(`barCard.${r.code}`, r.vars)}</span>
           ))}
           {check?.worldCup && (
-            <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">📺 Showing the World Cup</span>
+            <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">{t('barCard.showingWC')}</span>
           )}
           {check && !check.worldCup && check.screens && (
-            <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">✓ Screens confirmed</span>
+            <span className="text-xs bg-green-100 text-green-700 rounded-full px-2 py-0.5">{t('barCard.screensConfirmed')}</span>
           )}
         </div>
         <div className="mt-2">
@@ -38,7 +40,7 @@ export default function BarCard({ bar, check, onClick }) {
             onClick={(e) => e.stopPropagation()}
             className="text-xs text-accent hover:underline"
           >
-            Open in Google Maps ↗
+            {t('barCard.openMaps')}
           </a>
         </div>
       </div>

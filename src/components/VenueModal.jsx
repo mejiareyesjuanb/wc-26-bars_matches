@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { mapsUrl } from '../lib/venues.js'
+import { useI18n } from '../lib/i18n/react.jsx'
 
 const TIER_STYLE = {
   A: 'bg-green-100 text-green-700',
@@ -8,6 +9,7 @@ const TIER_STYLE = {
 }
 
 export default function VenueModal({ venue, check, onClose }) {
+  const { t } = useI18n()
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
@@ -43,34 +45,34 @@ export default function VenueModal({ venue, check, onClose }) {
 
         <div className="p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold">Watch score</span>
+            <span className="font-semibold">{t('venue.watchScore')}</span>
             <span className="font-bold text-accent">{venue.score}/100</span>
           </div>
 
-          {bd.tierLabel && (
+          {bd.tierKey && (
             <span className={`inline-block text-xs font-medium rounded-full px-2.5 py-1 mb-4 ${TIER_STYLE[bd.tier] || ''}`}>
-              {bd.tierLabel}
+              {t(`venue.${bd.tierKey}`)}
             </span>
           )}
 
-          <p className="text-sm text-neutral-500 mb-2">Why it ranks here:</p>
+          <p className="text-sm text-neutral-500 mb-2">{t('venue.why')}</p>
           <ul className="space-y-1.5 text-sm">
             {(bd.criteria || []).map((c, i) => (
               <li key={i} className="flex items-start gap-2">
                 <span className={c.met ? 'text-green-600' : 'text-neutral-300'}>{c.met ? '✓' : '○'}</span>
-                <span className={c.met ? 'text-neutral-700' : 'text-neutral-400'}>{c.label}</span>
+                <span className={c.met ? 'text-neutral-700' : 'text-neutral-400'}>{t(`venue.${c.key}`, c.vars)}</span>
               </li>
             ))}
             <li className="flex items-start gap-2">
               <span className="text-neutral-400">★</span>
               <span className="text-neutral-700">
-                Reviews (tie-breaker): {bd.rating?.toFixed?.(1)}★ ({bd.reviewCount})
+                {t('venue.reviewsTiebreak', { rating: bd.rating?.toFixed?.(1), count: bd.reviewCount })}
               </span>
             </li>
           </ul>
 
           {check?.evidence && (
-            <p className="mt-4 text-xs text-neutral-400 italic">Website: “…{check.evidence}…”</p>
+            <p className="mt-4 text-xs text-neutral-400 italic">{t('venue.websiteEvidence', { evidence: check.evidence })}</p>
           )}
 
           <div className="mt-5 flex flex-wrap gap-3">
@@ -80,7 +82,7 @@ export default function VenueModal({ venue, check, onClose }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-sm bg-accent text-white rounded-lg px-3 py-2 hover:opacity-90"
             >
-              Open in Google Maps ↗
+              {t('venue.openMaps')}
             </a>
             {venue.website && (
               <a
@@ -89,7 +91,7 @@ export default function VenueModal({ venue, check, onClose }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm border border-neutral-300 rounded-lg px-3 py-2 hover:border-accent"
               >
-                Visit website ↗
+                {t('venue.visitWebsite')}
               </a>
             )}
           </div>

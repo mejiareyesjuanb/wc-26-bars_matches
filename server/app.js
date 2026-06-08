@@ -96,9 +96,10 @@ export function createApiApp() {
       res.status(400).type('text/plain').send('No matching matches')
       return
     }
+    const lang = req.query.lang === 'es' ? 'es' : 'en'
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8')
     res.setHeader('Content-Disposition', 'inline; filename="wc2026-matches.ics"')
-    res.send(icsForMatches(matches))
+    res.send(icsForMatches(matches, lang))
   })
 
   app.get('/api/health', (_req, res) => {

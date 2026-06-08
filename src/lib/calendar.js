@@ -1,22 +1,29 @@
 import { getTeam } from '../data/teams.js'
+import { translate, getCurrentLang, stageLabel } from './i18n/index.js'
 
 const DURATION_MIN = 120 // a match window incl. halftime/stoppage
 
+function stageText(match, lang) {
+  const base = stageLabel(match.stage, lang)
+  return match.group ? `${base} · ${translate(lang, 'match.group', { g: match.group })}` : base
+}
+
 // Build a calendar event from a match. The match `datetime` ISO carries the
-// Pacific offset (-07:00), so `new Date(...)` is the correct UTC instant — we
-// never re-apply an offset. KO slot labels flow through via getTeam().name.
-export function eventForMatch(match) {
+// host city's offset, so `new Date(...)` is the correct UTC instant — we never
+// re-apply an offset. Strings are localized; `lang` defaults to the active
+// language (English for non-React/server callers unless passed explicitly).
+export function eventForMatch(match, lang) {
+  const L = lang || getCurrentLang()
   const home = getTeam(match.homeTeam).name
   const away = getTeam(match.awayTeam).name
   const start = new Date(match.datetime)
   const end = new Date(start.getTime() + DURATION_MIN * 60 * 1000)
   return {
-    title: `${home} vs ${away} — World Cup 2026`,
+    title: translate(L, 'calendar.eventTitle', { home, away }),
     start,
     end,
     location: match.venueCity,
-    description:
-      `${match.stage}${match.group ? ` · Group ${match.group}` : ''} — 2026 FIFA World Cup. Kickoff shown in Pacific Time.`,
+    description: translate(L, 'calendar.eventDesc', { stage: stageText(match, L) }),
   }
 }
 
@@ -25,8 +32,8 @@ export function icsStamp(date) {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z')
 }
 
-export function googleCalendarUrl(match) {
-  const e = eventForMatch(match)
+export function googleCalendarUrl(match, lang) {
+  const e = eventForMatch(match, lang)
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: e.title,
@@ -46,8 +53,9 @@ function escapeICS(s) {
 }
 
 // One VEVENT (with a 1-hour reminder alarm) — shared by single + bulk export.
-function veventLines(match) {
-  const e = eventForMatch(match)
+function veventLines(match, lang) {
+  const L = lang || getCurrentLang()
+  const e = eventForMatch(match, L)
   return [
     'BEGIN:VEVENT',
     `UID:${match.id}@wc2026-seattle`,
@@ -59,7 +67,7 @@ function veventLines(match) {
     `DESCRIPTION:${escapeICS(e.description)}`,
     'BEGIN:VALARM',
     'ACTION:DISPLAY',
-    'DESCRIPTION:Match starts in 1 hour',
+    `DESCRIPTION:${escapeICS(translate(L, 'calendar.reminder'))}`,
     'TRIGGER:-PT1H',
     'END:VALARM',
     'END:VEVENT',
@@ -70,7 +78,7 @@ function wrapCalendar(eventLineGroups) {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Seattle and Eastside WC 26//EN',
+    'PRODID:-//WC26 Watch//EN',
     'CALSCALE:GREGORIAN',
     ...eventLineGroups.flat(),
     'END:VCALENDAR',
@@ -78,13 +86,13 @@ function wrapCalendar(eventLineGroups) {
 }
 
 // An .ics for a single match (timezone-correct anywhere via UTC stamps).
-export function icsForMatch(match) {
-  return wrapCalendar([veventLines(match)])
+export function icsForMatch(match, lang) {
+  return wrapCalendar([veventLines(match, lang)])
 }
 
 // An .ics containing many matches — one VCALENDAR, one VEVENT each.
-export function icsForMatches(matches) {
-  return wrapCalendar(matches.map(veventLines))
+export function icsForMatches(matches, lang) {
+  return wrapCalendar(matches.map((m) => veventLines(m, lang)))
 }
 
 export const ICS_FILENAME = (match) => `${match.id}-wc2026.ics`
