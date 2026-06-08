@@ -2,17 +2,17 @@ import { useMemo, useState } from 'react'
 import { MATCHES } from '../data/matches.js'
 import { filterMatches } from '../lib/filters.js'
 import { dateKey } from '../lib/time.js'
-import { addMatchesToCalendar } from '../lib/addToCalendar.js'
 import FilterBar from '../components/FilterBar.jsx'
 import MatchCard from '../components/MatchCard.jsx'
 import MatchTable from '../components/MatchTable.jsx'
 import MatchDetailModal from '../components/MatchDetailModal.jsx'
-import CalendarHelp from '../components/CalendarHelp.jsx'
+import AddToCalendarModal from '../components/AddToCalendarModal.jsx'
 
 export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
   const [filters, setFilters] = useState({})
   const [view, setView] = useState('cards') // 'cards' | 'list'
   const [selected, setSelected] = useState(null)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const dates = useMemo(
     () => [...new Set(MATCHES.map((m) => dateKey(m.datetime)))].sort(),
     [],
@@ -46,24 +46,17 @@ export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
       </p>
       <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} />
 
-      <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-        <p className="text-sm text-neutral-500 pt-1.5">{results.length} matches</p>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <p className="text-sm text-neutral-500">{results.length} matches</p>
         {showBulk && (
-          <div className="flex flex-col items-start sm:items-end gap-1">
-            <button
-              onClick={() =>
-                filtered
-                  ? addMatchesToCalendar(results, { filename: 'wc2026-matches.ics' })
-                  : addMatchesToCalendar(MATCHES, { filename: 'wc2026-all-matches.ics', all: true })
-              }
-              className="text-sm rounded-lg px-3 py-1.5 border border-neutral-300 hover:border-accent"
-            >
-              {filtered
-                ? `📅 Add these ${results.length} matches to calendar`
-                : `📅 Add all ${MATCHES.length} matches to calendar`}
-            </button>
-            <CalendarHelp />
-          </div>
+          <button
+            onClick={() => setCalendarOpen(true)}
+            className="text-sm rounded-lg px-3 py-1.5 border border-neutral-300 hover:border-accent"
+          >
+            {filtered
+              ? `📅 Add these ${results.length} matches to my calendar`
+              : '📅 Add all matches to my calendar'}
+          </button>
         )}
       </div>
 
@@ -88,6 +81,14 @@ export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
           onClose={() => setSelected(null)}
           onSeeAllBars={onGoToBars}
           onPickTeam={pickTeam}
+        />
+      )}
+
+      {calendarOpen && (
+        <AddToCalendarModal
+          matches={filtered ? results : MATCHES}
+          all={!filtered}
+          onClose={() => setCalendarOpen(false)}
         />
       )}
     </div>

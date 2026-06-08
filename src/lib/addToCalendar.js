@@ -24,7 +24,7 @@ function blobDownload(matches, filename) {
 // Add a set of matches to the user's calendar. iOS → open the served .ics as a
 // link (one tap into Apple Calendar); everywhere else → in-browser .ics download
 // (Apple/Outlook open it; Android imports into Google Calendar; desktop Google
-// uses the import shortcut in CalendarHelp).
+// uses the import shortcut shown in AddToCalendarModal).
 export function addMatchesToCalendar(matches, { filename, all = false } = {}) {
   if (isIOS()) {
     window.location.href = calendarApiUrl({ all, ids: matches.map((m) => m.id) })

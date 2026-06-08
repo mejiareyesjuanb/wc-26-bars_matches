@@ -9,7 +9,6 @@ import { rankBars } from '../lib/scoring.js'
 import { confirmScreens } from '../lib/venues.js'
 import { MATCHES } from '../data/matches.js'
 import BarCard from './BarCard.jsx'
-import CalendarHelp from './CalendarHelp.jsx'
 import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
 
 function TeamName({ team }) {
@@ -170,8 +169,7 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
               </button>
             </div>
             <p className="mt-2 text-xs text-neutral-400">
-              Includes a reminder 1 hour before kickoff.{' '}
-              <CalendarHelp label="ⓘ How do I add this?" />
+              Includes a reminder 1 hour before kickoff.
             </p>
           </section>
 
