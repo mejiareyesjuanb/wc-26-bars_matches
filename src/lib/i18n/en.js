@@ -8,6 +8,7 @@ export default {
   matches: {
     title: 'World Cup 2026 matches',
     subtitle: 'Tap a match for details',
+    view: 'View',
     cards: 'Cards',
     list: 'List',
     count: '{n} matches',
@@ -78,6 +79,7 @@ export default {
     choose: 'Choose neighborhood',
     allOfCity: 'All of {city}',
     clearToAll: 'All',
+    view: 'View',
     list: 'List',
     map: 'Map',
     subtitle: 'Sports bars & confirmed World Cup venues — best first.',

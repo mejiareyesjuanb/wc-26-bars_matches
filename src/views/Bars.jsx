@@ -3,6 +3,7 @@ import { rankBars } from '../lib/scoring.js'
 import { confirmScreens } from '../lib/venues.js'
 import { getActiveCity, cityNeighborhoods, isCityLevel } from '../lib/city.js'
 import BarCard from '../components/BarCard.jsx'
+import SegmentedToggle from '../components/SegmentedToggle.jsx'
 import VenueMap from '../components/VenueMap.jsx'
 import VenueModal from '../components/VenueModal.jsx'
 import NeighborhoodPicker from './NeighborhoodPicker.jsx'
@@ -113,10 +114,15 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
     <div className="max-w-5xl mx-auto p-6">
       <div className="flex items-start justify-between gap-3">
         <h1 className="text-2xl font-bold">{grouped ? t('bars.titleByHood') : t('bars.titleCombined')}</h1>
-        <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm shrink-0">
-          <button onClick={() => setTab('list')} className={`px-3 py-1 ${tab === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.list')}</button>
-          <button onClick={() => setTab('map')} className={`px-3 py-1 ${tab === 'map' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.map')}</button>
-        </div>
+        <SegmentedToggle
+          value={tab}
+          onChange={setTab}
+          ariaLabel={t('bars.view')}
+          options={[
+            { value: 'list', label: t('bars.list') },
+            { value: 'map', label: t('bars.map') },
+          ]}
+        />
       </div>
 
       <p className="text-sm text-neutral-500 mt-1 mb-4">

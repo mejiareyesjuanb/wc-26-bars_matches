@@ -7,6 +7,7 @@ import MatchCard from '../components/MatchCard.jsx'
 import MatchTable from '../components/MatchTable.jsx'
 import MatchDetailModal from '../components/MatchDetailModal.jsx'
 import AddToCalendarModal from '../components/AddToCalendarModal.jsx'
+import SegmentedToggle from '../components/SegmentedToggle.jsx'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, onGoToBars, checks, onChecks }) {
@@ -38,10 +39,15 @@ export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, on
     <div className="max-w-5xl mx-auto p-6">
       <div className="flex items-start justify-between gap-3">
         <h1 className="text-2xl font-bold">{t('matches.title')}</h1>
-        <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm shrink-0">
-          <button onClick={() => setView('cards')} className={`px-3 py-1 ${view === 'cards' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('matches.cards')}</button>
-          <button onClick={() => setView('list')} className={`px-3 py-1 ${view === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('matches.list')}</button>
-        </div>
+        <SegmentedToggle
+          value={view}
+          onChange={setView}
+          ariaLabel={t('matches.view')}
+          options={[
+            { value: 'cards', label: t('matches.cards') },
+            { value: 'list', label: t('matches.list') },
+          ]}
+        />
       </div>
       <p className="text-sm text-neutral-500 mt-1 mb-4">{t('matches.subtitle')}</p>
       <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} />

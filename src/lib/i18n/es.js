@@ -7,6 +7,7 @@ export default {
   matches: {
     title: 'Partidos del Mundial 2026',
     subtitle: 'Escoge un partido para ver más',
+    view: 'Vista',
     cards: 'Tarjetas',
     list: 'Lista',
     count: '{n} partidos',
