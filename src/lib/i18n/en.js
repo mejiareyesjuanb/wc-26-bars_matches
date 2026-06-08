@@ -1,7 +1,7 @@
 // English strings (default + fallback). Keys are dotted paths used by t().
 // Team/country names and host-city names are data (not here) — left untranslated.
 export default {
-  app: { brand: '⚽ WC26 Watch', tabMatches: 'Matches', tabBars: 'Bars' },
+  app: { brand: '⚽ WC26 Watch', tabMatches: 'Matches', tabBars: 'Bars', nav: 'Navigation' },
 
   common: { vs: 'vs', v: 'v' },
 

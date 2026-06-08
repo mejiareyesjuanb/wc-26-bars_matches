@@ -1,6 +1,6 @@
 // Spanish strings. Same key structure as en.js (en.js is the fallback).
 export default {
-  app: { brand: '⚽ WC26 Watch', tabMatches: 'Partidos', tabBars: 'Bares' },
+  app: { brand: '⚽ WC26 Watch', tabMatches: 'Partidos', tabBars: 'Bares', nav: 'Navegación' },
 
   common: { vs: 'vs', v: 'v' },
 
