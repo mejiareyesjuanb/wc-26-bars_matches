@@ -110,21 +110,16 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
   const mapVenues = combined
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-1">
+    <div className="max-w-5xl mx-auto p-6">
+      <div className="flex items-start justify-between gap-3">
         <h1 className="text-2xl font-bold">{grouped ? t('bars.titleByHood') : t('bars.titleCombined')}</h1>
-        <div className="flex items-center gap-3">
-          {!cityLevel && (
-            <button onClick={() => setEditing(true)} className="text-sm text-accent underline">{t('bars.choose')}</button>
-          )}
-          <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm">
-            <button onClick={() => setTab('list')} className={`px-3 py-1 ${tab === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.list')}</button>
-            <button onClick={() => setTab('map')} className={`px-3 py-1 ${tab === 'map' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.map')}</button>
-          </div>
+        <div className="flex rounded-lg border border-neutral-300 overflow-hidden text-sm shrink-0">
+          <button onClick={() => setTab('list')} className={`px-3 py-1 ${tab === 'list' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.list')}</button>
+          <button onClick={() => setTab('map')} className={`px-3 py-1 ${tab === 'map' ? 'bg-accent text-white' : 'bg-white text-neutral-600'}`}>{t('bars.map')}</button>
         </div>
       </div>
 
-      <p className="text-sm text-neutral-500 mb-3">
+      <p className="text-sm text-neutral-500 mt-1 mb-4">
         {t('bars.subtitle')}
         {venues && <span className="ml-1 text-neutral-400">{source === 'google' ? t('bars.sourceLive') : t('bars.sourceCurated')}</span>}
       </p>
@@ -155,6 +150,12 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
           ) : (
             <span className="text-sm text-neutral-500">{t('bars.allOfCity', { city: city.name })}</span>
           )}
+          <button
+            onClick={() => setEditing(true)}
+            className="text-sm rounded-full px-3 py-1 bg-neutral-100 text-neutral-600 border border-neutral-200 hover:bg-neutral-200 transition"
+          >
+            {t('bars.choose')}
+          </button>
         </div>
       )}
 
@@ -174,7 +175,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
       {!venues ? (
         <p className="text-center text-neutral-400 py-12">{t('bars.finding')}</p>
       ) : showSkeleton ? (
-        <div className="grid gap-3" aria-busy="true" aria-label={t('bars.finding')}>
+        <div className="grid gap-3 sm:grid-cols-2" aria-busy="true" aria-label={t('bars.finding')}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-24 bg-neutral-100 rounded-xl animate-pulse" />
           ))}
@@ -194,7 +195,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
                 {list.length === 0 ? (
                   <p className="text-neutral-400 text-sm">{t('bars.sectionEmpty', { h })}</p>
                 ) : (
-                  <div className="grid gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     {shown.map((bar) => (
                       <BarCard key={bar.id} bar={bar} check={checks[bar.id]} onClick={() => setSelected(bar)} />
                     ))}
@@ -217,7 +218,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
           {combined.length === 0 ? (
             <p className="text-neutral-400 text-sm py-8 text-center">{t('bars.emptyAll')}</p>
           ) : (
-            <div className="grid gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               {combined.slice(0, shownCount).map((bar) => (
                 <BarCard key={bar.id} bar={bar} check={checks[bar.id]} onClick={() => setSelected(bar)} />
               ))}
