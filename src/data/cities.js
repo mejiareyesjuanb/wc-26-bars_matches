@@ -67,6 +67,7 @@ export const CITIES = {
   'new-york': {
     ...city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'),
     twoLevel: true,
+    hidden: true,
     stateFilter: 'New York', // drop Jersey City venues that the tiles can reach
     // Explicit tiles covering all five boroughs (the generic grid missed the
     // Bronx, most of Queens, and Staten Island).
@@ -84,7 +85,7 @@ export const CITIES = {
     ],
   },
   'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
-  boston: city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'),
+  boston: { ...city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'), hidden: true },
   denver: city('denver', 'Denver', 'USA', 'MT', 'Mountain', 'America/Denver', [39.7392, -104.9903], 'Denver, CO'),
   miami: city('miami', 'Miami', 'USA', 'ET', 'Eastern', 'America/New_York', [25.7617, -80.1918], 'Miami, FL'),
   chicago: city('chicago', 'Chicago', 'USA', 'CT', 'Central', 'America/Chicago', [41.8781, -87.6298], 'Chicago, IL'),
@@ -99,7 +100,7 @@ export const CITIES = {
   // Latin America
   'mexico-city': { ...city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'), hidden: true },
   bogota: { ...city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'), hidden: true },
-  'buenos-aires': city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'),
+  'buenos-aires': { ...city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'), hidden: true },
 
   // Europe
   copenhagen: { ...city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'), hidden: true },

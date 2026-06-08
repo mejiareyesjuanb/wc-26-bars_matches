@@ -5,7 +5,6 @@ import { detectLang } from './lib/i18n/index.js'
 import { I18nProvider, useI18n } from './lib/i18n/react.jsx'
 import { detectCity, setCurrentCity, getActiveCity, getCity, geolocateCity } from './lib/city.js'
 import CityPicker from './components/CityPicker.jsx'
-import NeighborhoodPromptModal from './components/NeighborhoodPromptModal.jsx'
 import Matches from './views/Matches.jsx'
 import Bars from './views/Bars.jsx'
 
@@ -22,7 +21,6 @@ function Shell({ prefs, onSavePrefs, venues, source, reason }) {
   const { t, lang, setLang } = useI18n()
   const [tab, setTab] = useState('matches')
   const [cityPickerOpen, setCityPickerOpen] = useState(false)
-  const [promptOpen, setPromptOpen] = useState(false)
   const [geoCityId, setGeoCityId] = useState(null)
   const [bannerOpen, setBannerOpen] = useState(false)
   const geoRan = useRef(false)
@@ -55,15 +53,8 @@ function Shell({ prefs, onSavePrefs, venues, source, reason }) {
     onSavePrefs({ ...prefs, city: id }) // keep per-city neighborhoods
     setCityPickerOpen(false)
     setBannerOpen(false)
-    // Only prompt the first time a city is visited.
-    if (byCity[id] === undefined) setPromptOpen(true)
-  }
-
-  // Closing the prompt without choosing marks the city visited (saves []) so it
-  // never re-nags.
-  const closePrompt = () => {
-    if (byCity[cityId] === undefined) saveNeighborhoods([])
-    setPromptOpen(false)
+    // The post-pick neighborhood prompt is intentionally disabled — neighborhoods
+    // are chosen in the Bars tab. Per-city selections still persist.
   }
 
   const tabClass = (x) =>
@@ -136,13 +127,6 @@ function Shell({ prefs, onSavePrefs, venues, source, reason }) {
           nearestId={geoCityId}
           onPick={pickCity}
           onClose={() => setCityPickerOpen(false)}
-        />
-      )}
-      {promptOpen && (
-        <NeighborhoodPromptModal
-          venues={venues}
-          onSave={(hoods) => { saveNeighborhoods(hoods); setPromptOpen(false) }}
-          onClose={closePrompt}
         />
       )}
     </div>

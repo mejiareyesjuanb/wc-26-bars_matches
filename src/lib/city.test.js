@@ -44,39 +44,41 @@ describe('setCurrentCity / detectCity', () => {
   })
   it('detectCity falls back to default for a hidden saved city', () => {
     expect(detectCity({ city: 'london' })).toBe('seattle')
-    expect(detectCity({ city: 'new-york' })).toBe('new-york')
+    expect(detectCity({ city: 'new-york' })).toBe('seattle') // hidden
+    expect(detectCity({ city: 'denver' })).toBe('denver') // visible
   })
   it('exposes the configured city ids', () => {
     expect(CITY_IDS).toContain('seattle')
   })
 })
 
-describe('city list (16 visible; new cities present; 4 hidden)', () => {
-  it('includes the new cities with correct timezones', () => {
+describe('city list (hidden cities excluded; configs retained)', () => {
+  it('keeps configs/timezones even for hidden cities', () => {
     expect(getCity('boston').tzShort).toBe('ET')
     expect(getCity('denver').tzShort).toBe('MT')
     expect(getCity('los-angeles').tzShort).toBe('PT')
   })
-  it('hides Mexico City, Bogotá, Copenhagen, London from the picker', () => {
+  it('excludes all hidden cities from the picker', () => {
     const ids = CITY_LIST.map((c) => c.id)
-    expect(ids).toHaveLength(16)
-    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london']) {
+    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london', 'new-york', 'boston', 'buenos-aires']) {
       expect(ids).not.toContain(hidden)
     }
-    expect(ids).toContain('new-york')
+    expect(ids).toContain('seattle')
+    expect(ids).toContain('denver')
+    expect(ids).toContain('los-angeles')
   })
   it('is alphabetical by name', () => {
     const names = CITY_LIST.map((c) => c.name)
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
   })
-  it('marks New York as two-level', () => {
+  it('keeps New York config marked two-level (for re-enable)', () => {
     expect(getCity('new-york').twoLevel).toBe(true)
   })
 })
 
 describe('nearestCity (haversine, visible only)', () => {
   it('snaps a coordinate to the closest visible city', () => {
-    expect(nearestCity(42.36, -71.06)).toBe('boston')
+    expect(nearestCity(39.74, -104.99)).toBe('denver')
     expect(nearestCity(34.05, -118.24)).toBe('los-angeles')
     expect(nearestCity(47.61, -122.33)).toBe('seattle')
     expect(nearestCity(56.34, -2.80)).toBe('st-andrews')
