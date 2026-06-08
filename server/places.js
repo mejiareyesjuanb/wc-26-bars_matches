@@ -84,41 +84,50 @@ function gridTiles([lat, lng]) {
   return out
 }
 
-async function googlePlaces(endpoint, body, apiKey) {
+async function googlePlacesRaw(endpoint, body, apiKey, fieldMask = FIELD_MASK) {
   const res = await fetch(`https://places.googleapis.com/v1/places:${endpoint}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': FIELD_MASK,
+      'X-Goog-FieldMask': fieldMask,
     },
     body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error(`Places ${endpoint} ${res.status}: ${await res.text()}`)
-  const data = await res.json()
-  return (data.places || []).map(normalizePlace)
+  return res.json()
 }
 
-async function searchText(query, apiKey, center, { sportsBar = false } = {}) {
-  const places = await googlePlaces('searchText', {
-    textQuery: query,
-    locationBias: { circle: { center, radius: 14000 } },
-    maxResultCount: 20,
-  }, apiKey)
-  // Tag venues that Google itself returns for a "sports bars in …" query, even
-  // when their primaryType is a generic bar/pub/grill.
-  return sportsBar ? places.map((p) => ({ ...p, sportsBarMatch: true })) : places
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+// Text search, optionally across multiple pages (Places New returns up to 20 per
+// page, 60 max). `sportsBar` tags results (so they qualify as sports bars).
+async function searchText(query, apiKey, center, { sportsBar = false, pages = 1 } = {}) {
+  const out = []
+  let pageToken
+  for (let i = 0; i < pages; i++) {
+    const body = { textQuery: query, locationBias: { circle: { center, radius: 16000 } }, maxResultCount: 20 }
+    if (pageToken) body.pageToken = pageToken
+    // nextPageToken is valid for searchText only (not searchNearby).
+    const data = await googlePlacesRaw('searchText', body, apiKey, FIELD_MASK + ',nextPageToken')
+    for (const p of data.places || []) out.push(normalizePlace(p))
+    pageToken = data.nextPageToken
+    if (!pageToken) break
+    await sleep(1600) // pageToken needs a moment to become valid
+  }
+  return sportsBar ? out.map((p) => ({ ...p, sportsBarMatch: true })) : out
 }
 
-function searchNearby(center, radius, apiKey) {
-  return googlePlaces('searchNearby', {
+async function searchNearby(center, radius, apiKey) {
+  const data = await googlePlacesRaw('searchNearby', {
     includedTypes: BAR_TYPES,
     maxResultCount: 20,
-    rankPreference: 'DISTANCE',
+    rankPreference: 'POPULARITY', // most popular bars in the circle (vs nearest 20)
     locationRestriction: {
       circle: { center: { latitude: center[0], longitude: center[1] }, radius },
     },
   }, apiKey)
+  return (data.places || []).map(normalizePlace)
 }
 
 // Dedupe a list of normalized places by id (pure — unit tested). Merges the
@@ -149,13 +158,16 @@ export async function fetchCityVenues(city, apiKey) {
   const tileRadius = curated ? 2000 : 4000
 
   // Google's own "sports bars in …" answer — catches sports bars typed as a
-  // generic bar/pub/grill. Per-neighborhood for Seattle; city-wide otherwise.
+  // generic bar/pub/grill. Per-neighborhood for curated cities; city-wide otherwise.
   const sportsBarQueries = curated
     ? city.neighborhoods.map((n) => `sports bars in ${n}, ${city.nearbyRegion}`)
     : [`sports bars in ${city.name}`]
+  // Broad per-neighborhood recall (catches edge bars the 20-cap nearby misses,
+  // e.g. The Dray). Paginated to ~40 results. Curated cities only.
+  const barQueries = curated ? city.neighborhoods.map((n) => `bars in ${n}, ${city.nearbyRegion}`) : []
 
   const batches = await Promise.all([
-    // Geographic coverage: nearest bars to each tile.
+    // Geographic coverage: most popular bars near each tile.
     ...tiles.map((c) =>
       searchNearby(c, tileRadius, apiKey).catch((e) => {
         console.error('[places] nearby failed:', e.message)
@@ -165,6 +177,12 @@ export async function fetchCityVenues(city, apiKey) {
     ...sportsBarQueries.map((q) =>
       searchText(q, apiKey, center, { sportsBar: true }).catch((e) => {
         console.error('[places] sports-bar query failed:', q, '-', e.message)
+        return []
+      }),
+    ),
+    ...barQueries.map((q) =>
+      searchText(q, apiKey, center, { pages: 2 }).catch((e) => {
+        console.error('[places] bars query failed:', q, '-', e.message)
         return []
       }),
     ),

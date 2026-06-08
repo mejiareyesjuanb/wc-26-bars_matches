@@ -48,10 +48,17 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
 // place: normalized Places object {id,name,address,lat,lng,rating,userRatingCount,priceLevel,types,reservable,blurb}
 // neighborhood: string. signals: map of normalizedName -> curated signals.
+// Strong bar signals in the raw Google `types` array (NOT plain 'bar', which many
+// restaurants carry). Used to recognize gastropubs typed as a restaurant (e.g.
+// Kangaroo & Kiwi → australian_restaurant + sports_bar/pub) while excluding
+// fine-dining restaurants that merely have a 'bar'.
+const STRONG_BAR_TYPES = ['sports_bar', 'pub', 'brewery', 'bar_and_grill']
+
 export function mergeVenue(place, neighborhood, signals = {}) {
   const type = categoryOf(place) // category from Places primaryType (source of truth)
   const sig = signals[normalizeName(place.name)] || null
   const s = sig || defaultSignals(type)
+  const rawTypes = place.types || []
   return {
     id: place.id,
     placeId: place.id,
@@ -59,6 +66,9 @@ export function mergeVenue(place, neighborhood, signals = {}) {
     neighborhood,
     borough: place.borough ?? null,
     type,
+    barType: STRONG_BAR_TYPES.some((t) => rawTypes.includes(t)), // strong bar signal in types[]
+    sportsType: rawTypes.includes('sports_bar'),
+    fineDining: rawTypes.includes('fine_dining_restaurant'),
     primaryType: place.primaryType || null,
     googleSportsBar: !!place.sportsBarMatch, // appeared in a "sports bars in …" query
     lat: place.lat,

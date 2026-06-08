@@ -35,7 +35,8 @@ async function getVenues(cityId) {
       let neighborhood
       let borough = null
       if (city.centroids) {
-        neighborhood = nearestNeighborhood(p.lat, p.lng, city.centroids)
+        // Cap distance so a far city-wide-query result isn't forced into a neighborhood.
+        neighborhood = nearestNeighborhood(p.lat, p.lng, city.centroids, 3)
         if (city.twoLevel && city.boroughOf) borough = city.boroughOf[neighborhood] || null
       } else if (city.twoLevel) {
         borough = p.sublocality || null

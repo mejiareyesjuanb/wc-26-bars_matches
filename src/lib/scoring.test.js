@@ -21,6 +21,13 @@ describe('isSportsBar (category is source of truth, name is a fallback)', () => 
     expect(isSportsBar(venue({ type: 'bar', name: "Bad Albert's Tap & Grill", googleSportsBar: true }))).toBe(true)
     expect(isSportsBar(venue({ type: 'bar', name: 'Some Cocktail Lounge' }))).toBe(false)
   })
+  it('googleSportsBar on a NON-bar (restaurant) is NOT a sports bar', () => {
+    // Google's "sports bars in {area}" text search loosely returns prominent non-bars.
+    expect(isSportsBar(venue({ type: 'american restaurant', name: 'Fancy Place', googleSportsBar: true }))).toBe(false)
+  })
+  it('a restaurant whose types[] include sports_bar (sportsType) counts', () => {
+    expect(isSportsBar(venue({ type: 'australian restaurant', name: 'Kangaroo & Kiwi', sportsType: true }))).toBe(true)
+  })
 })
 
 describe('isConfirmedWorldCup', () => {
@@ -54,11 +61,17 @@ describe('scoreBar inclusion (broadened: bars/pubs/breweries eligible)', () => {
     expect(r.sports).toBe(false)
     expect(r.score).toBeLessThanOrEqual(30)
   })
-  it('includes a confirmed venue in the 60–100 band, even a restaurant by category (KK)', () => {
-    const r = scoreBar(venue({ type: 'australian restaurant', name: 'Kangaroo & Kiwi' }), { worldCup: true })
+  it('includes a confirmed gastropub typed as a restaurant (KK has bar/sports_bar types)', () => {
+    const r = scoreBar(venue({ type: 'australian restaurant', name: 'Kangaroo & Kiwi', barType: true, sportsType: true }), { worldCup: true })
     expect(r.included).toBe(true)
     expect(r.confirmed).toBe(true)
     expect(r.score).toBeGreaterThanOrEqual(60)
+  })
+  it('does NOT include a fine-dining restaurant even if its site confirms a watch party (Canlis)', () => {
+    // Canlis: american_restaurant + fine_dining; website mentions a one-off watch party.
+    const r = scoreBar(venue({ type: 'american restaurant', name: 'Canlis', fineDining: true }), { worldCup: true, screens: true })
+    expect(r.included).toBe(false)
+    expect(r.score).toBe(0)
   })
 })
 
@@ -68,7 +81,7 @@ describe('ranking order', () => {
       venue({ id: 'matador', type: 'mexican restaurant', name: 'Matador', rating: 4.4, reviewCount: 2572 }),
       venue({ id: 'pub', type: 'pub', name: 'Corner Pub', rating: 4.6, reviewCount: 900 }),
       venue({ id: 'plainSB', type: 'sports bar', name: 'Plain SB', rating: 4.0, reviewCount: 100 }),
-      venue({ id: 'kk', type: 'australian restaurant', name: 'Kangaroo & Kiwi', rating: 4.2, reviewCount: 1223 }),
+      venue({ id: 'kk', type: 'australian restaurant', name: 'Kangaroo & Kiwi', sportsType: true, rating: 4.2, reviewCount: 1223 }),
     ]
     const ranked = rankBars(bars, { kk: { worldCup: true } })
     const included = ranked.filter((b) => b.included).map((b) => b.id)

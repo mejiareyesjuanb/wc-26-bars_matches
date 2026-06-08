@@ -9,15 +9,33 @@ const defaultCity = () => getCityConfig(DEFAULT_CITY)
 // Back-compat export (= the default city's centroids).
 export const NEIGHBORHOOD_CENTROIDS = defaultCity().centroids
 
-export function nearestNeighborhood(lat, lng, centroids = NEIGHBORHOOD_CENTROIDS) {
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371
+  const toRad = (d) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
+
+// Nearest neighborhood centroid. `maxKm` (optional) drops venues that aren't
+// actually near any centroid (a far city-wide-query result) → returns null.
+export function nearestNeighborhood(lat, lng, centroids = NEIGHBORHOOD_CENTROIDS, maxKm = Infinity) {
   let best = null
   let bestD = Infinity
+  let bestCoord = null
   for (const [name, [clat, clng]] of Object.entries(centroids)) {
     const d = (lat - clat) ** 2 + (lng - clng) ** 2
     if (d < bestD) {
       bestD = d
       best = name
+      bestCoord = [clat, clng]
     }
+  }
+  if (best && maxKm !== Infinity && haversineKm(lat, lng, bestCoord[0], bestCoord[1]) > maxKm) {
+    return null
   }
   return best
 }
