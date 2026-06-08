@@ -18,11 +18,11 @@ export default function MatchTable({ matches, onSelect }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left text-neutral-500 border-b border-neutral-200">
-            <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.date')}</th>
-            <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.time', { tz: getActiveCity().tzShort })}</th>
-            <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.stage')}</th>
-            <th className="font-medium px-3 py-2">{t('table.match')}</th>
-            <th className="font-medium px-3 py-2 whitespace-nowrap">{t('table.city')}</th>
+            <th className="font-medium px-2 sm:px-3 py-2 sm:whitespace-nowrap">{t('table.date')}</th>
+            <th className="font-medium px-2 sm:px-3 py-2 whitespace-nowrap">{t('table.time', { tz: getActiveCity().tzShort })}</th>
+            <th className="font-medium px-2 sm:px-3 py-2 sm:whitespace-nowrap">{t('table.stage')}</th>
+            <th className="font-medium px-2 sm:px-3 py-2">{t('table.match')}</th>
+            <th className="font-medium px-2 sm:px-3 py-2 whitespace-nowrap hidden sm:table-cell">{t('table.city')}</th>
           </tr>
         </thead>
         <tbody>
@@ -36,17 +36,17 @@ export default function MatchTable({ matches, onSelect }) {
                 onClick={() => onSelect?.(m)}
                 className={`cursor-pointer hover:bg-neutral-50 ${newDay ? 'border-t border-neutral-200' : ''}`}
               >
-                <td className="px-3 py-2 whitespace-nowrap font-medium text-neutral-700">
+                <td className="px-2 sm:px-3 py-2 sm:whitespace-nowrap font-medium text-neutral-700">
                   {newDay ? formatDay(m.datetime, lang) : ''}
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-neutral-600">{formatClock(m.datetime, lang)}</td>
-                <td className="px-3 py-2 whitespace-nowrap text-accent text-xs">
+                <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-neutral-600">{formatClock(m.datetime, lang)}</td>
+                <td className="px-2 sm:px-3 py-2 sm:whitespace-nowrap text-accent text-xs">
                   {stage(m.stage)}{m.group ? ` ${m.group}` : ''}
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-2 sm:px-3 py-2">
                   {teamLabel(m.homeTeam)} <span className="text-neutral-400">v</span> {teamLabel(m.awayTeam)}
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-neutral-500">{m.venueCity}</td>
+                <td className="px-2 sm:px-3 py-2 whitespace-nowrap text-neutral-500 hidden sm:table-cell">{m.venueCity}</td>
               </tr>
             )
           })}
