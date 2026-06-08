@@ -26,8 +26,14 @@ async function getVenues(cityId) {
     if (!places.length) {
       return { venues: curated(city), source: 'curated', reason: 'no_results' }
     }
+    // Seattle (curated centroids) maps venues to its named neighborhoods; other
+    // cities use the venue's discovered sublocality.
     const venues = places.map((p) =>
-      mergeVenue(p, nearestNeighborhood(p.lat, p.lng, city.centroids), SIGNALS),
+      mergeVenue(
+        p,
+        city.centroids ? nearestNeighborhood(p.lat, p.lng, city.centroids) : p.neighborhood || null,
+        SIGNALS,
+      ),
     )
     const result = { at: Date.now(), venues, source: 'google', reason: null }
     caches.set(city.id, result)

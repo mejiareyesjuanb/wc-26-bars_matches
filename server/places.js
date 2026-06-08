@@ -20,7 +20,17 @@ const FIELD_MASK = [
   'places.rating', 'places.userRatingCount', 'places.priceLevel', 'places.types',
   'places.primaryType', 'places.reservable', 'places.editorialSummary',
   'places.businessStatus', 'places.websiteUri', 'places.googleMapsUri',
+  'places.addressComponents',
 ].join(',')
+
+// Derive a neighborhood name from Google address components (sublocality →
+// neighborhood). Used for cities without curated centroids.
+function neighborhoodFromComponents(components) {
+  if (!Array.isArray(components)) return null
+  const byType = (t) => components.find((c) => (c.types || []).includes(t))
+  const c = byType('sublocality') || byType('sublocality_level_1') || byType('neighborhood')
+  return c ? c.longText || c.shortText || null : null
+}
 
 function normalizePlace(p) {
   return {
@@ -39,7 +49,19 @@ function normalizePlace(p) {
     businessStatus: p.businessStatus,
     website: p.websiteUri,
     googleMapsUri: p.googleMapsUri,
+    neighborhood: neighborhoodFromComponents(p.addressComponents),
   }
+}
+
+// A 3×3 grid of tile centers around a city center — geographic coverage for
+// cities without curated neighborhood centroids (beats the 20-result cap and
+// downtown bias of a single city-wide search).
+function gridTiles([lat, lng]) {
+  const dLat = 0.05
+  const dLng = 0.06
+  const out = []
+  for (const i of [-1, 0, 1]) for (const j of [-1, 0, 1]) out.push([lat + i * dLat, lng + j * dLng])
+  return out
 }
 
 async function googlePlaces(endpoint, body, apiKey) {
@@ -95,24 +117,32 @@ export function dedupeById(places) {
   return [...byId.values()]
 }
 
-// Discover venues for a city config (centroids + queries + region). Seattle's
-// config reproduces the previous Seattle-only queries exactly (parity).
+// Discover venues for a city config. Seattle (curated centroids) reproduces the
+// previous Seattle-only queries exactly (parity). Other cities tile a grid around
+// the center and discover neighborhoods from each venue's sublocality.
 export async function fetchCityVenues(city, apiKey) {
   const center = { latitude: city.center[0], longitude: city.center[1] }
-  const centroids = Object.values(city.centroids)
+  const curated = !!city.centroids
+  const tiles = curated ? Object.values(city.centroids) : gridTiles(city.center)
+  const tileRadius = curated ? 2000 : 4000
+
+  // Google's own "sports bars in …" answer — catches sports bars typed as a
+  // generic bar/pub/grill. Per-neighborhood for Seattle; city-wide otherwise.
+  const sportsBarQueries = curated
+    ? city.neighborhoods.map((n) => `sports bars in ${n}, ${city.nearbyRegion}`)
+    : [`sports bars in ${city.name}`]
+
   const batches = await Promise.all([
-    // Geographic coverage: nearest bars to each neighborhood centroid.
-    ...centroids.map((c) =>
-      searchNearby(c, 2000, apiKey).catch((e) => {
+    // Geographic coverage: nearest bars to each tile.
+    ...tiles.map((c) =>
+      searchNearby(c, tileRadius, apiKey).catch((e) => {
         console.error('[places] nearby failed:', e.message)
         return []
       }),
     ),
-    // Google's own "sports bars in {neighborhood}" answer — catches sports bars
-    // typed as generic bar/pub/grill, and improves per-neighborhood coverage.
-    ...city.neighborhoods.map((n) =>
-      searchText(`sports bars in ${n}, ${city.nearbyRegion}`, apiKey, center, { sportsBar: true }).catch((e) => {
-        console.error('[places] sports-bar query failed:', n, '-', e.message)
+    ...sportsBarQueries.map((q) =>
+      searchText(q, apiKey, center, { sportsBar: true }).catch((e) => {
+        console.error('[places] sports-bar query failed:', q, '-', e.message)
         return []
       }),
     ),

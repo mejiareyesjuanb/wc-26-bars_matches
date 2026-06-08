@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { getActiveCity, setCurrentCity, getCity, detectCity, DEFAULT_CITY, CITY_IDS } from './city.js'
+import {
+  getActiveCity, setCurrentCity, getCity, detectCity, DEFAULT_CITY, CITY_IDS,
+  CITY_LIST, nearestCity, neighborhoodsFromVenues, cityNeighborhoods, isCityLevel,
+} from './city.js'
 import { NEIGHBORHOODS } from '../data/neighborhoods.js'
 
 // The exact Seattle/Eastside list the app shipped with — guards the parity gate.
@@ -40,5 +43,45 @@ describe('setCurrentCity / detectCity', () => {
   })
   it('exposes the configured city ids', () => {
     expect(CITY_IDS).toContain('seattle')
+  })
+})
+
+describe('city list (20 cities incl. Boston/Denver/LA)', () => {
+  it('includes the new cities with correct timezones', () => {
+    expect(getCity('boston').tzShort).toBe('ET')
+    expect(getCity('denver').tzShort).toBe('MT')
+    expect(getCity('los-angeles').tzShort).toBe('PT')
+    expect(CITY_LIST).toHaveLength(20)
+  })
+})
+
+describe('nearestCity (haversine to city centers)', () => {
+  it('snaps a coordinate to the closest configured city', () => {
+    expect(nearestCity(42.36, -71.06)).toBe('boston')
+    expect(nearestCity(34.05, -118.24)).toBe('los-angeles')
+    expect(nearestCity(47.61, -122.33)).toBe('seattle')
+    expect(nearestCity(51.5, -0.13)).toBe('london')
+  })
+})
+
+describe('neighborhoodsFromVenues / cityNeighborhoods / isCityLevel', () => {
+  const venues = [
+    { neighborhood: 'SoHo' }, { neighborhood: 'SoHo' },
+    { neighborhood: 'Midtown' }, { neighborhood: 'Midtown' }, { neighborhood: 'Midtown' },
+    { neighborhood: 'Harlem' }, { neighborhood: 'Harlem' },
+    { neighborhood: 'Tribeca' }, // only 1 → dropped
+    { neighborhood: null },
+  ]
+  it('keeps neighborhoods with >=2 venues, sorted by count', () => {
+    expect(neighborhoodsFromVenues(venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
+  })
+  it('Seattle uses its config list; discovered cities use venues', () => {
+    expect(cityNeighborhoods(getCity('seattle'), venues)).toEqual(getCity('seattle').neighborhoods)
+    expect(cityNeighborhoods(getCity('new-york'), venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
+  })
+  it('city-level when <3 neighborhoods', () => {
+    expect(isCityLevel([])).toBe(true)
+    expect(isCityLevel(['A', 'B'])).toBe(true)
+    expect(isCityLevel(['A', 'B', 'C'])).toBe(false)
   })
 })

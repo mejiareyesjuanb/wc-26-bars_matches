@@ -73,7 +73,7 @@ export default {
   bars: {
     titleCombined: 'Mejores bares',
     titleByHood: 'Mejores bares por zona',
-    choose: 'Elegir zona o ciudad',
+    choose: 'Elegir zona',
     list: 'Lista',
     map: 'Mapa',
     subtitle: 'Bares deportivos y sedes confirmadas del Mundial — los mejores primero.',
@@ -91,10 +91,22 @@ export default {
 
   picker: {
     compactPrompt: 'Elige hasta 5 zonas para ver los mejores bares cercanos para el Mundial.',
-    title: 'Elige tus zonas o ciudades',
+    title: 'Elige tus zonas',
     blurb: 'Elige hasta 5, en orden de preferencia — las usamos para ordenar los mejores bares cerca de ti.',
     see: 'Ver bares',
     pickAtLeast: 'Elige al menos una zona',
+    optionalTitle: 'Elige tus zonas en {city} (opcional)',
+    skip: 'Omitir — lo configuras luego en Bares',
+    loading: 'Buscando zonas…',
+  },
+
+  city: {
+    change: 'Cambiar ciudad',
+    pickTitle: 'Elige una ciudad',
+    search: 'Buscar…',
+    closest: 'la más cercana',
+    banner: 'Mostrando {city} (la más cercana a ti).',
+    notRight: '¿No es correcta?',
   },
 
   barCard: {

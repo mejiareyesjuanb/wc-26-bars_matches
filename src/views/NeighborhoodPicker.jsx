@@ -4,10 +4,12 @@ import { getActiveCity } from '../lib/city.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 // `compact` renders an embeddable version (no full-page wrapper / heading) for
-// use inside the match-detail modal.
-export default function NeighborhoodPicker({ initial, onSave, compact = false }) {
+// use inside the match-detail modal or the post-city prompt. `neighborhoods`
+// overrides the active city's list (e.g. a venue-discovered list). `onSkip`, when
+// provided, renders a Skip action (optional-selection flows).
+export default function NeighborhoodPicker({ initial, onSave, onSkip, neighborhoods, compact = false }) {
   const { t } = useI18n()
-  const NEIGHBORHOODS = getActiveCity().neighborhoods
+  const NEIGHBORHOODS = neighborhoods || getActiveCity().neighborhoods
   const [hoods, setHoods] = useState(initial || [])
 
   const toggle = (h) =>
@@ -46,6 +48,15 @@ export default function NeighborhoodPicker({ initial, onSave, compact = false })
       >
         {hoods.length ? t('picker.see') : t('picker.pickAtLeast')}
       </button>
+
+      {onSkip && (
+        <button
+          onClick={onSkip}
+          className="mt-3 w-full text-sm text-neutral-500 hover:text-accent"
+        >
+          {t('picker.skip')}
+        </button>
+      )}
     </div>
   )
 }

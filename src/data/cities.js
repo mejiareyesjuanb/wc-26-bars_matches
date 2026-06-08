@@ -1,17 +1,15 @@
-// City configs (pure data — imported by both client and server). Today Seattle
-// is the only city; P3 adds more by appending configs here. Each config carries
-// everything the pipeline needs so nothing stays hardcoded:
-//   name / tzShort / tzLong  — display
-//   tz                       — IANA zone (unused in P2; sets up P3 time conversion)
-//   center                   — [lat,lng] map + search-bias center
-//   centroids                — neighborhood → [lat,lng] (search tiles + map placement)
-//   neighborhoods            — ordered list (derived from centroids key order)
-//   textQueries              — prominence text searches (exact strings)
-//   nearbyRegion             — region suffix for "sports bars in {hood}, {region}"
-//   mapsRegion               — suffix for the Google Maps fallback search link
+// City configs (pure data — imported by both client and server).
 //
-// Seattle's values are copied verbatim from the previous Seattle-only code so
-// behavior is byte-identical (the P2 parity gate).
+// Seattle keeps curated neighborhood `centroids` (its venues are tiled by
+// centroid and mapped to those names — preserves the validated Seattle behavior).
+// Every other city has NO centroids: the server tiles a grid around `center` and
+// neighborhoods are discovered from each venue's Google sublocality. Cities that
+// yield too few neighborhoods fall back to city-level mode at runtime.
+//
+// Each config: id, name, country, tzShort/tzLong (display), tz (IANA — used to
+// convert match kickoff times to the city's local time), center [lat,lng],
+// mapsRegion (Google Maps fallback search suffix), textQueries (prominence
+// searches), nearbyRegion (Seattle only — "sports bars in {hood}, {region}").
 
 const SEATTLE_CENTROIDS = {
   'Capitol Hill': [47.6230, -122.3210],
@@ -35,10 +33,22 @@ const SEATTLE_CENTROIDS = {
   Woodinville: [47.7543, -122.1635],
 }
 
+// Build templated prominence queries from the display name.
+const queries = (name) => [
+  `World Cup viewing party bars ${name}`,
+  `restaurants showing soccer matches ${name}`,
+]
+
+// Helper to declare a discovered-neighborhood city (no centroids).
+function city(id, name, country, tzShort, tzLong, tz, center, mapsRegion) {
+  return { id, name, country, tzShort, tzLong, tz, center, mapsRegion, textQueries: queries(name) }
+}
+
 export const CITIES = {
   seattle: {
     id: 'seattle',
     name: 'Seattle',
+    country: 'USA',
     tzShort: 'PT',
     tzLong: 'Pacific',
     tz: 'America/Los_Angeles',
@@ -52,6 +62,31 @@ export const CITIES = {
     nearbyRegion: 'WA',
     mapsRegion: 'Seattle',
   },
+
+  // North America
+  'new-york': city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'),
+  'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
+  boston: city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'),
+  denver: city('denver', 'Denver', 'USA', 'MT', 'Mountain', 'America/Denver', [39.7392, -104.9903], 'Denver, CO'),
+  miami: city('miami', 'Miami', 'USA', 'ET', 'Eastern', 'America/New_York', [25.7617, -80.1918], 'Miami, FL'),
+  chicago: city('chicago', 'Chicago', 'USA', 'CT', 'Central', 'America/Chicago', [41.8781, -87.6298], 'Chicago, IL'),
+  'san-francisco': city('san-francisco', 'San Francisco', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.7749, -122.4194], 'San Francisco, CA'),
+  austin: city('austin', 'Austin', 'USA', 'CT', 'Central', 'America/Chicago', [30.2672, -97.7431], 'Austin, TX'),
+  'washington-dc': city('washington-dc', 'Washington DC', 'USA', 'ET', 'Eastern', 'America/New_York', [38.9072, -77.0369], 'Washington, DC'),
+  portland: city('portland', 'Portland', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [45.5152, -122.6784], 'Portland, OR'),
+  'mountain-view': city('mountain-view', 'Mountain View', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.3861, -122.0839], 'Mountain View, CA'),
+  'palo-alto': city('palo-alto', 'Palo Alto', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4419, -122.1430], 'Palo Alto, CA'),
+  'redwood-city': city('redwood-city', 'Redwood City', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4852, -122.2364], 'Redwood City, CA'),
+
+  // Latin America
+  'mexico-city': city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'),
+  bogota: city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'),
+  'buenos-aires': city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'),
+
+  // Europe
+  copenhagen: city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'),
+  london: city('london', 'London', 'UK', 'BST', 'British', 'Europe/London', [51.5074, -0.1278], 'London, UK'),
+  'st-andrews': city('st-andrews', 'St Andrews', 'UK', 'BST', 'British', 'Europe/London', [56.3398, -2.7967], 'St Andrews, Scotland'),
 }
 
 export const DEFAULT_CITY = 'seattle'

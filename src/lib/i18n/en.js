@@ -75,7 +75,7 @@ export default {
   bars: {
     titleCombined: 'Best bars',
     titleByHood: 'Best bars by neighborhood',
-    choose: 'Choose neighborhood or city',
+    choose: 'Choose neighborhood',
     list: 'List',
     map: 'Map',
     subtitle: 'Sports bars & confirmed World Cup venues — best first.',
@@ -93,10 +93,22 @@ export default {
 
   picker: {
     compactPrompt: 'Pick up to 5 areas to see the best nearby bars for the World Cup.',
-    title: 'Choose your neighborhoods or cities',
+    title: 'Choose your neighborhoods',
     blurb: 'Pick up to 5, in order of preference — we use them to rank the best bars near you.',
     see: 'See bars',
     pickAtLeast: 'Pick at least one area',
+    optionalTitle: 'Choose your areas in {city} (optional)',
+    skip: 'Skip — set this later in Bars',
+    loading: 'Finding neighborhoods…',
+  },
+
+  city: {
+    change: 'Change city',
+    pickTitle: 'Choose a city',
+    search: 'Search…',
+    closest: 'closest to you',
+    banner: 'Showing {city} (closest to you).',
+    notRight: 'Not right?',
   },
 
   barCard: {

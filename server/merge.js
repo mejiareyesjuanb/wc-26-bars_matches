@@ -77,7 +77,7 @@ export function mergeVenue(place, neighborhood, signals = {}) {
     capacity: s.capacity,
     fanAffinity: s.fanAffinity,
     atmosphereTags: s.atmosphereTags,
-    blurb: place.blurb || (sig && sig.blurb) || `${cap(type)} in ${neighborhood}.`,
+    blurb: place.blurb || (sig && sig.blurb) || (neighborhood ? `${cap(type)} in ${neighborhood}.` : `${cap(type)}.`),
     unconfirmedSignals: !sig,
   }
 }

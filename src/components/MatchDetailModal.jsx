@@ -10,6 +10,7 @@ import { confirmScreens } from '../lib/venues.js'
 import { MATCHES } from '../data/matches.js'
 import BarCard from './BarCard.jsx'
 import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
+import { getActiveCity, cityNeighborhoods, isCityLevel } from '../lib/city.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
 function TeamName({ team }) {
@@ -72,18 +73,23 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
 
   const hoods = prefs?.neighborhoods || []
   const hoodKey = hoods.join(',')
+  const hasHoods = hoods.length > 0
+  const city = getActiveCity()
+  const nList = useMemo(() => cityNeighborhoods(city, venues), [city.id, venues])
+  const cityLevel = isCityLevel(nList)
 
-  // Base ranking (no website checks) picks which venues are worth checking.
-  const baseRanked = useMemo(
-    () => (venues ? rankBars(venues.filter((v) => hoods.includes(v.neighborhood))) : []),
+  // Base set: chosen neighborhoods, or the whole city when none are selected.
+  const baseVenues = useMemo(
+    () => (venues ? (hasHoods ? venues.filter((v) => hoods.includes(v.neighborhood)) : venues) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [venues, hoodKey],
   )
+  // Base ranking (no website checks) picks which venues are worth checking.
+  const baseRanked = useMemo(() => rankBars(baseVenues), [baseVenues])
   // Final ranking folds in confirmations and keeps only sports bars / confirmed.
   const ranked = useMemo(
-    () => (venues ? rankBars(venues.filter((v) => hoods.includes(v.neighborhood)), checks).filter((v) => v.included) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [venues, hoodKey, checks],
+    () => rankBars(baseVenues, checks).filter((v) => v.included),
+    [baseVenues, checks],
   )
   const candidates = useMemo(() => baseRanked.filter((v) => v.website).slice(0, 20), [baseRanked])
 
@@ -182,32 +188,40 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
             </section>
           )}
 
-          {/* Where to watch — top bars in the user's neighborhoods */}
+          {/* Where to watch — top bars in the chosen areas, or city-wide */}
           <section>
             <h3 className="text-sm font-semibold mb-2">{t('detail.whereToWatch')}</h3>
-            {hoods.length === 0 || editingHoods ? (
+            {editingHoods && !cityLevel ? (
               <NeighborhoodPicker
                 initial={hoods}
                 compact
+                neighborhoods={nList}
                 onSave={(h) => { onSavePrefs?.({ ...prefs, neighborhoods: h }); setEditingHoods(false) }}
+                onSkip={() => setEditingHoods(false)}
               />
             ) : (
               <>
-                {/* Chosen neighborhoods — same pin + chip pattern as the Bars tab */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span aria-hidden="true" className="text-neutral-400">📍</span>
-                  {hoods.map((h) => (
-                    <button
-                      key={h}
-                      onClick={() => setEditingHoods(true)}
-                      title={t('bars.changeAreas', { h })}
-                      aria-label={t('bars.changeAreas', { h })}
-                      className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
-                    >
-                      {h}
-                    </button>
-                  ))}
-                </div>
+                {/* Chosen neighborhoods (pin + chips), or a Choose-areas affordance */}
+                {hasHoods ? (
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span aria-hidden="true" className="text-neutral-400">📍</span>
+                    {hoods.map((h) => (
+                      <button
+                        key={h}
+                        onClick={() => setEditingHoods(true)}
+                        title={t('bars.changeAreas', { h })}
+                        aria-label={t('bars.changeAreas', { h })}
+                        className="text-sm rounded-full px-3 py-1 bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition"
+                      >
+                        {h}
+                      </button>
+                    ))}
+                  </div>
+                ) : !cityLevel ? (
+                  <button onClick={() => setEditingHoods(true)} className="text-sm text-accent hover:underline mb-3">
+                    {t('bars.choose')}
+                  </button>
+                ) : null}
 
                 {!venues || (top.length === 0 && enriching) ? (
                   <div className="space-y-2">
