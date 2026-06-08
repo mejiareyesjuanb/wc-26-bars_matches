@@ -1,17 +1,18 @@
 import { useEffect } from 'react'
-import { getActiveCity, cityNeighborhoods, isCityLevel } from '../lib/city.js'
+import { getActiveCity, cityNeighborhoods, isCityLevel, boroughsFromVenues } from '../lib/city.js'
 import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
 import { useI18n } from '../lib/i18n/react.jsx'
 
-// Shown right after a user explicitly picks a city. Optional: pick areas now or
-// Skip (set later in Bars). Waits for the new city's venues to derive the list;
-// for city-level cities (too few neighborhoods) it closes itself silently.
+// Shown right after a user explicitly picks a city. Optional: pick neighborhoods
+// now or Skip. Waits for the new city's venues; for city-level cities (too few
+// neighborhoods/boroughs) it closes itself silently.
 export default function NeighborhoodPromptModal({ venues, onSave, onClose }) {
   const { t } = useI18n()
   const city = getActiveCity()
   const ready = venues != null
-  const list = ready ? cityNeighborhoods(city, venues) : []
-  const cityLevel = ready && isCityLevel(list)
+  const twoLevel = !!city.twoLevel
+  const flatList = ready && !twoLevel ? cityNeighborhoods(city, venues) : []
+  const cityLevel = ready && (twoLevel ? boroughsFromVenues(venues).length === 0 : isCityLevel(flatList))
 
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
@@ -19,7 +20,6 @@ export default function NeighborhoodPromptModal({ venues, onSave, onClose }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  // Nothing to choose for a city-level city → don't show an empty prompt.
   useEffect(() => {
     if (cityLevel) onClose()
   }, [cityLevel, onClose])
@@ -49,7 +49,14 @@ export default function NeighborhoodPromptModal({ venues, onSave, onClose }) {
           {!ready ? (
             <p className="text-sm text-neutral-400 py-6 text-center">{t('picker.loading')}</p>
           ) : (
-            <NeighborhoodPicker compact neighborhoods={list} onSave={onSave} onSkip={onClose} />
+            <NeighborhoodPicker
+              compact
+              twoLevel={twoLevel}
+              venues={venues}
+              neighborhoods={flatList}
+              onSave={onSave}
+              onSkip={onClose}
+            />
           )}
         </div>
       </div>

@@ -13,6 +13,7 @@ export async function loadVenues(cityId) {
     const data = await res.json()
     if (Array.isArray(data.venues) && data.venues.length) {
       return {
+        city: data.city || city.id,
         venues: data.venues,
         source: data.source || 'google',
         reason: data.reason ?? null,
@@ -21,7 +22,7 @@ export async function loadVenues(cityId) {
     }
     throw new Error('empty venue list')
   } catch {
-    return { venues: decorateCurated(BARS, city), source: 'curated', reason: 'unreachable', detail: null }
+    return { city: city.id, venues: decorateCurated(BARS, city), source: 'curated', reason: 'unreachable', detail: null }
   }
 }
 

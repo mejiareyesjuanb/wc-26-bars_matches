@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   getActiveCity, setCurrentCity, getCity, detectCity, DEFAULT_CITY, CITY_IDS,
   CITY_LIST, nearestCity, neighborhoodsFromVenues, cityNeighborhoods, isCityLevel,
+  boroughsFromVenues, neighborhoodsInBorough,
 } from './city.js'
 import { NEIGHBORHOODS } from '../data/neighborhoods.js'
 
@@ -41,26 +42,60 @@ describe('setCurrentCity / detectCity', () => {
     expect(detectCity({ city: 'nope' })).toBe('seattle')
     expect(detectCity({})).toBe('seattle')
   })
+  it('detectCity falls back to default for a hidden saved city', () => {
+    expect(detectCity({ city: 'london' })).toBe('seattle')
+    expect(detectCity({ city: 'new-york' })).toBe('new-york')
+  })
   it('exposes the configured city ids', () => {
     expect(CITY_IDS).toContain('seattle')
   })
 })
 
-describe('city list (20 cities incl. Boston/Denver/LA)', () => {
+describe('city list (16 visible; new cities present; 4 hidden)', () => {
   it('includes the new cities with correct timezones', () => {
     expect(getCity('boston').tzShort).toBe('ET')
     expect(getCity('denver').tzShort).toBe('MT')
     expect(getCity('los-angeles').tzShort).toBe('PT')
-    expect(CITY_LIST).toHaveLength(20)
+  })
+  it('hides Mexico City, Bogotá, Copenhagen, London from the picker', () => {
+    const ids = CITY_LIST.map((c) => c.id)
+    expect(ids).toHaveLength(16)
+    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london']) {
+      expect(ids).not.toContain(hidden)
+    }
+    expect(ids).toContain('new-york')
+  })
+  it('is alphabetical by name', () => {
+    const names = CITY_LIST.map((c) => c.name)
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
+  })
+  it('marks New York as two-level', () => {
+    expect(getCity('new-york').twoLevel).toBe(true)
   })
 })
 
-describe('nearestCity (haversine to city centers)', () => {
-  it('snaps a coordinate to the closest configured city', () => {
+describe('nearestCity (haversine, visible only)', () => {
+  it('snaps a coordinate to the closest visible city', () => {
     expect(nearestCity(42.36, -71.06)).toBe('boston')
     expect(nearestCity(34.05, -118.24)).toBe('los-angeles')
     expect(nearestCity(47.61, -122.33)).toBe('seattle')
-    expect(nearestCity(51.5, -0.13)).toBe('london')
+    expect(nearestCity(56.34, -2.80)).toBe('st-andrews')
+  })
+})
+
+describe('boroughs (two-level)', () => {
+  const nyc = [
+    { borough: 'Manhattan', neighborhood: 'SoHo' }, { borough: 'Manhattan', neighborhood: 'SoHo' },
+    { borough: 'Manhattan', neighborhood: 'Midtown' }, { borough: 'Manhattan', neighborhood: 'Midtown' },
+    { borough: 'Manhattan', neighborhood: 'Manhattan' }, // fallback (no fine area)
+    { borough: 'Brooklyn', neighborhood: 'Williamsburg' }, { borough: 'Brooklyn', neighborhood: 'Williamsburg' },
+  ]
+  it('lists boroughs with >=2 venues', () => {
+    expect(boroughsFromVenues(nyc)).toEqual(['Manhattan', 'Brooklyn'])
+  })
+  it('lists fine neighborhoods in a borough (excludes the borough fallback)', () => {
+    expect(neighborhoodsInBorough(nyc, 'Manhattan')).toEqual(['SoHo', 'Midtown'])
+    expect(neighborhoodsInBorough(nyc, 'Brooklyn')).toEqual(['Williamsburg'])
   })
 })
 

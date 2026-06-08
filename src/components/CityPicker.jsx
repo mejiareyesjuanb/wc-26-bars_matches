@@ -15,11 +15,10 @@ export default function CityPicker({ currentId, nearestId, onPick, onClose }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  // Strictly alphabetical (CITY_LIST is pre-sorted); the nearest city is just
+  // starred in place, not pinned to the top.
   const query = q.trim().toLowerCase()
-  let list = CITY_LIST.filter((c) => !query || c.name.toLowerCase().includes(query))
-  if (nearestId) {
-    list = [...list].sort((a, b) => (a.id === nearestId ? -1 : b.id === nearestId ? 1 : 0))
-  }
+  const list = CITY_LIST.filter((c) => !query || c.name.toLowerCase().includes(query))
 
   return (
     <div

@@ -16,7 +16,7 @@ const ENRICH_CAP = 60 // max venues we website-check per view
 const BAR_CATEGORIES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'wine bar', 'beer hall', 'night club'])
 const isBarish = (v) => BAR_CATEGORIES.has(v.type)
 
-export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
+export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason }) {
   const { t } = useI18n()
   const [editing, setEditing] = useState(false)
   const [tab, setTab] = useState('list')
@@ -27,9 +27,12 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   const [shownCount, setShownCount] = useState(PAGE)
 
   const city = getActiveCity()
-  const hoods = prefs.neighborhoods || []
+  const hoods = neighborhoods || []
   const hoodKey = hoods.join(',')
   const hasHoods = hoods.length > 0
+  // A chosen item matches a venue by its fine neighborhood OR its borough
+  // (two-level cities can store a whole-borough selection).
+  const inHoods = (v) => hoods.includes(v.neighborhood) || hoods.includes(v.borough)
 
   // Neighborhood options: Seattle's curated list, else discovered from venues.
   const nList = useMemo(() => cityNeighborhoods(city, venues), [city.id, venues])
@@ -38,7 +41,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   // Base set: chosen neighborhoods, or the whole city when none are selected.
   const baseVenues = useMemo(() => {
     if (!venues) return []
-    return hasHoods ? venues.filter((v) => hoods.includes(v.neighborhood)) : venues
+    return hasHoods ? venues.filter(inHoods) : venues
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [venues, hoodKey])
 
@@ -50,7 +53,7 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
   // Per-neighborhood rankings (grouped view; only meaningful with ≥2 hoods).
   const byHood = useMemo(() => {
     const m = {}
-    for (const h of hoods) m[h] = rankBars((venues || []).filter((v) => v.neighborhood === h), checks).filter((v) => v.included)
+    for (const h of hoods) m[h] = rankBars((venues || []).filter((v) => v.neighborhood === h || v.borough === h), checks).filter((v) => v.included)
     return m
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [venues, hoodKey, checks])
@@ -81,7 +84,9 @@ export default function Bars({ prefs, onSavePrefs, venues, source, reason }) {
       <NeighborhoodPicker
         initial={hoods}
         neighborhoods={nList}
-        onSave={(h) => { onSavePrefs({ ...prefs, neighborhoods: h }); setEditing(false) }}
+        twoLevel={!!city.twoLevel}
+        venues={venues}
+        onSave={(h) => { onSaveNeighborhoods(h); setEditing(false) }}
         onSkip={() => setEditing(false)}
       />
     )

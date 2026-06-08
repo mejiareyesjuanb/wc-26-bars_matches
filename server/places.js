@@ -23,13 +23,16 @@ const FIELD_MASK = [
   'places.addressComponents',
 ].join(',')
 
-// Derive a neighborhood name from Google address components (sublocality →
-// neighborhood). Used for cities without curated centroids.
-function neighborhoodFromComponents(components) {
+// Extract area names from Google address components. `sublocality` is the broad
+// area (a NYC borough; a district elsewhere); `fineArea` is the finer
+// neighborhood (e.g. SoHo, Williamsburg) when Google provides one.
+function componentText(components, ...types) {
   if (!Array.isArray(components)) return null
-  const byType = (t) => components.find((c) => (c.types || []).includes(t))
-  const c = byType('sublocality') || byType('sublocality_level_1') || byType('neighborhood')
-  return c ? c.longText || c.shortText || null : null
+  for (const t of types) {
+    const c = components.find((x) => (x.types || []).includes(t))
+    if (c) return c.longText || c.shortText || null
+  }
+  return null
 }
 
 function normalizePlace(p) {
@@ -49,7 +52,8 @@ function normalizePlace(p) {
     businessStatus: p.businessStatus,
     website: p.websiteUri,
     googleMapsUri: p.googleMapsUri,
-    neighborhood: neighborhoodFromComponents(p.addressComponents),
+    sublocality: componentText(p.addressComponents, 'sublocality', 'sublocality_level_1'),
+    fineArea: componentText(p.addressComponents, 'neighborhood'),
   }
 }
 

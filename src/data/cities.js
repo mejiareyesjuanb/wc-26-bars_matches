@@ -64,7 +64,7 @@ export const CITIES = {
   },
 
   // North America
-  'new-york': city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'),
+  'new-york': { ...city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'), twoLevel: true },
   'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
   boston: city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'),
   denver: city('denver', 'Denver', 'USA', 'MT', 'Mountain', 'America/Denver', [39.7392, -104.9903], 'Denver, CO'),
@@ -79,13 +79,13 @@ export const CITIES = {
   'redwood-city': city('redwood-city', 'Redwood City', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4852, -122.2364], 'Redwood City, CA'),
 
   // Latin America
-  'mexico-city': city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'),
-  bogota: city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'),
+  'mexico-city': { ...city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'), hidden: true },
+  bogota: { ...city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'), hidden: true },
   'buenos-aires': city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'),
 
   // Europe
-  copenhagen: city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'),
-  london: city('london', 'London', 'UK', 'BST', 'British', 'Europe/London', [51.5074, -0.1278], 'London, UK'),
+  copenhagen: { ...city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'), hidden: true },
+  london: { ...city('london', 'London', 'UK', 'BST', 'British', 'Europe/London', [51.5074, -0.1278], 'London, UK'), hidden: true },
   'st-andrews': city('st-andrews', 'St Andrews', 'UK', 'BST', 'British', 'Europe/London', [56.3398, -2.7967], 'St Andrews, Scotland'),
 }
 

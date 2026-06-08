@@ -9,7 +9,7 @@ import MatchDetailModal from '../components/MatchDetailModal.jsx'
 import AddToCalendarModal from '../components/AddToCalendarModal.jsx'
 import { useI18n } from '../lib/i18n/react.jsx'
 
-export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
+export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, onGoToBars }) {
   const { t } = useI18n()
   const [filters, setFilters] = useState({})
   const [view, setView] = useState('cards') // 'cards' | 'list'
@@ -74,8 +74,8 @@ export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
         <MatchDetailModal
           match={selected}
           venues={venues}
-          prefs={prefs}
-          onSavePrefs={onSavePrefs}
+          neighborhoods={neighborhoods}
+          onSaveNeighborhoods={onSaveNeighborhoods}
           onClose={() => setSelected(null)}
           onSeeAllBars={onGoToBars}
           onPickTeam={pickTeam}

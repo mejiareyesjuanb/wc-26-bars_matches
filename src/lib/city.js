@@ -5,8 +5,10 @@ import { CITIES, DEFAULT_CITY, getCityConfig } from '../data/cities.js'
 
 export { DEFAULT_CITY, getCityConfig }
 export const CITY_IDS = Object.keys(CITIES)
-// All configs for the picker, alphabetical by display name.
-export const CITY_LIST = Object.values(CITIES).sort((a, b) => a.name.localeCompare(b.name))
+// Visible (non-hidden) configs for the picker, alphabetical by display name.
+export const CITY_LIST = Object.values(CITIES)
+  .filter((c) => !c.hidden)
+  .sort((a, b) => a.name.localeCompare(b.name))
 
 function haversineKm([lat1, lng1], [lat2, lng2]) {
   const R = 6371
@@ -19,11 +21,12 @@ function haversineKm([lat1, lng1], [lat2, lng2]) {
   return 2 * R * Math.asin(Math.sqrt(a))
 }
 
-// Nearest configured city to a coordinate (haversine to each city center).
+// Nearest visible city to a coordinate (haversine to each city center).
 export function nearestCity(lat, lng) {
   let best = DEFAULT_CITY
   let bestD = Infinity
   for (const c of Object.values(CITIES)) {
+    if (c.hidden) continue
     const d = haversineKm([lat, lng], c.center)
     if (d < bestD) { bestD = d; best = c.id }
   }
@@ -68,6 +71,35 @@ export function isCityLevel(list) {
   return !list || list.length < 3
 }
 
+// --- Two-level (borough → neighborhood) cities, e.g. New York ---
+
+// Boroughs present in the venues (≥2 venues), sorted by count.
+export function boroughsFromVenues(venues) {
+  const counts = new Map()
+  for (const v of venues || []) {
+    if (v.borough) counts.set(v.borough, (counts.get(v.borough) || 0) + 1)
+  }
+  return [...counts.entries()]
+    .filter(([, n]) => n >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name]) => name)
+}
+
+// Fine neighborhoods within a borough (≥2 venues; excludes the borough itself,
+// i.e. venues that had no finer area).
+export function neighborhoodsInBorough(venues, borough) {
+  const counts = new Map()
+  for (const v of venues || []) {
+    if (v.borough === borough && v.neighborhood && v.neighborhood !== borough) {
+      counts.set(v.neighborhood, (counts.get(v.neighborhood) || 0) + 1)
+    }
+  }
+  return [...counts.entries()]
+    .filter(([, n]) => n >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name]) => name)
+}
+
 let currentCityId = DEFAULT_CITY
 
 export function setCurrentCity(id) {
@@ -80,8 +112,9 @@ export function getCity(id) {
   return getCityConfig(id)
 }
 
-// Which city to show: a saved valid preference wins; otherwise the default.
-// P3 adds geolocation → nearest curated city here.
+// Which city to show: a saved, valid, non-hidden preference wins; otherwise the
+// default (so a now-hidden saved city falls back instead of rendering).
 export function detectCity(prefs) {
-  return prefs && CITIES[prefs.city] ? prefs.city : DEFAULT_CITY
+  const saved = prefs && prefs.city && CITIES[prefs.city]
+  return saved && !saved.hidden ? prefs.city : DEFAULT_CITY
 }

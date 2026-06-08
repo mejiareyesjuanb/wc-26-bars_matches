@@ -52,7 +52,7 @@ function TeamLabel({ team, onPick }) {
   )
 }
 
-export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, onClose, onSeeAllBars, onPickTeam }) {
+export default function MatchDetailModal({ match, venues, neighborhoods, onSaveNeighborhoods, onClose, onSeeAllBars, onPickTeam }) {
   const { t, lang, stage } = useI18n()
   const [checks, setChecks] = useState({})
   const [editingHoods, setEditingHoods] = useState(false)
@@ -71,16 +71,17 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
     return () => { if (prev && typeof prev.focus === 'function') prev.focus() }
   }, [])
 
-  const hoods = prefs?.neighborhoods || []
+  const hoods = neighborhoods || []
   const hoodKey = hoods.join(',')
   const hasHoods = hoods.length > 0
   const city = getActiveCity()
   const nList = useMemo(() => cityNeighborhoods(city, venues), [city.id, venues])
   const cityLevel = isCityLevel(nList)
+  const inHoods = (v) => hoods.includes(v.neighborhood) || hoods.includes(v.borough)
 
   // Base set: chosen neighborhoods, or the whole city when none are selected.
   const baseVenues = useMemo(
-    () => (venues ? (hasHoods ? venues.filter((v) => hoods.includes(v.neighborhood)) : venues) : []),
+    () => (venues ? (hasHoods ? venues.filter(inHoods) : venues) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [venues, hoodKey],
   )
@@ -196,7 +197,9 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
                 initial={hoods}
                 compact
                 neighborhoods={nList}
-                onSave={(h) => { onSavePrefs?.({ ...prefs, neighborhoods: h }); setEditingHoods(false) }}
+                twoLevel={!!city.twoLevel}
+                venues={venues}
+                onSave={(h) => { onSaveNeighborhoods?.(h); setEditingHoods(false) }}
                 onSkip={() => setEditingHoods(false)}
               />
             ) : (

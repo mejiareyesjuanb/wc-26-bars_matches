@@ -18,7 +18,7 @@ function LangToggle({ lang, setLang, langClass }) {
   )
 }
 
-function Shell({ prefs, onSavePrefs, venueData }) {
+function Shell({ prefs, onSavePrefs, venues, source, reason }) {
   const { t, lang, setLang } = useI18n()
   const [tab, setTab] = useState('matches')
   const [cityPickerOpen, setCityPickerOpen] = useState(false)
@@ -27,9 +27,16 @@ function Shell({ prefs, onSavePrefs, venueData }) {
   const [bannerOpen, setBannerOpen] = useState(false)
   const geoRan = useRef(false)
   const city = getActiveCity()
+  const cityId = city.id
+
+  // Neighborhoods are stored per city, so switching cities never loses them.
+  const byCity = prefs.neighborhoodsByCity || {}
+  const neighborhoods = byCity[cityId] ?? []
+  const saveNeighborhoods = (hoods) =>
+    onSavePrefs({ ...prefs, neighborhoodsByCity: { ...byCity, [cityId]: hoods } })
 
   // First visit (no saved city): geolocate → nearest city + banner. Non-blocking;
-  // denial/unavailable leaves the default city.
+  // denial/unavailable leaves the default city. Never opens the neighborhood prompt.
   useEffect(() => {
     if (geoRan.current) return
     geoRan.current = true
@@ -45,10 +52,18 @@ function Shell({ prefs, onSavePrefs, venueData }) {
   }, [])
 
   const pickCity = (id) => {
-    onSavePrefs({ ...prefs, city: id, neighborhoods: [] })
+    onSavePrefs({ ...prefs, city: id }) // keep per-city neighborhoods
     setCityPickerOpen(false)
     setBannerOpen(false)
-    setPromptOpen(true)
+    // Only prompt the first time a city is visited.
+    if (byCity[id] === undefined) setPromptOpen(true)
+  }
+
+  // Closing the prompt without choosing marks the city visited (saves []) so it
+  // never re-nags.
+  const closePrompt = () => {
+    if (byCity[cityId] === undefined) saveNeighborhoods([])
+    setPromptOpen(false)
   }
 
   const tabClass = (x) =>
@@ -99,19 +114,19 @@ function Shell({ prefs, onSavePrefs, venueData }) {
 
       {tab === 'matches' && (
         <Matches
-          venues={venueData?.venues}
-          prefs={prefs}
-          onSavePrefs={onSavePrefs}
+          venues={venues}
+          neighborhoods={neighborhoods}
+          onSaveNeighborhoods={saveNeighborhoods}
           onGoToBars={() => setTab('bars')}
         />
       )}
       {tab === 'bars' && (
         <Bars
-          prefs={prefs}
-          onSavePrefs={onSavePrefs}
-          venues={venueData?.venues}
-          source={venueData?.source}
-          reason={venueData?.reason}
+          neighborhoods={neighborhoods}
+          onSaveNeighborhoods={saveNeighborhoods}
+          venues={venues}
+          source={source}
+          reason={reason}
         />
       )}
 
@@ -125,9 +140,9 @@ function Shell({ prefs, onSavePrefs, venueData }) {
       )}
       {promptOpen && (
         <NeighborhoodPromptModal
-          venues={venueData?.venues}
-          onSave={(hoods) => { onSavePrefs({ ...prefs, neighborhoods: hoods }); setPromptOpen(false) }}
-          onClose={() => setPromptOpen(false)}
+          venues={venues}
+          onSave={(hoods) => { saveNeighborhoods(hoods); setPromptOpen(false) }}
+          onClose={closePrompt}
         />
       )}
     </div>
@@ -156,9 +171,17 @@ export default function App() {
   const lang = detectLang(prefs)
   const setLang = (l) => savePreferences({ ...prefs, language: l })
 
+  // Treat venue data as "loading" until it matches the active city, so a city
+  // switch never flashes the previous city's venues (and never trips the
+  // neighborhood prompt's city-level check on stale data).
+  const ready = venueData && venueData.city === cityId
+  const venues = ready ? venueData.venues : null
+  const source = ready ? venueData.source : undefined
+  const reason = ready ? venueData.reason : undefined
+
   return (
     <I18nProvider lang={lang} setLang={setLang}>
-      <Shell prefs={prefs} onSavePrefs={savePreferences} venueData={venueData} />
+      <Shell prefs={prefs} onSavePrefs={savePreferences} venues={venues} source={source} reason={reason} />
     </I18nProvider>
   )
 }
