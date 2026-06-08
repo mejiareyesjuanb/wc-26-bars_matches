@@ -170,7 +170,8 @@ export default function MatchDetailModal({ match, venues, prefs, onSavePrefs, on
               </button>
             </div>
             <p className="mt-2 text-xs text-neutral-400">
-              Includes a reminder 1 hour before kickoff. <CalendarHelp />
+              Includes a reminder 1 hour before kickoff.{' '}
+              <CalendarHelp label="ⓘ How do I add this?" />
             </p>
           </section>
 

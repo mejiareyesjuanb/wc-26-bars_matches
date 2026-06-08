@@ -6,7 +6,7 @@ const GOOGLE_IMPORT_URL = 'https://calendar.google.com/calendar/u/0/r/settings/e
 // A quiet, collapsed link by default. It only expands into real guidance for the
 // paths that are actually clunky (Google Calendar import; iPhone + Google). For
 // Apple/Outlook/Android the .ics just opens, so we don't nag.
-export default function CalendarHelp({ className = '' }) {
+export default function CalendarHelp({ className = '', label = 'ⓘ I need help adding these to my calendar' }) {
   const [open, setOpen] = useState(false)
   const ios = isIOS()
 
@@ -18,7 +18,7 @@ export default function CalendarHelp({ className = '' }) {
         aria-expanded={open}
         className="text-xs text-neutral-500 hover:text-accent underline-offset-2 hover:underline"
       >
-        ⓘ How do I add these?
+        {label}
       </button>
       {open && (
         <div className="mt-2 text-xs leading-relaxed text-neutral-600 bg-neutral-50 border border-neutral-200 rounded-lg p-3 space-y-2 max-w-sm">

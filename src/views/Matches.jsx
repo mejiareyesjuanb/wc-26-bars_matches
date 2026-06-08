@@ -23,6 +23,9 @@ export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
   )
   const results = useMemo(() => filterMatches(MATCHES, filters), [filters])
   const filtered = results.length !== MATCHES.length
+  // Bulk add shows for >1 result (unfiltered = all 104, or a filtered set of 2+).
+  // A 1-result filter has no bulk button — that match is added via its card → modal.
+  const showBulk = results.length > 1
 
   const pickTeam = (code) => {
     setFilters((f) => ({ ...f, team: code }))
@@ -43,26 +46,26 @@ export default function Matches({ venues, prefs, onSavePrefs, onGoToBars }) {
       </p>
       <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} />
 
-      <div className="flex flex-wrap items-center gap-2 mb-1">
-        <p className="text-sm text-neutral-500 mr-auto">{results.length} matches</p>
-        {filtered && results.length > 0 && (
-          <button
-            onClick={() => addMatchesToCalendar(results, { filename: 'wc2026-matches.ics' })}
-            className="text-sm bg-accent text-white rounded-lg px-3 py-1.5 hover:opacity-90"
-          >
-            📅 Add these {results.length} to calendar
-          </button>
+      <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+        <p className="text-sm text-neutral-500 pt-1.5">{results.length} matches</p>
+        {showBulk && (
+          <div className="flex flex-col items-start sm:items-end gap-1">
+            <button
+              onClick={() =>
+                filtered
+                  ? addMatchesToCalendar(results, { filename: 'wc2026-matches.ics' })
+                  : addMatchesToCalendar(MATCHES, { filename: 'wc2026-all-matches.ics', all: true })
+              }
+              className="text-sm rounded-lg px-3 py-1.5 border border-neutral-300 hover:border-accent"
+            >
+              {filtered
+                ? `📅 Add these ${results.length} matches to calendar`
+                : `📅 Add all ${MATCHES.length} matches to calendar`}
+            </button>
+            <CalendarHelp />
+          </div>
         )}
-        <button
-          onClick={() => addMatchesToCalendar(MATCHES, { filename: 'wc2026-all-matches.ics', all: true })}
-          className={`text-sm rounded-lg px-3 py-1.5 ${filtered ? 'border border-neutral-300 hover:border-accent' : 'bg-accent text-white hover:opacity-90'}`}
-        >
-          📅 Add all 104 to calendar
-        </button>
       </div>
-      <p className="text-xs text-neutral-400 mb-3">
-        Adds each match with a 1-hour reminder. <CalendarHelp />
-      </p>
 
       {results.length === 0 ? (
         <p className="text-center text-neutral-400 py-12">No matches fit these filters.</p>
