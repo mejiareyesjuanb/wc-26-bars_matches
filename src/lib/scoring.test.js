@@ -82,6 +82,13 @@ describe('inclusion gates', () => {
     expect(r.included).toBe(false)
     expect(r.score).toBe(0)
   })
+  it('excludes retail even with a stray sports_bar type + WC site mention (jersey store)', () => {
+    // e.g. "Uniformes de Futbol" in Mexico City: sporting_goods_store whose site
+    // sells Mundial kits — types[] noise made it sportsType:true.
+    const r = scoreBar(venue({ type: 'sporting goods store', name: 'Uniformes de Futbol', sportsType: true, barType: true }), { worldCup: true })
+    expect(r.included).toBe(false)
+    expect(scoreBar(venue({ type: 'department store', name: 'Sanborns' }), { worldCup: true }).included).toBe(false)
+  })
   it('excludes a restaurant with a stray sports_bar type but no screens/WC (Giddy Up Burgers)', () => {
     const r = scoreBar(venue({ type: 'hamburger restaurant', name: 'Giddy Up Burgers', sportsType: true }), { screens: false, worldCup: false })
     expect(r.included).toBe(false)

@@ -60,14 +60,20 @@ export function venueClass(bar) {
   return 'other'
 }
 
+// Retail is never a watch venue, even when Google's types[] carry a stray
+// sports_bar or its website mentions the World Cup (e.g. a fútbol-jersey store
+// selling Mundial kits, or Sanborns department stores in Mexico City).
+const RETAIL_RE = /\b(store|shop|market)\b/i
+
 // Whether a venue should appear at all.
-//  - fine dining: never.
+//  - fine dining / retail (store/shop/market types): never.
 //  - sports bars / pubs / bar & grills / breweries: always.
 //  - generic `bar` (no sports signal): only with screens or WC confirmation.
 //  - restaurants / cocktail-lounge-wine bars / other: only with a real watch signal
 //    (name says sports bar, WC-confirmed, or sports_bar type AND screens).
 export function isRanked(bar, check) {
   if (bar.fineDining) return false
+  if (RETAIL_RE.test(bar.type || '')) return false
   const screens = check?.screens === true
   const confirmed = isConfirmedWorldCup(bar, check)
   if (isSportsBar(bar)) {
