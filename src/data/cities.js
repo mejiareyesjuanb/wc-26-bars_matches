@@ -95,7 +95,6 @@ export const CITIES = {
   // Latin America (queryLang 'es' → discovery also runs Spanish queries)
   'mexico-city': {
     ...city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'),
-    hidden: true,
     queryLang: 'es',
     textQueries: [...queries('Mexico City'), ...queriesEs('Ciudad de México')],
   },
