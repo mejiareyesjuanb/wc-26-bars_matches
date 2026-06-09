@@ -74,7 +74,7 @@ export const CITIES = {
     // generated cityCentroids.js (replaces the coarse borough tiles).
   },
   'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
-  boston: { ...city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'), hidden: true },
+  boston: city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'),
   denver: city('denver', 'Denver', 'USA', 'MT', 'Mountain', 'America/Denver', [39.7392, -104.9903], 'Denver, CO'),
   miami: city('miami', 'Miami', 'USA', 'ET', 'Eastern', 'America/New_York', [25.7617, -80.1918], 'Miami, FL'),
   chicago: city('chicago', 'Chicago', 'USA', 'CT', 'Central', 'America/Chicago', [41.8781, -87.6298], 'Chicago, IL'),
@@ -105,7 +105,7 @@ export const CITIES = {
 const REGION_BY_CITY = {
   'los-angeles': 'CA', chicago: 'IL', denver: 'CO', austin: 'TX',
   'washington-dc': 'DC', miami: 'FL', portland: 'OR', 'san-francisco': 'CA',
-  'new-york': 'NY',
+  'new-york': 'NY', boston: 'MA',
 }
 for (const [id, centroids] of Object.entries(CITY_CENTROIDS)) {
   const c = CITIES[id]

@@ -11,6 +11,12 @@ import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { CITY_NEIGHBORHOODS } from '../src/data/cityNeighborhoodNames.js'
+import { CITY_CENTROIDS as PREV_CENTROIDS, CITY_BOROUGH_OF as PREV_BOROUGH_OF } from '../src/data/cityCentroids.js'
+
+// Incremental: by default geocode only cities missing from the committed file;
+// pass city ids to force-refresh those. Existing cities are preserved untouched
+// (no re-billing, no coord drift). e.g. `node scripts/build-city-neighborhoods.mjs boston`
+const ONLY = process.argv.slice(2)
 
 const KEY = process.env.GOOGLE_MAPS_API_KEY
 if (!KEY) {
@@ -38,11 +44,19 @@ async function geocode(query) {
   return loc ? [round5(loc.latitude), round5(loc.longitude)] : null
 }
 
-const centroids = {} // cityId -> { name: [lat,lng] }
-const boroughOf = {} // cityId -> { name: borough }  (two-level cities only)
+const centroids = { ...PREV_CENTROIDS } // cityId -> { name: [lat,lng] }
+const boroughOf = { ...PREV_BOROUGH_OF } // cityId -> { name: borough }  (two-level cities only)
 
-for (const [cityId, cfg] of Object.entries(CITY_NEIGHBORHOODS)) {
+const targets = Object.entries(CITY_NEIGHBORHOODS).filter(([id]) =>
+  ONLY.length ? ONLY.includes(id) : !PREV_CENTROIDS[id],
+)
+if (!targets.length) {
+  console.log('Nothing to geocode — all cities already in cityCentroids.js (pass city ids to force-refresh).')
+}
+
+for (const [cityId, cfg] of targets) {
   centroids[cityId] = {}
+  delete boroughOf[cityId]
   const region = cfg.region ? `, ${cfg.region}` : ''
   // Flatten: flat `neighborhoods` list, or per-borough `boroughs` map.
   const entries = cfg.boroughs

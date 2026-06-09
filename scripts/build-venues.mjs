@@ -23,14 +23,27 @@ if (!KEY) {
 const here = dirname(fileURLToPath(import.meta.url))
 const OUT = resolve(here, '../server/venuesSnapshot.js')
 
-// Visible cities + curated-but-hidden New York & Boston (ready to enable later).
-const extra = ['new-york', 'boston']
-const cities = [...CITY_LIST]
-for (const id of extra) {
-  if (!cities.some((c) => c.id === id)) cities.push(getCity(id))
-}
+// Optional city-id args → rebuild only those and MERGE into the existing snapshot
+// (avoids re-billing every city). No args → full rebuild of the default set.
+const ONLY = process.argv.slice(2)
 
-const snapshot = {}
+// Default set: visible cities + curated New York & Boston.
+const extra = ['new-york', 'boston']
+const all = [...CITY_LIST]
+for (const id of extra) {
+  if (!all.some((c) => c.id === id)) all.push(getCity(id))
+}
+const cities = ONLY.length ? ONLY.map(getCity).filter(Boolean) : all
+
+let snapshot = {}
+if (ONLY.length) {
+  try {
+    const prev = await import('../server/venuesSnapshot.js')
+    snapshot = { ...prev.VENUES_SNAPSHOT } // merge: keep cities we're not rebuilding
+  } catch {
+    /* no existing snapshot — start fresh */
+  }
+}
 let total = 0
 for (const city of cities) {
   process.stdout.write(`Building ${city.id}… `)

@@ -44,8 +44,8 @@ describe('setCurrentCity / detectCity', () => {
   })
   it('detectCity falls back to default for a hidden saved city', () => {
     expect(detectCity({ city: 'london' })).toBe('seattle')
-    expect(detectCity({ city: 'boston' })).toBe('seattle') // still hidden
     expect(detectCity({ city: 'new-york' })).toBe('new-york') // now visible
+    expect(detectCity({ city: 'boston' })).toBe('boston') // now visible
     expect(detectCity({ city: 'denver' })).toBe('denver') // visible
   })
   it('exposes the configured city ids', () => {
@@ -61,13 +61,14 @@ describe('city list (hidden cities excluded; configs retained)', () => {
   })
   it('excludes all hidden cities from the picker', () => {
     const ids = CITY_LIST.map((c) => c.id)
-    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london', 'boston', 'buenos-aires']) {
+    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london', 'buenos-aires']) {
       expect(ids).not.toContain(hidden)
     }
     expect(ids).toContain('seattle')
     expect(ids).toContain('denver')
     expect(ids).toContain('los-angeles')
     expect(ids).toContain('new-york') // re-enabled
+    expect(ids).toContain('boston') // re-enabled
   })
   it('is alphabetical by name', () => {
     const names = CITY_LIST.map((c) => c.name)

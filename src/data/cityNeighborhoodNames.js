@@ -75,6 +75,15 @@ export const CITY_NEIGHBORHOODS = {
       'Castro', 'Haight-Ashbury', 'Polk Gulch', 'Tenderloin', 'Dogpatch',
     ],
   },
+  boston: {
+    city: 'Boston',
+    region: 'MA',
+    neighborhoods: [
+      'Downtown', 'Beacon Hill', 'Back Bay', 'North End', 'South End', 'Fenway',
+      'Seaport', 'South Boston', 'Charlestown', 'Jamaica Plain', 'Allston',
+      'Harvard Square', 'Central Square', 'Kendall Square', 'Davis Square',
+    ],
+  },
   // Two-level (borough → neighborhood). Geocoded as "{neighborhood}, {borough}, New York, NY".
   'new-york': {
     city: 'New York',
