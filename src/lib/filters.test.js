@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterMatches } from './filters.js'
+import { filterMatches, facetValues } from './filters.js'
 
 const MATCHES = [
   { id: 'M1', stage: 'Group', group: 'A', venueCity: 'Seattle', datetime: '2026-06-15T09:00:00-07:00', homeTeam: 'USA', awayTeam: 'MEX' },
@@ -36,5 +36,25 @@ describe('filterMatches', () => {
   it('combines filters with AND', () => {
     const r = filterMatches(MATCHES, { team: 'USA', stage: 'Group' })
     expect(r.map((m) => m.id)).toEqual(['M1'])
+  })
+})
+
+describe('facetValues (dependent filter options)', () => {
+  const set = (matches, filters, key) => [...facetValues(matches, filters, key)].sort()
+  it('narrows other fields to those co-occurring with a chosen team', () => {
+    // USA plays M1 (Group A, Seattle, 2026-06-15) and M3 (R16, Seattle).
+    expect(set(MATCHES, { team: 'USA' }, 'group')).toEqual(['A']) // M3 has no group
+    expect(set(MATCHES, { team: 'USA' }, 'city')).toEqual(['Seattle'])
+    expect(set(MATCHES, { team: 'USA' }, 'stage')).toEqual(['Group', 'R16'])
+  })
+  it('does not narrow a field by its own value (exclude-self → all teams)', () => {
+    expect(set(MATCHES, { team: 'USA' }, 'team').sort()).toEqual(['BRA', 'ENG', 'GER', 'MEX', 'USA'])
+  })
+  it('a knockout stage yields no group options (knockouts have no group)', () => {
+    expect(set(MATCHES, { stage: 'R16' }, 'group')).toEqual([])
+  })
+  it('narrows teams to those playing on a chosen date', () => {
+    // 2026-06-15 = M1 (USA, MEX) + M2 (ENG, BRA).
+    expect(set(MATCHES, { date: '2026-06-15' }, 'team')).toEqual(['BRA', 'ENG', 'MEX', 'USA'])
   })
 })

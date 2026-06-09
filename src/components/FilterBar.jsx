@@ -2,15 +2,13 @@ import { TEAMS } from '../data/teams.js'
 import { STAGE_ORDER } from '../data/matches.js'
 import { useI18n } from '../lib/i18n/react.jsx'
 
-const TIMES = ['morning', 'afternoon', 'evening']
 const GROUP_STAGE = STAGE_ORDER[0] // 'Group' — groups apply only here
 
-export default function FilterBar({ filters, setFilters, dates, cities = [], groups = [] }) {
+// Option lists (teams/dates/groups/stages/cities/times) are dependent/faceted —
+// computed in Matches from the other active filters and passed in here.
+export default function FilterBar({ filters, setFilters, teams = [], dates = [], groups = [], stages = [], cities = [], times = [] }) {
   const { t, stage } = useI18n()
   const update = (patch) => setFilters({ ...filters, ...patch })
-  const teamCodes = Object.keys(TEAMS).sort((a, b) =>
-    TEAMS[a].name.localeCompare(TEAMS[b].name),
-  )
   const hasFilters = Object.values(filters).some(Boolean)
   // Groups exist only in the group stage — disable the picker for knockout stages.
   const knockout = !!filters.stage && filters.stage !== GROUP_STAGE
@@ -26,7 +24,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [], gro
           onChange={(e) => update({ team: e.target.value || undefined })}
         >
           <option value="">{t('filters.allTeams')}</option>
-          {teamCodes.map((c) => (
+          {teams.map((c) => (
             <option key={c} value={c}>{TEAMS[c].name}</option>
           ))}
         </select>
@@ -60,7 +58,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [], gro
           }}
         >
           <option value="">{t('filters.allStages')}</option>
-          {STAGE_ORDER.map((s) => <option key={s} value={s}>{stage(s)}</option>)}
+          {stages.map((s) => <option key={s} value={s}>{stage(s)}</option>)}
         </select>
 
         <select
@@ -78,7 +76,7 @@ export default function FilterBar({ filters, setFilters, dates, cities = [], gro
           onChange={(e) => update({ timeOfDay: e.target.value || undefined })}
         >
           <option value="">{t('filters.anyTime')}</option>
-          {TIMES.map((to) => <option key={to} value={to} className="capitalize">{t(`filters.${to}`)}</option>)}
+          {times.map((to) => <option key={to} value={to} className="capitalize">{t(`filters.${to}`)}</option>)}
         </select>
       </div>
       {hasFilters && (

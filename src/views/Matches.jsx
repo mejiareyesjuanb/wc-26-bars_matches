@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { MATCHES } from '../data/matches.js'
-import { filterMatches } from '../lib/filters.js'
-import { dateKey } from '../lib/time.js'
+import { MATCHES, STAGE_ORDER } from '../data/matches.js'
+import { TEAMS } from '../data/teams.js'
+import { filterMatches, facetValues } from '../lib/filters.js'
 import FilterBar from '../components/FilterBar.jsx'
 import MatchCard from '../components/MatchCard.jsx'
 import MatchTable from '../components/MatchTable.jsx'
@@ -15,26 +15,36 @@ export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, on
   const [filters, setFilters] = useState({})
   const [selected, setSelected] = useState(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
-  const dates = useMemo(
-    () => [...new Set(MATCHES.map((m) => dateKey(m.datetime)))].sort(),
-    [],
-  )
-  const cities = useMemo(
-    () => [...new Set(MATCHES.map((m) => m.venueCity))].sort(),
-    [],
-  )
-  const groups = useMemo(
-    () => [...new Set(MATCHES.map((m) => m.group).filter(Boolean))].sort(),
-    [],
-  )
+  // Dependent (faceted) dropdown options: each field's allowed values given the
+  // OTHER active filters, plus the current selection (guard for externally-set
+  // filters, e.g. pickTeam). So choosing a team narrows dates/cities/groups/etc.
+  const TIMES = ['morning', 'afternoon', 'evening']
+  const withSel = (set, sel) => (sel ? set.add(sel) : set)
+  const teams = useMemo(() => {
+    const set = withSel(facetValues(MATCHES, filters, 'team'), filters.team)
+    return Object.keys(TEAMS).filter((c) => set.has(c)).sort((a, b) => TEAMS[a].name.localeCompare(TEAMS[b].name))
+  }, [filters])
+  const dates = useMemo(() => [...withSel(facetValues(MATCHES, filters, 'date'), filters.date)].sort(), [filters])
+  const cities = useMemo(() => [...withSel(facetValues(MATCHES, filters, 'city'), filters.city)].sort(), [filters])
+  const groups = useMemo(() => [...withSel(facetValues(MATCHES, filters, 'group'), filters.group)].sort(), [filters])
+  const stages = useMemo(() => {
+    const set = withSel(facetValues(MATCHES, filters, 'stage'), filters.stage)
+    return STAGE_ORDER.filter((s) => set.has(s))
+  }, [filters])
+  const times = useMemo(() => {
+    const set = withSel(facetValues(MATCHES, filters, 'timeOfDay'), filters.timeOfDay)
+    return TIMES.filter((to) => set.has(to))
+  }, [filters])
   const results = useMemo(() => filterMatches(MATCHES, filters), [filters])
   const filtered = results.length !== MATCHES.length
   // Bulk add shows for >1 result (unfiltered = all 104, or a filtered set of 2+).
   // A 1-result filter has no bulk button — that match is added via its card → modal.
   const showBulk = results.length > 1
 
+  // Clicking a team in a match modal shows that team's full schedule — reset the
+  // other (possibly incompatible) filters so it never lands on a 0-result combo.
   const pickTeam = (code) => {
-    setFilters((f) => ({ ...f, team: code }))
+    setFilters({ team: code })
     setSelected(null)
   }
 
@@ -53,7 +63,16 @@ export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, on
         />
       </div>
       <p className="text-sm text-neutral-500 mt-1 mb-4">{t('matches.subtitle')}</p>
-      <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} groups={groups} />
+      <FilterBar
+        filters={filters}
+        setFilters={setFilters}
+        teams={teams}
+        dates={dates}
+        groups={groups}
+        stages={stages}
+        cities={cities}
+        times={times}
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
         <p className="text-sm text-neutral-500">{t('matches.count', { n: results.length })}</p>
