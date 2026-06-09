@@ -87,12 +87,13 @@ export function isRanked(bar, check) {
   return confirmed // restaurant / other: only when confirmed
 }
 
-// A "core" venue is one that appears even before any website check resolves —
-// the deterministic always-shown set (sports bars / pubs / breweries / bar & grills
-// / curated-confirmed). Used to decide which neighborhoods actually have bars, without
-// waiting on the async screens check.
+// A venue that counts toward a neighborhood "having bars" (drives which
+// neighborhoods the picker offers). Evaluated WITH the venue's own baked website
+// check — deterministic, since checks ship inside the snapshot venue objects —
+// so a neighborhood whose only bars are check-confirmed (e.g. Bogotá's Chicó,
+// whose BBC brewpubs are typed plain `bar` but WC-confirmed) is still listed.
 export function isCoreVenue(bar) {
-  return isRanked(bar, undefined)
+  return isRanked(bar, bar.check)
 }
 
 export function scoreBar(bar, check) {

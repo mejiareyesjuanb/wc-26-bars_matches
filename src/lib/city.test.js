@@ -122,6 +122,10 @@ describe('neighborhoodsFromVenues / cityNeighborhoods / isCityLevel', () => {
   it('keeps neighborhoods with >=1 core bar, sorted by core count', () => {
     expect(neighborhoodsFromVenues(venues)).toEqual(['Midtown', 'SoHo', 'Harlem'])
   })
+  it('a neighborhood whose only bar is a check-confirmed generic bar counts (Chicó)', () => {
+    const withChecked = [...venues, { neighborhood: 'Chicó', type: 'bar', check: { screens: false, worldCup: true } }]
+    expect(neighborhoodsFromVenues(withChecked)).toContain('Chicó')
+  })
   it('curated cities keep config order but drop neighborhoods with no core bar', () => {
     const sea = [
       { neighborhood: 'Ballard', type: 'sports bar' },

@@ -159,7 +159,7 @@ describe('band scoring (category dominates; signals + reviews order within a ban
   })
 })
 
-describe('isCoreVenue (always-shown set, no website checks needed)', () => {
+describe('isCoreVenue (counts toward a neighborhood having bars; uses the baked check)', () => {
   it('true for sports bars / pubs / breweries / bar & grills', () => {
     expect(isCoreVenue(venue({ type: 'sports bar' }))).toBe(true)
     expect(isCoreVenue(venue({ type: 'pub' }))).toBe(true)
@@ -173,6 +173,13 @@ describe('isCoreVenue (always-shown set, no website checks needed)', () => {
   })
   it('true for a curated-confirmed venue regardless of category', () => {
     expect(isCoreVenue(venue({ type: 'bar', confirmedViewing: true }))).toBe(true)
+  })
+  it('true for a generic bar with a baked website check (screens or WC)', () => {
+    // e.g. Bogotá's BBC brewpubs: Google types them plain `bar`, but their baked
+    // check confirms World Cup viewing → their neighborhood (Chicó) is listed.
+    expect(isCoreVenue(venue({ type: 'bar', check: { screens: false, worldCup: true } }))).toBe(true)
+    expect(isCoreVenue(venue({ type: 'bar', check: { screens: true, worldCup: false } }))).toBe(true)
+    expect(isCoreVenue(venue({ type: 'bar', check: { screens: false, worldCup: false } }))).toBe(false)
   })
 })
 
