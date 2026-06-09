@@ -22,6 +22,7 @@ export default {
     allCities: 'All cities',
     allStages: 'All stages',
     allDates: 'All dates',
+    allGroups: 'All groups',
     anyTime: 'Any time',
     clear: 'Clear filters',
     morning: 'morning',

@@ -17,11 +17,12 @@ export default {
   },
 
   filters: {
-    allTeams: 'Todos los equipos',
-    allCities: 'Todas las ciudades',
-    allStages: 'Todas las fases',
-    allDates: 'Todas las fechas',
-    anyTime: 'Cualquier hora',
+    allTeams: 'Equipos',
+    allCities: 'Ciudades',
+    allStages: 'Fases',
+    allDates: 'Fechas',
+    allGroups: 'Grupos',
+    anyTime: 'Hora',
     clear: 'Borrar filtros',
     morning: 'mañana',
     afternoon: 'tarde',

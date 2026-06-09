@@ -23,6 +23,10 @@ export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, on
     () => [...new Set(MATCHES.map((m) => m.venueCity))].sort(),
     [],
   )
+  const groups = useMemo(
+    () => [...new Set(MATCHES.map((m) => m.group).filter(Boolean))].sort(),
+    [],
+  )
   const results = useMemo(() => filterMatches(MATCHES, filters), [filters])
   const filtered = results.length !== MATCHES.length
   // Bulk add shows for >1 result (unfiltered = all 104, or a filtered set of 2+).
@@ -49,7 +53,7 @@ export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, on
         />
       </div>
       <p className="text-sm text-neutral-500 mt-1 mb-4">{t('matches.subtitle')}</p>
-      <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} />
+      <FilterBar filters={filters} setFilters={setFilters} dates={dates} cities={cities} groups={groups} />
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
         <p className="text-sm text-neutral-500">{t('matches.count', { n: results.length })}</p>
