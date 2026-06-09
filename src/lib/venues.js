@@ -26,23 +26,6 @@ export async function loadVenues(cityId) {
   }
 }
 
-// Ask the backend to confirm screens / World Cup viewing from venue websites.
-// Returns a map of venueId -> { screens, worldCup, evidence }. Best-effort.
-export async function confirmScreens(venues) {
-  try {
-    const res = await fetch('/api/venue-screens', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ venues: venues.map((v) => ({ id: v.id, website: v.website })) }),
-    })
-    if (!res.ok) throw new Error('bad status')
-    const data = await res.json()
-    return data.checks || {}
-  } catch {
-    return {}
-  }
-}
-
 // Best "open in Google Maps" URL for a venue.
 export function mapsUrl(v) {
   if (v.googleMapsUri) return v.googleMapsUri

@@ -4,73 +4,22 @@ import { BARS } from '../src/data/bars.js'
 import { MATCHES } from '../src/data/matches.js'
 import { getCityConfig, DEFAULT_CITY } from '../src/data/cities.js'
 import { icsForMatches } from '../src/lib/calendar.js'
-import { SIGNALS } from './venueSignals.js'
-import { fetchCityVenues } from './places.js'
-import { mergeVenue } from './merge.js'
-import { nearestNeighborhood, decorateCurated } from './neighborhoods.js'
-import { checkVenue } from './enrich.js'
-
-const TTL_MS = 24 * 60 * 60 * 1000 // cache live results 24h to limit API cost
-const caches = new Map() // cityId -> { at, venues, source, reason, detail }
+import { decorateCurated } from './neighborhoods.js'
+import { VENUES_SNAPSHOT } from './venuesSnapshot.js'
 
 const curated = (city) => decorateCurated(BARS, city)
 
-async function getVenues(cityId) {
+// Venues are precomputed (Google Places + baked website "screens / World Cup"
+// checks) by scripts/build-venues.mjs and committed to venuesSnapshot.js, so the
+// app serves them instantly with no runtime Places/website calls (and no API key).
+// Cities without a snapshot fall back to the bundled curated list.
+function getVenues(cityId) {
   const city = getCityConfig(cityId)
-  const key = process.env.GOOGLE_MAPS_API_KEY
-  if (!key) return { venues: curated(city), source: 'curated', reason: 'no_key' }
-  const cached = caches.get(city.id)
-  if (cached && Date.now() - cached.at < TTL_MS) return cached
-  try {
-    const places = await fetchCityVenues(city, key)
-    if (!places.length) {
-      return { venues: curated(city), source: 'curated', reason: 'no_results' }
-    }
-    // Neighborhood per city mode:
-    //  - Curated centroids (Seattle + curated cities): nearest named neighborhood;
-    //    for curated two-level cities (NYC) map it to its borough via boroughOf.
-    //  - Two-level without centroids: borough = sublocality, neighborhood = fine area.
-    //  - Other discovered: prefer the finer addressDescriptor label, then sublocality.
-    const venues = places.map((p) => {
-      let neighborhood
-      let borough = null
-      if (city.centroids) {
-        // Cap distance so a far city-wide-query result isn't forced into a neighborhood.
-        neighborhood = nearestNeighborhood(p.lat, p.lng, city.centroids, 3)
-        if (city.twoLevel && city.boroughOf) borough = city.boroughOf[neighborhood] || null
-      } else if (city.twoLevel) {
-        borough = p.sublocality || null
-        neighborhood = p.fineArea || p.descriptorArea || p.sublocality || null
-      } else {
-        neighborhood = p.descriptorArea || p.sublocality || p.fineArea || null
-      }
-      return mergeVenue({ ...p, borough }, neighborhood, SIGNALS)
-    })
-    const result = { at: Date.now(), venues, source: 'google', reason: null }
-    caches.set(city.id, result)
-    return result
-  } catch (e) {
-    console.error('[venues] falling back to curated:', e.message)
-    return { venues: curated(city), source: 'curated', reason: 'api_error', detail: e.message }
+  const snap = VENUES_SNAPSHOT[city.id]
+  if (snap && snap.venues && snap.venues.length) {
+    return { venues: snap.venues, source: 'snapshot', reason: null }
   }
-}
-
-// Website-based confirmation of screens / World Cup viewing.
-const screenCache = new Map() // id -> { at, result }
-const SCREEN_TTL = 24 * 60 * 60 * 1000
-
-// Run async work with bounded concurrency (avoid opening many sockets at once).
-async function mapLimit(items, limit, fn) {
-  const results = []
-  let i = 0
-  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
-    while (i < items.length) {
-      const idx = i++
-      results[idx] = await fn(items[idx])
-    }
-  })
-  await Promise.all(workers)
-  return results
+  return { venues: curated(city), source: 'curated', reason: 'no_snapshot' }
 }
 
 // Build the API as an Express app so it can run standalone (server/index.js)
@@ -79,27 +28,10 @@ export function createApiApp() {
   const app = express()
   app.use(express.json())
 
-  app.get('/api/venues', async (req, res) => {
+  app.get('/api/venues', (req, res) => {
     const cityId = typeof req.query.city === 'string' ? req.query.city : DEFAULT_CITY
-    const { venues, source, reason, detail } = await getVenues(cityId)
-    res.json({ venues, source, reason: reason ?? null, detail: detail ?? null, count: venues.length, city: getCityConfig(cityId).id })
-  })
-
-  app.post('/api/venue-screens', async (req, res) => {
-    const venues = Array.isArray(req.body?.venues) ? req.body.venues.slice(0, 100) : []
-    const checks = {}
-    await mapLimit(venues, 10, async (v) => {
-      if (!v || !v.id) return
-      const cached = screenCache.get(v.id)
-      if (cached && Date.now() - cached.at < SCREEN_TTL) {
-        checks[v.id] = cached.result
-        return
-      }
-      const result = await checkVenue(v.website)
-      screenCache.set(v.id, { at: Date.now(), result })
-      checks[v.id] = result
-    })
-    res.json({ checks })
+    const { venues, source, reason } = getVenues(cityId)
+    res.json({ venues, source, reason: reason ?? null, detail: null, count: venues.length, city: getCityConfig(cityId).id })
   })
 
   // Serve an .ics for all matches (?set=all) or a subset (?ids=M001,M002).

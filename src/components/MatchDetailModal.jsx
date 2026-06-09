@@ -6,7 +6,6 @@ import { googleCalendarUrl, ICS_FILENAME } from '../lib/calendar.js'
 import { addMatchesToCalendar } from '../lib/addToCalendar.js'
 import { stakesFor } from '../lib/stakes.js'
 import { rankBars } from '../lib/scoring.js'
-import { confirmScreens } from '../lib/venues.js'
 import { MATCHES } from '../data/matches.js'
 import BarCard from './BarCard.jsx'
 import NeighborhoodPicker from '../views/NeighborhoodPicker.jsx'
@@ -53,7 +52,7 @@ function TeamLabel({ team, onPick }) {
   )
 }
 
-export default function MatchDetailModal({ match, venues, neighborhoods, onSaveNeighborhoods, onClose, onSeeAllBars, onPickTeam, checks = {}, onChecks }) {
+export default function MatchDetailModal({ match, venues, neighborhoods, onSaveNeighborhoods, onClose, onSeeAllBars, onPickTeam, checks = {} }) {
   const { t, lang, stage } = useI18n()
   const [editingHoods, setEditingHoods] = useState(false)
   const contentRef = useRef(null)
@@ -86,25 +85,11 @@ export default function MatchDetailModal({ match, venues, neighborhoods, onSaveN
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [venues, hoodKey],
   )
-  // Base ranking (no website checks) picks which venues are worth checking.
-  const baseRanked = useMemo(() => rankBars(baseVenues), [baseVenues])
-  // Final ranking folds in confirmations and keeps only sports bars / confirmed.
+  // Ranking folds in the baked website checks and keeps only sports bars / confirmed.
   const ranked = useMemo(
     () => rankBars(baseVenues, checks).filter((v) => v.included),
     [baseVenues, checks],
   )
-  const candidates = useMemo(() => baseRanked.filter((v) => v.website).slice(0, 20), [baseRanked])
-
-  useEffect(() => {
-    const need = candidates.filter((v) => checks[v.id] === undefined)
-    if (!need.length) return
-    let cancelled = false
-    confirmScreens(need).then((res) => {
-      if (!cancelled && res && Object.keys(res).length) onChecks?.(res)
-    })
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [candidates.map((v) => v.id).join(',')])
 
   if (!match) return null
   const home = getTeam(match.homeTeam)
@@ -114,7 +99,6 @@ export default function MatchDetailModal({ match, venues, neighborhoods, onSaveN
   const showTeams = homeInfo && awayInfo && !isPlaceholder(home) && !isPlaceholder(away)
   const stakes = stakesFor(match, MATCHES, lang)
   const top = ranked.slice(0, 3)
-  const enriching = candidates.some((v) => checks[v.id] === undefined)
 
   return (
     <div
@@ -227,7 +211,7 @@ export default function MatchDetailModal({ match, venues, neighborhoods, onSaveN
                   </button>
                 ) : null}
 
-                {!venues || (top.length === 0 && enriching) ? (
+                {!venues ? (
                   <div className="space-y-2">
                     <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />
                     <div className="h-16 bg-neutral-100 rounded-xl animate-pulse" />

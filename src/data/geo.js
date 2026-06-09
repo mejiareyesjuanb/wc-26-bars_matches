@@ -48,7 +48,7 @@ export function gmapsSearch(name, address, region = defaultCity().mapsRegion) {
 // Give curated venues approximate map positions (neighborhood centroid plus a
 // deterministic offset so they don't all stack) and a Google Maps link.
 export function decorateCurated(bars, city = defaultCity()) {
-  const centroids = city.centroids
+  const centroids = city.centroids || {} // some cities have no curated centroids
   const [dlat, dlng] = city.center
   return bars.map((b, i) => {
     const [clat, clng] = centroids[b.neighborhood] || [dlat, dlng]

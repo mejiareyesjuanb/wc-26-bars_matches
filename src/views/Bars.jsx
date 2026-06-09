@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { rankBars } from '../lib/scoring.js'
-import { confirmScreens } from '../lib/venues.js'
 import { getActiveCity, cityNeighborhoods, isCityLevel } from '../lib/city.js'
 import BarCard from '../components/BarCard.jsx'
 import SegmentedToggle from '../components/SegmentedToggle.jsx'
@@ -11,13 +10,8 @@ import { useI18n } from '../lib/i18n/react.jsx'
 
 const PER_HOOD = 10 // bars shown per neighborhood before "show all"
 const PAGE = 10 // page size
-const ENRICH_CAP = 60 // max venues we website-check per view
 
-// Bar-style Google categories — prioritized for the website check.
-const BAR_CATEGORIES = new Set(['sports bar', 'bar', 'pub', 'brewery', 'wine bar', 'beer hall', 'night club'])
-const isBarish = (v) => BAR_CATEGORIES.has(v.type)
-
-export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason, checks = {}, onChecks }) {
+export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason, checks = {} }) {
   const { t } = useI18n()
   const [editing, setEditing] = useState(false)
   const [tab, setTab] = useState('list')
@@ -25,7 +19,6 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
   const [selected, setSelected] = useState(null)
   const [expanded, setExpanded] = useState({})
   const [shownCount, setShownCount] = useState(PAGE)
-  const [timedOut, setTimedOut] = useState(false)
 
   const city = getActiveCity()
   const hoods = neighborhoods || []
@@ -59,38 +52,11 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [venues, hoodKey, checks])
 
-  // Website-check venues with a site (bars first) so we can confirm World Cup
-  // viewing; capped to bound cost.
-  const candidates = useMemo(() => {
-    const withWeb = baseVenues.filter((v) => v.website)
-    return [...withWeb.filter(isBarish), ...withWeb.filter((v) => !isBarish(v))].slice(0, ENRICH_CAP)
-  }, [baseVenues])
-
-  const candKey = candidates.map((v) => v.id).join(',')
-
-  useEffect(() => {
-    const need = candidates.filter((v) => checks[v.id] === undefined)
-    if (!need.length) return
-    let cancelled = false
-    confirmScreens(need).then((res) => {
-      if (!cancelled && res && Object.keys(res).length) onChecks?.(res)
-    })
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [candKey])
-
   useEffect(() => setShownCount(PAGE), [hoodKey, group])
 
-  // "Wait for a clean list": hold a skeleton until the visible venues' checks
-  // resolve (so the list renders once, settled) — or a short fallback timeout for a
-  // cold cache. With the per-city checks cache, warm revisits skip the skeleton.
-  const enriching = useMemo(() => candidates.some((v) => checks[v.id] === undefined), [candidates, checks])
-  useEffect(() => {
-    setTimedOut(false)
-    const id = setTimeout(() => setTimedOut(true), 5000)
-    return () => clearTimeout(id)
-  }, [candKey])
-  const showSkeleton = !!venues && tab === 'list' && enriching && !timedOut
+  // Venues arrive fully baked (checks included) in a single request, so the list
+  // renders once, final — a brief skeleton covers only the network fetch.
+  const loading = !venues
 
   // Editing the neighborhood selection (only offered when not city-level).
   if (editing && !cityLevel) {
@@ -178,9 +144,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
         </div>
       )}
 
-      {!venues ? (
-        <p className="text-center text-neutral-400 py-12">{t('bars.finding')}</p>
-      ) : showSkeleton ? (
+      {loading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-busy="true" aria-label={t('bars.finding')}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-24 bg-neutral-100 rounded-xl animate-pulse" />

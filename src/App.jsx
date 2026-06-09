@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { loadPrefs, savePrefs } from './lib/storage.js'
 import { loadVenues } from './lib/venues.js'
 import { detectLang } from './lib/i18n/index.js'
@@ -22,7 +22,7 @@ function LangToggle({ lang, setLang }) {
   )
 }
 
-function Shell({ prefs, onSavePrefs, venues, source, reason, checks, onChecks }) {
+function Shell({ prefs, onSavePrefs, venues, source, reason, checks }) {
   const { t, lang, setLang } = useI18n()
   const [tab, setTab] = useState('matches')
   const [cityPickerOpen, setCityPickerOpen] = useState(false)
@@ -120,7 +120,6 @@ function Shell({ prefs, onSavePrefs, venues, source, reason, checks, onChecks })
           onSaveNeighborhoods={saveNeighborhoods}
           onGoToBars={() => setTab('bars')}
           checks={checks}
-          onChecks={onChecks}
         />
       )}
       {tab === 'bars' && (
@@ -131,7 +130,6 @@ function Shell({ prefs, onSavePrefs, venues, source, reason, checks, onChecks })
           source={source}
           reason={reason}
           checks={checks}
-          onChecks={onChecks}
         />
       )}
 
@@ -150,11 +148,6 @@ function Shell({ prefs, onSavePrefs, venues, source, reason, checks, onChecks })
 export default function App() {
   const [prefs, setPrefs] = useState(loadPrefs)
   const [venueData, setVenueData] = useState(null)
-  // Website "screens/World Cup" checks, cached per session (keyed by venue id) so
-  // tab-switches and revisits don't re-fetch or re-churn the bar list. Cleared on
-  // city change alongside the venue list.
-  const [checks, setChecks] = useState({})
-  const mergeChecks = (res) => setChecks((c) => ({ ...c, ...res }))
 
   // Keep the active-city module in sync so non-React helpers read the right city.
   const cityId = detectCity(prefs)
@@ -163,7 +156,6 @@ export default function App() {
   // Reload venues whenever the city changes (clear first → loading states show).
   useEffect(() => {
     setVenueData(null)
-    setChecks({})
     loadVenues(cityId).then(setVenueData)
   }, [cityId])
 
@@ -183,9 +175,16 @@ export default function App() {
   const source = ready ? venueData.source : undefined
   const reason = ready ? venueData.reason : undefined
 
+  // Website "screens / World Cup" checks are baked into the venue objects by the
+  // precomputed snapshot; expose them as the id→check map the ranking expects.
+  const checks = useMemo(
+    () => Object.fromEntries((venues || []).filter((v) => v.check).map((v) => [v.id, v.check])),
+    [venues],
+  )
+
   return (
     <I18nProvider lang={lang} setLang={setLang}>
-      <Shell prefs={prefs} onSavePrefs={savePreferences} venues={venues} source={source} reason={reason} checks={checks} onChecks={mergeChecks} />
+      <Shell prefs={prefs} onSavePrefs={savePreferences} venues={venues} source={source} reason={reason} checks={checks} />
     </I18nProvider>
   )
 }
