@@ -179,6 +179,7 @@ export default function MatchDetailModal({ match, venues, neighborhoods, onSaveN
             <h3 className="text-sm font-semibold mb-2">{t('detail.whereToWatch')}</h3>
             {editingHoods && !cityLevel ? (
               <NeighborhoodPicker
+                key={city.id}
                 initial={hoods}
                 compact
                 neighborhoods={nList}

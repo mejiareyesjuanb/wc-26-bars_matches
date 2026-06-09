@@ -53,6 +53,10 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
 
   useEffect(() => setShownCount(PAGE), [hoodKey, group])
 
+  // Close the neighborhood editor when the city changes, so an in-progress
+  // selection can't carry over into the new city.
+  useEffect(() => setEditing(false), [city.id])
+
   // Venues arrive fully baked (checks included) in a single request, so the list
   // renders once, final — a brief skeleton covers only the network fetch.
   const loading = !venues
@@ -61,6 +65,7 @@ export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, sourc
   if (editing && !cityLevel) {
     return (
       <NeighborhoodPicker
+        key={city.id}
         initial={hoods}
         neighborhoods={nList}
         twoLevel={!!city.twoLevel}
