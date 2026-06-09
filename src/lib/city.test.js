@@ -44,7 +44,8 @@ describe('setCurrentCity / detectCity', () => {
   })
   it('detectCity falls back to default for a hidden saved city', () => {
     expect(detectCity({ city: 'london' })).toBe('seattle')
-    expect(detectCity({ city: 'new-york' })).toBe('seattle') // hidden
+    expect(detectCity({ city: 'boston' })).toBe('seattle') // still hidden
+    expect(detectCity({ city: 'new-york' })).toBe('new-york') // now visible
     expect(detectCity({ city: 'denver' })).toBe('denver') // visible
   })
   it('exposes the configured city ids', () => {
@@ -60,18 +61,19 @@ describe('city list (hidden cities excluded; configs retained)', () => {
   })
   it('excludes all hidden cities from the picker', () => {
     const ids = CITY_LIST.map((c) => c.id)
-    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london', 'new-york', 'boston', 'buenos-aires']) {
+    for (const hidden of ['mexico-city', 'bogota', 'copenhagen', 'london', 'boston', 'buenos-aires']) {
       expect(ids).not.toContain(hidden)
     }
     expect(ids).toContain('seattle')
     expect(ids).toContain('denver')
     expect(ids).toContain('los-angeles')
+    expect(ids).toContain('new-york') // re-enabled
   })
   it('is alphabetical by name', () => {
     const names = CITY_LIST.map((c) => c.name)
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
   })
-  it('keeps New York config marked two-level (for re-enable)', () => {
+  it('keeps New York config marked two-level', () => {
     expect(getCity('new-york').twoLevel).toBe(true)
   })
 })

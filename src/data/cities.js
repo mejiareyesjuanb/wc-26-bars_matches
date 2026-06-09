@@ -69,7 +69,6 @@ export const CITIES = {
   'new-york': {
     ...city('new-york', 'New York', 'USA', 'ET', 'Eastern', 'America/New_York', [40.7128, -74.0060], 'New York, NY'),
     twoLevel: true,
-    hidden: true,
     stateFilter: 'New York', // drop any Jersey City venues from city-wide queries
     // Curated per-neighborhood centroids + boroughOf are attached below from the
     // generated cityCentroids.js (replaces the coarse borough tiles).
