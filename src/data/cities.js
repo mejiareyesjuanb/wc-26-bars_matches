@@ -100,7 +100,6 @@ export const CITIES = {
   },
   bogota: {
     ...city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'),
-    hidden: true,
     queryLang: 'es',
     textQueries: [...queries('Bogotá'), ...queriesEs('Bogotá')],
   },
