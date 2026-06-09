@@ -40,6 +40,12 @@ const queries = (name) => [
   `World Cup viewing party bars ${name}`,
   `restaurants showing soccer matches ${name}`,
 ]
+// Spanish prominence queries for ES-market cities (run IN ADDITION to the English
+// ones — live probes showed EN/ES results overlap only ~55%, so both add recall).
+const queriesEs = (localName) => [
+  `bares para ver el Mundial 2026 ${localName}`,
+  `bares deportivos ${localName}`,
+]
 
 // Helper to declare a discovered-neighborhood city (no centroids).
 function city(id, name, country, tzShort, tzLong, tz, center, mapsRegion) {
@@ -86,10 +92,25 @@ export const CITIES = {
   'palo-alto': city('palo-alto', 'Palo Alto', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4419, -122.1430], 'Palo Alto, CA'),
   'redwood-city': city('redwood-city', 'Redwood City', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4852, -122.2364], 'Redwood City, CA'),
 
-  // Latin America
-  'mexico-city': { ...city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'), hidden: true },
-  bogota: { ...city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'), hidden: true },
-  'buenos-aires': { ...city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'), hidden: true },
+  // Latin America (queryLang 'es' → discovery also runs Spanish queries)
+  'mexico-city': {
+    ...city('mexico-city', 'Mexico City', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [19.4326, -99.1332], 'Ciudad de México'),
+    hidden: true,
+    queryLang: 'es',
+    textQueries: [...queries('Mexico City'), ...queriesEs('Ciudad de México')],
+  },
+  bogota: {
+    ...city('bogota', 'Bogotá', 'Colombia', 'COT', 'Colombia', 'America/Bogota', [4.7110, -74.0721], 'Bogotá'),
+    hidden: true,
+    queryLang: 'es',
+    textQueries: [...queries('Bogotá'), ...queriesEs('Bogotá')],
+  },
+  'buenos-aires': {
+    ...city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'),
+    hidden: true,
+    queryLang: 'es',
+    textQueries: [...queries('Buenos Aires'), ...queriesEs('Buenos Aires')],
+  },
 
   // Europe
   copenhagen: { ...city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'), hidden: true },

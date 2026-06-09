@@ -159,12 +159,23 @@ export async function fetchCityVenues(city, apiKey) {
 
   // Google's own "sports bars in …" answer — catches sports bars typed as a
   // generic bar/pub/grill. Per-neighborhood for curated cities; city-wide otherwise.
+  // ES-market cities (queryLang 'es') also run the Spanish variants — live probes
+  // showed EN/ES result sets overlap only ~55%, so both add recall.
+  const es = city.queryLang === 'es'
   const sportsBarQueries = curated
-    ? city.neighborhoods.map((n) => `sports bars in ${n}, ${city.nearbyRegion}`)
+    ? city.neighborhoods.flatMap((n) => [
+        `sports bars in ${n}, ${city.nearbyRegion}`,
+        ...(es ? [`bares deportivos en ${n}, ${city.nearbyRegion}`] : []),
+      ])
     : [`sports bars in ${city.name}`]
   // Broad per-neighborhood recall (catches edge bars the 20-cap nearby misses,
   // e.g. The Dray). Paginated to ~40 results. Curated cities only.
-  const barQueries = curated ? city.neighborhoods.map((n) => `bars in ${n}, ${city.nearbyRegion}`) : []
+  const barQueries = curated
+    ? city.neighborhoods.flatMap((n) => [
+        `bars in ${n}, ${city.nearbyRegion}`,
+        ...(es ? [`bares en ${n}, ${city.nearbyRegion}`] : []),
+      ])
+    : []
 
   const batches = await Promise.all([
     // Geographic coverage: most popular bars near each tile.

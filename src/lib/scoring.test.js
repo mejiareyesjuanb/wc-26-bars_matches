@@ -16,16 +16,22 @@ describe('venueClass (category sets the band)', () => {
   it('"sports bar" in the name → sports (even when miscategorized)', () => {
     expect(venueClass(venue({ type: 'restaurant', name: 'Slim Goody Sports Bar' }))).toBe('sports')
   })
-  it('pub / irish pub → pub', () => {
+  it('pub / irish pub / gastropub → pub', () => {
     expect(venueClass(venue({ type: 'pub' }))).toBe('pub')
     expect(venueClass(venue({ type: 'irish pub' }))).toBe('pub')
+    expect(venueClass(venue({ type: 'gastropub' }))).toBe('pub')
   })
   it('bar and grill → barGrill', () => {
     expect(venueClass(venue({ type: 'bar and grill' }))).toBe('barGrill')
   })
-  it('brewery / brewpub → brewery', () => {
+  it('brewery / brewpub / beer garden → brewery', () => {
     expect(venueClass(venue({ type: 'brewery' }))).toBe('brewery')
     expect(venueClass(venue({ type: 'brewpub' }))).toBe('brewery')
+    expect(venueClass(venue({ type: 'beer garden' }))).toBe('brewery')
+  })
+  it('"bar deportivo" in the name → sports (ES markets lack the sports_bar type)', () => {
+    expect(venueClass(venue({ type: 'bar', name: 'Bar Deportivo La Afición' }))).toBe('sports')
+    expect(venueClass(venue({ type: 'restaurant', name: 'El Gran Bar Deportivo' }))).toBe('sports')
   })
   it('plain bar → bar', () => {
     expect(venueClass(venue({ type: 'bar' }))).toBe('bar')
@@ -105,6 +111,8 @@ describe('inclusion gates', () => {
     expect(scoreBar(venue({ type: 'pub', name: 'A Pub' }), undefined).included).toBe(true)
     expect(scoreBar(venue({ type: 'brewery', name: 'A Brewery' }), undefined).included).toBe(true)
     expect(scoreBar(venue({ type: 'bar and grill', name: 'A B&G' }), undefined).included).toBe(true)
+    expect(scoreBar(venue({ type: 'gastropub', name: 'A Gastropub' }), undefined).included).toBe(true)
+    expect(scoreBar(venue({ type: 'beer garden', name: 'A Biergarten' }), undefined).included).toBe(true)
   })
 })
 

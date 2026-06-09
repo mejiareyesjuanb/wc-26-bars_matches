@@ -17,14 +17,17 @@ const clamp01 = (x) => Math.max(0, Math.min(1, x))
 // here but gated separately (it's ambiguous). Cocktail/wine/lounge bars are NOT —
 // they're poor fits and need an explicit watch signal to appear.
 const DRINK_PRIMARY = new Set([
-  'sports bar', 'pub', 'irish pub', 'bar', 'bar and grill',
-  'brewery', 'brewpub', 'taproom', 'beer hall',
+  'sports bar', 'pub', 'irish pub', 'gastropub', 'bar', 'bar and grill',
+  'brewery', 'brewpub', 'taproom', 'beer hall', 'beer garden',
 ])
 
 // Non-overlapping band bases; gap (16) exceeds the max within-band sub-score (13).
 const BANDS = { sports: 80, pub: 64, barGrill: 48, brewery: 32, bar: 16, other: 16 }
 
-const nameSportsBar = (bar) => /sports\s*bar/i.test(bar.name || '')
+// "Sports bar" by name, in English or Spanish ("bar deportivo") — in Latin
+// American markets Google rarely emits the sports_bar type, so the name is the
+// main principled signal for the sports band there.
+const nameSportsBar = (bar) => /sports\s*bar|bar\s+deportivo/i.test(bar.name || '')
 
 // 0..1 from rating (3.0→0, 5.0→1) scaled by review-count confidence.
 export function reviewsScore(bar) {
@@ -49,9 +52,9 @@ export function isConfirmedWorldCup(bar, check) {
 // Fit-class → score band. Pure.
 export function venueClass(bar) {
   if (isSportsBar(bar)) return 'sports'
-  if (bar.type === 'pub' || bar.type === 'irish pub') return 'pub'
+  if (bar.type === 'pub' || bar.type === 'irish pub' || bar.type === 'gastropub') return 'pub'
   if (bar.type === 'bar and grill') return 'barGrill'
-  if (bar.type === 'brewery' || bar.type === 'brewpub' || bar.type === 'taproom' || bar.type === 'beer hall')
+  if (bar.type === 'brewery' || bar.type === 'brewpub' || bar.type === 'taproom' || bar.type === 'beer hall' || bar.type === 'beer garden')
     return 'brewery'
   if (bar.type === 'bar') return 'bar'
   return 'other'

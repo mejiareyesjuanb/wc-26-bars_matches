@@ -3,8 +3,10 @@
 // To upgrade accuracy later, swap `checkVenue` for an LLM or web-search call —
 // the rest of the app only depends on its { screens, worldCup, evidence } shape.
 
+// EN + ES screen/viewing terms. ES terms are kept specific (e.g. "partidos en
+// vivo", not bare "en vivo", which would over-match "música en vivo").
 const SCREEN_RE =
-  /(big screens?|projector|flat[- ]?screens?|\btvs?\b|televisions?|\bscreens?\b|watch part(?:y|ies)|game ?day|live sports|sports bar|every match)/i
+  /(big screens?|projector|flat[- ]?screens?|\btvs?\b|televisions?|\bscreens?\b|watch part(?:y|ies)|game ?day|live sports|sports bar|every match|pantallas?(?: gigantes?)?|televisor(?:es)?|proyector|transmisi[oó]n|partidos? en vivo|deportes? en vivo|f[úu]tbol en vivo|ver (?:el|los) partidos?|bar deportivo)/i
 // Strict World-Cup terms only. Bare "soccer / fútbol / watch party / usmnt" were
 // removed — they over-matched (a brewery's "Summer of Soccer" or a generic "watch
 // party" is not a World Cup commitment), which floated non-fits to the top.
