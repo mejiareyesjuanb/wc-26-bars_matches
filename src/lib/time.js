@@ -65,14 +65,17 @@ export function dateKey(iso) {
   return `${y}-${pad(mo)}-${pad(d)}`
 }
 
-// "Jun 15, 3:00 PM PT" (en) / "15 jun, 3:00 p. m. PT" (es). Timezone label + the
-// conversion both come from the active city.
+// "Mon Jun 15, 3:00 PM PT" (en) / "lun 15 jun, 3:00 p. m. PT" (es). Weekday +
+// timezone label + the conversion all come from the active city (weekday matches
+// the list view's `formatDay`).
 export function formatKickoff(iso, lang) {
   const L = lang || getCurrentLang()
   const city = getActiveCity()
-  const { mo, d, hh, mm, h12 } = partsInTz(iso, city.tz)
+  const { y, mo, d, hh, mm, h12 } = partsInTz(iso, city.tz)
+  const wd = new Date(Date.UTC(y, mo - 1, d)).getUTCDay()
+  const dow = weekdays(L)[wd]
   const mon = months(L)[mo - 1]
-  const date = L === 'es' ? `${d} ${mon}` : `${mon} ${d}`
+  const date = L === 'es' ? `${dow} ${d} ${mon}` : `${dow} ${mon} ${d}`
   return `${date}, ${h12}:${mm} ${ampm(hh, L)} ${city.tzShort}`
 }
 

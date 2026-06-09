@@ -49,12 +49,12 @@ describe('stageLabel', () => {
 
 describe('locale-aware date/time (12-hour both)', () => {
   it('English keeps month-day order and AM/PM', () => {
-    expect(formatKickoff(ISO, 'en')).toBe('Jun 15, 3:00 PM PT')
+    expect(formatKickoff(ISO, 'en')).toBe('Mon Jun 15, 3:00 PM PT')
     expect(formatDay(ISO, 'en')).toBe('Mon Jun 15')
     expect(formatClock(ISO, 'en')).toBe('3:00 PM')
   })
   it('Spanish uses day-month order, translated names, and "p. m."', () => {
-    expect(formatKickoff(ISO, 'es')).toBe('15 jun, 3:00 p. m. PT')
+    expect(formatKickoff(ISO, 'es')).toBe('lun 15 jun, 3:00 p. m. PT')
     expect(formatDay(ISO, 'es')).toBe('lun 15 jun')
     expect(formatClock(ISO, 'es')).toBe('3:00 p. m.')
   })
