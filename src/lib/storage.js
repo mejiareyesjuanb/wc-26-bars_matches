@@ -4,6 +4,8 @@ export const DEFAULT_PREFS = {
   language: null, // null = auto-detect (Spanish browser → es, else en); set on toggle
   city: null, // null = default city (Seattle today); set via geolocation/picker
   neighborhoodsByCity: {}, // { [cityId]: string[] } — selections kept per city
+  matchesView: 'cards', // Matches sub-view toggle (Cards/List) — sticky
+  barsView: 'list', // Bars sub-view toggle (List/Map) — sticky
 }
 
 export function loadPrefs() {

@@ -10,7 +10,7 @@ describe('prefs storage', () => {
   it('round-trips per-city neighborhood prefs', () => {
     const p = { language: 'es', city: 'new-york', neighborhoodsByCity: { 'new-york': ['SoHo'] } }
     savePrefs(p)
-    expect(loadPrefs()).toEqual(p)
+    expect(loadPrefs()).toEqual({ ...DEFAULT_PREFS, ...p })
   })
   it('migrates the legacy single neighborhoods list to Seattle', () => {
     savePrefs({ language: 'en', neighborhoods: ['Ballard', 'Fremont'] })

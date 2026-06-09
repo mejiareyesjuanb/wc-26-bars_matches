@@ -10,10 +10,9 @@ import AddToCalendarModal from '../components/AddToCalendarModal.jsx'
 import SegmentedToggle from '../components/SegmentedToggle.jsx'
 import { useI18n } from '../lib/i18n/react.jsx'
 
-export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, onGoToBars, checks }) {
+export default function Matches({ venues, neighborhoods, onSaveNeighborhoods, onGoToBars, checks, view, setView }) {
   const { t } = useI18n()
   const [filters, setFilters] = useState({})
-  const [view, setView] = useState('cards') // 'cards' | 'list'
   const [selected, setSelected] = useState(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const dates = useMemo(

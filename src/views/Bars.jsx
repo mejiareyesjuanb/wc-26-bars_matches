@@ -11,10 +11,9 @@ import { useI18n } from '../lib/i18n/react.jsx'
 const PER_HOOD = 10 // bars shown per neighborhood before "show all"
 const PAGE = 10 // page size
 
-export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason, checks = {} }) {
+export default function Bars({ neighborhoods, onSaveNeighborhoods, venues, source, reason, checks = {}, tab, setTab }) {
   const { t } = useI18n()
   const [editing, setEditing] = useState(false)
-  const [tab, setTab] = useState('list')
   const [group, setGroup] = useState('combined') // 'combined' | 'byHood'
   const [selected, setSelected] = useState(null)
   const [expanded, setExpanded] = useState({})

@@ -38,6 +38,12 @@ function Shell({ prefs, onSavePrefs, venues, source, reason, checks }) {
   const saveNeighborhoods = (hoods) =>
     onSavePrefs({ ...prefs, neighborhoodsByCity: { ...byCity, [cityId]: hoods } })
 
+  // Sticky sub-view toggles: Matches Cards/List and Bars List/Map persist.
+  const matchesView = prefs.matchesView ?? 'cards'
+  const barsView = prefs.barsView ?? 'list'
+  const setMatchesView = (v) => onSavePrefs({ ...prefs, matchesView: v })
+  const setBarsView = (v) => onSavePrefs({ ...prefs, barsView: v })
+
   // First visit (no saved city): geolocate → nearest city + banner. Non-blocking;
   // denial/unavailable leaves the default city. Never opens the neighborhood prompt.
   useEffect(() => {
@@ -120,6 +126,8 @@ function Shell({ prefs, onSavePrefs, venues, source, reason, checks }) {
           onSaveNeighborhoods={saveNeighborhoods}
           onGoToBars={() => setTab('bars')}
           checks={checks}
+          view={matchesView}
+          setView={setMatchesView}
         />
       )}
       {tab === 'bars' && (
@@ -130,6 +138,8 @@ function Shell({ prefs, onSavePrefs, venues, source, reason, checks }) {
           source={source}
           reason={reason}
           checks={checks}
+          tab={barsView}
+          setTab={setBarsView}
         />
       )}
 
