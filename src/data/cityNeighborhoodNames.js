@@ -84,6 +84,32 @@ export const CITY_NEIGHBORHOODS = {
       'Harvard Square', 'Central Square', 'Kendall Square', 'Davis Square',
     ],
   },
+  // Spanish-market cities (geocoded with the local city name).
+  'mexico-city': {
+    city: 'Ciudad de México',
+    region: null,
+    neighborhoods: [
+      'Roma Norte', 'Condesa', 'Polanco', 'Juárez', 'Centro Histórico', 'Coyoacán',
+      'Narvarte', 'Del Valle', 'Nápoles', 'San Rafael', 'Santa Fe', 'San Ángel',
+    ],
+  },
+  'buenos-aires': {
+    city: 'Buenos Aires',
+    region: 'Argentina',
+    neighborhoods: [
+      'Palermo', 'Recoleta', 'San Telmo', 'Villa Crespo', 'Belgrano', 'Puerto Madero',
+      'Microcentro', 'Almagro', 'Caballito', 'Núñez', 'Colegiales', 'Chacarita',
+    ],
+  },
+  bogota: {
+    city: 'Bogotá',
+    region: 'Colombia',
+    neighborhoods: [
+      'Chapinero', 'Chapinero Alto', 'Quinta Camacho', 'Zona T', 'Zona G',
+      'Parque de la 93', 'Usaquén', 'La Candelaria', 'Galerías', 'Cedritos',
+      'La Macarena', 'Chicó', 'Chicó Norte',
+    ],
+  },
   // Two-level (borough → neighborhood). Geocoded as "{neighborhood}, {borough}, New York, NY".
   'new-york': {
     city: 'New York',

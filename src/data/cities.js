@@ -127,6 +127,9 @@ const REGION_BY_CITY = {
   'los-angeles': 'CA', chicago: 'IL', denver: 'CO', austin: 'TX',
   'washington-dc': 'DC', miami: 'FL', portland: 'OR', 'san-francisco': 'CA',
   'new-york': 'NY', boston: 'MA',
+  // ES-market cities use the local city name as the query region suffix
+  // ("bares deportivos en Roma Norte, CDMX").
+  'mexico-city': 'CDMX', 'buenos-aires': 'Buenos Aires', bogota: 'Bogotá',
 }
 for (const [id, centroids] of Object.entries(CITY_CENTROIDS)) {
   const c = CITIES[id]
