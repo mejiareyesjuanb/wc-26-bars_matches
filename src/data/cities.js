@@ -106,7 +106,6 @@ export const CITIES = {
   },
   'buenos-aires': {
     ...city('buenos-aires', 'Buenos Aires', 'Argentina', 'ART', 'Argentina', 'America/Argentina/Buenos_Aires', [-34.6037, -58.3816], 'Buenos Aires'),
-    hidden: true,
     queryLang: 'es',
     textQueries: [...queries('Buenos Aires'), ...queriesEs('Buenos Aires')],
   },

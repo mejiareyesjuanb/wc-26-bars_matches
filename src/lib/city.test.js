@@ -61,10 +61,11 @@ describe('city list (hidden cities excluded; configs retained)', () => {
   })
   it('excludes all hidden cities from the picker', () => {
     const ids = CITY_LIST.map((c) => c.id)
-    for (const hidden of ['bogota', 'copenhagen', 'london', 'buenos-aires']) {
+    for (const hidden of ['bogota', 'copenhagen', 'london']) {
       expect(ids).not.toContain(hidden)
     }
     expect(ids).toContain('mexico-city') // re-enabled (P4c)
+    expect(ids).toContain('buenos-aires') // re-enabled (P4c)
     expect(ids).toContain('seattle')
     expect(ids).toContain('denver')
     expect(ids).toContain('los-angeles')
