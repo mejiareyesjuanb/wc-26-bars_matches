@@ -84,6 +84,65 @@ export const CITY_NEIGHBORHOODS = {
       'Harvard Square', 'Central Square', 'Kendall Square', 'Davis Square',
     ],
   },
+  atlanta: {
+    city: 'Atlanta',
+    region: 'GA',
+    neighborhoods: [
+      'Midtown', 'Buckhead', 'Old Fourth Ward', 'Little Five Points', 'Virginia-Highland',
+      'West Midtown', 'Inman Park', 'Poncey-Highland', 'East Atlanta Village', 'Edgewood',
+      'Downtown',
+    ],
+  },
+  dallas: {
+    city: 'Dallas',
+    region: 'TX',
+    neighborhoods: [
+      'Deep Ellum', 'Uptown', 'Bishop Arts District', 'Lower Greenville', 'Downtown',
+      'Victory Park', 'Trinity Groves', 'Knox-Henderson', 'Greenville Avenue',
+      'Arlington Entertainment District',
+    ],
+  },
+  houston: {
+    city: 'Houston',
+    region: 'TX',
+    neighborhoods: [
+      'Montrose', 'Midtown', 'Washington Avenue', 'EaDo', 'The Heights', 'Rice Village',
+      'Downtown', 'Upper Kirby', 'River Oaks', 'Galleria',
+    ],
+  },
+  'kansas-city': {
+    city: 'Kansas City',
+    region: 'MO',
+    neighborhoods: [
+      'Power & Light District', 'Westport', 'Crossroads Arts District', 'River Market',
+      'Country Club Plaza', 'Waldo', 'Downtown', 'West Bottoms', 'Brookside',
+    ],
+  },
+  philadelphia: {
+    city: 'Philadelphia',
+    region: 'PA',
+    neighborhoods: [
+      'Fishtown', 'Old City', 'Northern Liberties', 'Rittenhouse Square', 'South Street',
+      'Manayunk', 'University City', 'East Passyunk', 'Center City', 'Spring Garden',
+    ],
+  },
+  toronto: {
+    city: 'Toronto',
+    region: 'ON',
+    neighborhoods: [
+      'King West', 'Entertainment District', 'Distillery District', 'Kensington Market',
+      'Liberty Village', 'Leslieville', 'The Annex', 'Ossington', 'Queen West',
+      'West Queen West',
+    ],
+  },
+  vancouver: {
+    city: 'Vancouver',
+    region: 'BC',
+    neighborhoods: [
+      'Gastown', 'Yaletown', 'Davie Village', 'Mount Pleasant', 'Commercial Drive',
+      'Kitsilano', 'Downtown', 'Granville Entertainment District', 'Main Street',
+    ],
+  },
   // Spanish-market cities (geocoded with the local city name).
   'mexico-city': {
     city: 'Ciudad de México',
@@ -99,6 +158,22 @@ export const CITY_NEIGHBORHOODS = {
     neighborhoods: [
       'Palermo', 'Recoleta', 'San Telmo', 'Villa Crespo', 'Belgrano', 'Puerto Madero',
       'Microcentro', 'Almagro', 'Caballito', 'Núñez', 'Colegiales', 'Chacarita',
+    ],
+  },
+  guadalajara: {
+    city: 'Guadalajara',
+    region: 'Jalisco',
+    neighborhoods: [
+      'Colonia Americana', 'Chapultepec', 'Centro', 'Providencia', 'Zona Minerva',
+      'Tlaquepaque', 'Lafayette', 'Andares', 'Zapopan Centro', 'Ladrón de Guevara',
+    ],
+  },
+  monterrey: {
+    city: 'Monterrey',
+    region: 'Nuevo León',
+    neighborhoods: [
+      'Barrio Antiguo', 'San Pedro Garza García', 'Centro', 'Valle Oriente',
+      'Calzada del Valle', 'Contry', 'Cumbres', 'Obispado', 'Fundidora',
     ],
   },
   bogota: {

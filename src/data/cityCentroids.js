@@ -723,6 +723,376 @@ export const CITY_CENTROIDS = {
       4.68124,
       -74.04716
     ]
+  },
+  "atlanta": {
+    "Midtown": [
+      33.78332,
+      -84.38312
+    ],
+    "Buckhead": [
+      33.83942,
+      -84.37987
+    ],
+    "Old Fourth Ward": [
+      33.76396,
+      -84.37197
+    ],
+    "Little Five Points": [
+      33.76439,
+      -84.3496
+    ],
+    "Virginia-Highland": [
+      33.78173,
+      -84.36351
+    ],
+    "West Midtown": [
+      33.78332,
+      -84.38312
+    ],
+    "Inman Park": [
+      33.75983,
+      -84.35783
+    ],
+    "Poncey-Highland": [
+      33.76953,
+      -84.35552
+    ],
+    "East Atlanta Village": [
+      33.7406,
+      -84.34697
+    ],
+    "Edgewood": [
+      33.7554,
+      -84.34072
+    ],
+    "Downtown": [
+      33.75571,
+      -84.38837
+    ]
+  },
+  "dallas": {
+    "Deep Ellum": [
+      32.78439,
+      -96.78018
+    ],
+    "Uptown": [
+      32.80337,
+      -96.79838
+    ],
+    "Bishop Arts District": [
+      32.74726,
+      -96.83041
+    ],
+    "Lower Greenville": [
+      32.82386,
+      -96.76798
+    ],
+    "Downtown": [
+      32.77909,
+      -96.80027
+    ],
+    "Victory Park": [
+      32.79122,
+      -96.80965
+    ],
+    "Trinity Groves": [
+      32.77823,
+      -96.82907
+    ],
+    "Knox-Henderson": [
+      32.82321,
+      -96.78894
+    ],
+    "Greenville Avenue": [
+      32.86667,
+      -96.76694
+    ],
+    "Arlington Entertainment District": [
+      32.74936,
+      -97.08496
+    ]
+  },
+  "houston": {
+    "Montrose": [
+      29.74272,
+      -95.39919
+    ],
+    "Midtown": [
+      29.74021,
+      -95.37452
+    ],
+    "Washington Avenue": [
+      29.76901,
+      -95.3919
+    ],
+    "EaDo": [
+      29.74542,
+      -95.3513
+    ],
+    "The Heights": [
+      29.79805,
+      -95.39793
+    ],
+    "Rice Village": [
+      29.71674,
+      -95.41686
+    ],
+    "Downtown": [
+      29.75473,
+      -95.35553
+    ],
+    "Upper Kirby": [
+      29.733,
+      -95.43355
+    ],
+    "River Oaks": [
+      29.74747,
+      -95.43312
+    ],
+    "Galleria": [
+      29.7392,
+      -95.46343
+    ]
+  },
+  "kansas-city": {
+    "Power & Light District": [
+      39.09776,
+      -94.58114
+    ],
+    "Westport": [
+      39.05695,
+      -94.59547
+    ],
+    "Crossroads Arts District": [
+      39.09304,
+      -94.58566
+    ],
+    "River Market": [
+      39.11008,
+      -94.58179
+    ],
+    "Country Club Plaza": [
+      39.04197,
+      -94.59261
+    ],
+    "Waldo": [
+      38.99389,
+      -94.5919
+    ],
+    "Downtown": [
+      39.10241,
+      -94.58832
+    ],
+    "West Bottoms": [
+      39.10282,
+      -94.60114
+    ],
+    "Brookside": [
+      39.02222,
+      -94.58501
+    ]
+  },
+  "philadelphia": {
+    "Fishtown": [
+      39.97098,
+      -75.12848
+    ],
+    "Old City": [
+      39.95005,
+      -75.14381
+    ],
+    "Northern Liberties": [
+      39.96369,
+      -75.13994
+    ],
+    "Rittenhouse Square": [
+      39.94947,
+      -75.17186
+    ],
+    "South Street": [
+      39.94193,
+      -75.15159
+    ],
+    "Manayunk": [
+      40.026,
+      -75.22311
+    ],
+    "University City": [
+      39.95364,
+      -75.19871
+    ],
+    "East Passyunk": [
+      39.92653,
+      -75.16329
+    ],
+    "Center City": [
+      39.9509,
+      -75.15746
+    ],
+    "Spring Garden": [
+      39.96567,
+      -75.16475
+    ]
+  },
+  "toronto": {
+    "King West": [
+      43.64725,
+      -79.38667
+    ],
+    "Entertainment District": [
+      43.64266,
+      -79.38879
+    ],
+    "Distillery District": [
+      43.65031,
+      -79.35958
+    ],
+    "Kensington Market": [
+      43.65452,
+      -79.40146
+    ],
+    "Liberty Village": [
+      43.63738,
+      -79.42116
+    ],
+    "Leslieville": [
+      43.66267,
+      -79.3328
+    ],
+    "The Annex": [
+      43.66983,
+      -79.40758
+    ],
+    "Ossington": [
+      43.65952,
+      -79.42467
+    ],
+    "Queen West": [
+      43.64433,
+      -79.41802
+    ],
+    "West Queen West": [
+      43.64293,
+      -79.40768
+    ]
+  },
+  "vancouver": {
+    "Gastown": [
+      49.28281,
+      -123.10669
+    ],
+    "Yaletown": [
+      49.2757,
+      -123.11991
+    ],
+    "Davie Village": [
+      49.28042,
+      -123.1312
+    ],
+    "Mount Pleasant": [
+      49.26285,
+      -123.09948
+    ],
+    "Commercial Drive": [
+      49.28386,
+      -123.07036
+    ],
+    "Kitsilano": [
+      49.26837,
+      -123.16833
+    ],
+    "Downtown": [
+      49.28195,
+      -123.11707
+    ],
+    "Granville Entertainment District": [
+      49.27964,
+      -123.12276
+    ],
+    "Main Street": [
+      49.24558,
+      -123.10124
+    ]
+  },
+  "guadalajara": {
+    "Colonia Americana": [
+      20.6729,
+      -103.36739
+    ],
+    "Chapultepec": [
+      20.67052,
+      -103.36866
+    ],
+    "Centro": [
+      20.68661,
+      -103.35079
+    ],
+    "Providencia": [
+      20.70198,
+      -103.37822
+    ],
+    "Zona Minerva": [
+      20.67439,
+      -103.38741
+    ],
+    "Tlaquepaque": [
+      20.60252,
+      -103.33616
+    ],
+    "Lafayette": [
+      20.67345,
+      -103.37372
+    ],
+    "Andares": [
+      20.71044,
+      -103.41196
+    ],
+    "Zapopan Centro": [
+      20.73078,
+      -103.38797
+    ],
+    "Ladrón de Guevara": [
+      20.68233,
+      -103.3775
+    ]
+  },
+  "monterrey": {
+    "Barrio Antiguo": [
+      25.66718,
+      -100.30671
+    ],
+    "San Pedro Garza García": [
+      25.65235,
+      -100.3583
+    ],
+    "Centro": [
+      25.67804,
+      -100.31331
+    ],
+    "Valle Oriente": [
+      25.65877,
+      -100.34768
+    ],
+    "Calzada del Valle": [
+      25.65734,
+      -100.36967
+    ],
+    "Contry": [
+      25.63517,
+      -100.27824
+    ],
+    "Cumbres": [
+      25.6989,
+      -100.36386
+    ],
+    "Obispado": [
+      25.67452,
+      -100.34733
+    ],
+    "Fundidora": [
+      25.67861,
+      -100.2842
+    ]
   }
 }
 

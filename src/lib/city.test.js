@@ -72,6 +72,10 @@ describe('city list (hidden cities excluded; configs retained)', () => {
     expect(ids).toContain('los-angeles')
     expect(ids).toContain('new-york') // re-enabled
     expect(ids).toContain('boston') // re-enabled
+    // Remaining WC 2026 host cities (added so all 16 hosts are supported).
+    for (const host of ['atlanta', 'dallas', 'houston', 'kansas-city', 'philadelphia', 'toronto', 'vancouver', 'guadalajara', 'monterrey']) {
+      expect(ids).toContain(host)
+    }
   })
   it('is alphabetical by name', () => {
     const names = CITY_LIST.map((c) => c.name)
@@ -88,6 +92,8 @@ describe('nearestCity (haversine, visible only)', () => {
     expect(nearestCity(34.05, -118.24)).toBe('los-angeles')
     expect(nearestCity(47.61, -122.33)).toBe('seattle')
     expect(nearestCity(56.34, -2.80)).toBe('st-andrews')
+    expect(nearestCity(43.65, -79.38)).toBe('toronto')
+    expect(nearestCity(29.76, -95.37)).toBe('houston')
   })
 })
 

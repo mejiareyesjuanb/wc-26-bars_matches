@@ -81,6 +81,11 @@ export const CITIES = {
   },
   'los-angeles': city('los-angeles', 'Los Angeles', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [34.0522, -118.2437], 'Los Angeles, CA'),
   boston: city('boston', 'Boston', 'USA', 'ET', 'Eastern', 'America/New_York', [42.3601, -71.0589], 'Boston, MA'),
+  atlanta: city('atlanta', 'Atlanta', 'USA', 'ET', 'Eastern', 'America/New_York', [33.7490, -84.3880], 'Atlanta, GA'),
+  dallas: city('dallas', 'Dallas', 'USA', 'CT', 'Central', 'America/Chicago', [32.7767, -96.7970], 'Dallas, TX'),
+  houston: city('houston', 'Houston', 'USA', 'CT', 'Central', 'America/Chicago', [29.7604, -95.3698], 'Houston, TX'),
+  'kansas-city': city('kansas-city', 'Kansas City', 'USA', 'CT', 'Central', 'America/Chicago', [39.0997, -94.5786], 'Kansas City, MO'),
+  philadelphia: city('philadelphia', 'Philadelphia', 'USA', 'ET', 'Eastern', 'America/New_York', [39.9526, -75.1652], 'Philadelphia, PA'),
   denver: city('denver', 'Denver', 'USA', 'MT', 'Mountain', 'America/Denver', [39.7392, -104.9903], 'Denver, CO'),
   miami: city('miami', 'Miami', 'USA', 'ET', 'Eastern', 'America/New_York', [25.7617, -80.1918], 'Miami, FL'),
   chicago: city('chicago', 'Chicago', 'USA', 'CT', 'Central', 'America/Chicago', [41.8781, -87.6298], 'Chicago, IL'),
@@ -91,6 +96,10 @@ export const CITIES = {
   'mountain-view': city('mountain-view', 'Mountain View', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.3861, -122.0839], 'Mountain View, CA'),
   'palo-alto': city('palo-alto', 'Palo Alto', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4419, -122.1430], 'Palo Alto, CA'),
   'redwood-city': city('redwood-city', 'Redwood City', 'USA', 'PT', 'Pacific', 'America/Los_Angeles', [37.4852, -122.2364], 'Redwood City, CA'),
+
+  // Canada
+  toronto: city('toronto', 'Toronto', 'Canada', 'ET', 'Eastern', 'America/Toronto', [43.6532, -79.3832], 'Toronto, ON'),
+  vancouver: city('vancouver', 'Vancouver', 'Canada', 'PT', 'Pacific', 'America/Vancouver', [49.2827, -123.1207], 'Vancouver, BC'),
 
   // Latin America (queryLang 'es' → discovery also runs Spanish queries)
   'mexico-city': {
@@ -108,6 +117,16 @@ export const CITIES = {
     queryLang: 'es',
     textQueries: [...queries('Buenos Aires'), ...queriesEs('Buenos Aires')],
   },
+  guadalajara: {
+    ...city('guadalajara', 'Guadalajara', 'Mexico', 'CT', 'Central', 'America/Mexico_City', [20.6597, -103.3496], 'Guadalajara'),
+    queryLang: 'es',
+    textQueries: [...queries('Guadalajara'), ...queriesEs('Guadalajara')],
+  },
+  monterrey: {
+    ...city('monterrey', 'Monterrey', 'Mexico', 'CT', 'Central', 'America/Monterrey', [25.6866, -100.3161], 'Monterrey'),
+    queryLang: 'es',
+    textQueries: [...queries('Monterrey'), ...queriesEs('Monterrey')],
+  },
 
   // Europe
   copenhagen: { ...city('copenhagen', 'Copenhagen', 'Denmark', 'CET', 'Central European', 'Europe/Copenhagen', [55.6761, 12.5683], 'Copenhagen'), hidden: true },
@@ -124,9 +143,12 @@ const REGION_BY_CITY = {
   'los-angeles': 'CA', chicago: 'IL', denver: 'CO', austin: 'TX',
   'washington-dc': 'DC', miami: 'FL', portland: 'OR', 'san-francisco': 'CA',
   'new-york': 'NY', boston: 'MA',
+  atlanta: 'GA', dallas: 'TX', houston: 'TX', 'kansas-city': 'MO', philadelphia: 'PA',
+  toronto: 'ON', vancouver: 'BC',
   // ES-market cities use the local city name as the query region suffix
   // ("bares deportivos en Roma Norte, CDMX").
   'mexico-city': 'CDMX', 'buenos-aires': 'Buenos Aires', bogota: 'Bogotá',
+  guadalajara: 'Jalisco', monterrey: 'Nuevo León',
 }
 for (const [id, centroids] of Object.entries(CITY_CENTROIDS)) {
   const c = CITIES[id]
